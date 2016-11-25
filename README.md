@@ -69,7 +69,7 @@ public Guid BoxUid { get; set; }
 
 You can also use names starting with `@` sign. That names will be replaced by name generated automatically by EF. 
 
-````
+````csharp
 [Index("@1", 1)]
 public Guid InstanceUid { get; set; }
 
