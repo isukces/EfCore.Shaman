@@ -100,6 +100,8 @@ namespace EfCore.Shaman
                     var entity = modelBuilder.Entity(dbSet.EntityType);
                     var indexBuilder = entity.HasIndex(fields);
                     TrySetIndexName(indexBuilder, idx.Key);
+                    indexBuilder.IsUnique(idx.First().Item1.IsUnique);
+
                 }
             }
         }
