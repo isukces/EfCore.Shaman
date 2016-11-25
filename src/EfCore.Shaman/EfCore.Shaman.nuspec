@@ -3,13 +3,20 @@
   <metadata>
     <id>$id$</id>
     <version>$version$</version>
-    <title>Ef.Irritation</title>
+    <title>EfCore.Shaman</title>
     <authors>$author$</authors>
     <owners>$author$</owners>     
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Fixes for EntityFrameworkCore</description>
     <releaseNotes>Fix for Migration and OnModelCreating</releaseNotes>
+    <projectUrl>https://github.com/isukces/EfCore.Shaman</projectUrl>
     <copyright>Copyright by Internet Sukces Piotr Stęclik 2016</copyright>
-    <tags>Math</tags>
+    <tags>EntityFrameworkCore</tags>
   </metadata>
+<files>
+  <file src="bin\Release\EfCore.Shaman.dll" target="lib\net451" /> 
+  <file src="bin\Release\EfCore.Shaman.pdb" target="lib\net451" /> 
+  <file src="bin\Release\EfCore.Shaman.xml" target="lib\net451" />   
+</files>
 </package>
+ 
