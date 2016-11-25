@@ -7,12 +7,17 @@ EfCore.Shaman offers simple solution for some of problems.
 ## Quick start - 3 steps to fix many problems
 
 1. Install nuget package 	
+
     `Install-package EfCore.Shaman`
+
 2. Enter following code in `Up` method in each `Migration` class:
+
     ````csharp
    migrationBuilder.FixMigrationUp<YourDbConextClass>();
    ````
+
 3. Enter following code in `OnModelCreating` method in `DbContext` class:
+
    ````csharp
    this.FixOnModelCreating(modelBuilder);
    ````
