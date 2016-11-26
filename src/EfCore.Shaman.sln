@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EfCore.Shaman", "EfCore.Sha
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EfCore.Shaman.SqlServer", "EfCore.Shaman.SqlServer\EfCore.Shaman.SqlServer.csproj", "{4D085DEB-EC4D-4001-8D1B-FC26D2142417}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EfCore.Shaman.Tests", "EfCore.Shaman.Tests\EfCore.Shaman.Tests.csproj", "{8826E12A-82F0-4C3E-8BBC-12A035C5AA6C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{4D085DEB-EC4D-4001-8D1B-FC26D2142417}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4D085DEB-EC4D-4001-8D1B-FC26D2142417}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4D085DEB-EC4D-4001-8D1B-FC26D2142417}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8826E12A-82F0-4C3E-8BBC-12A035C5AA6C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8826E12A-82F0-4C3E-8BBC-12A035C5AA6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8826E12A-82F0-4C3E-8BBC-12A035C5AA6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8826E12A-82F0-4C3E-8BBC-12A035C5AA6C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
