@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("EfCore.Shaman.SqlServer")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Fixes for EntityFrameworkCore")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("EfCore.Shaman.SqlServer")]
-[assembly: AssemblyCopyright("Copyright ©  2016")]
+[assembly: AssemblyCompany("Internet Sukces Piotr Stęclik")]
+[assembly: AssemblyProduct("EfCore.Shaman")]
+[assembly: AssemblyCopyright("Copyright by Internet Sukces Piotr Stęclik 2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

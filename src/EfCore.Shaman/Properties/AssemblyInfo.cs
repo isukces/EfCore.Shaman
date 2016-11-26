@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Ef.Irritation")]
+[assembly: AssemblyTitle("EfCore.Shaman")]
 [assembly: AssemblyDescription("Fixes for EntityFrameworkCore")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Internet Sukces Piotr Stęclik")]
-[assembly: AssemblyProduct("Ef.Irritation")]
+[assembly: AssemblyProduct("EfCore.Shaman")]
 [assembly: AssemblyCopyright("Copyright by Internet Sukces Piotr Stęclik 2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
