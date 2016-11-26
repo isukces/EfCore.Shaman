@@ -1,9 +1,11 @@
-﻿using System;
+﻿#region using
+
+using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
-using System.Reflection;
 using Microsoft.EntityFrameworkCore;
+
+#endregion
 
 namespace EfCore.Shaman.ModelScanner
 {
@@ -18,7 +20,18 @@ namespace EfCore.Shaman.ModelScanner
             Prepare();
         }
 
-        public IEnumerable<DbSetInfo> DbSets => _dbSets.Values;
+        #endregion
+
+        #region Static Methods
+
+        public static bool NotNullFromPropertyType(Type type)
+        {
+            if (type == typeof(string)) return false;
+            if (type.IsGenericType && (type.GetGenericTypeDefinition() == typeof(Nullable<>)))
+                return false;
+            if (type.IsEnum || type.IsValueType) return true;
+            return false;
+        }
 
         #endregion
 
@@ -37,15 +50,17 @@ namespace EfCore.Shaman.ModelScanner
             var dbSetInfoUpdateServices = _services?.OfType<IDbSetInfoUpdateService>().ToArray();
             var dbSetInfo = new DbSetInfo(entityType, propertyName);
             {
-                if (dbSetInfoUpdateServices!=null)
+                if (dbSetInfoUpdateServices != null)
                     foreach (var i in dbSetInfoUpdateServices)
                         i.UpdateDbSetInfo(dbSetInfo, entityType);
-               
             }
             var columnInfoUpdateServices = _services?.OfType<IColumnInfoUpdateService>().ToArray();
             foreach (var propertyInfo in entityType.GetProperties())
             {
-                var columnInfo = new ColumnInfo(dbSetInfo.Properites.Count, propertyInfo.Name);
+                var columnInfo = new ColumnInfo(dbSetInfo.Properites.Count, propertyInfo.Name)
+                {
+                    NotNull = NotNullFromPropertyType(propertyInfo.PropertyType)
+                };
                 if (columnInfoUpdateServices != null)
                     foreach (var service in columnInfoUpdateServices)
                         service.UpdateColumnInfo(columnInfo, propertyInfo);
@@ -67,6 +82,12 @@ namespace EfCore.Shaman.ModelScanner
                 _dbSets[entity.TableName] = entity;
             }
         }
+
+        #endregion
+
+        #region Properties
+
+        public IEnumerable<DbSetInfo> DbSets => _dbSets.Values;
 
         #endregion
 
