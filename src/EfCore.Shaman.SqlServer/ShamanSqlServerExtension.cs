@@ -15,7 +15,9 @@ namespace EfCore.Shaman
 
         public static ShamanOptions WithSqlServer(this ShamanOptions options)
         {
-            return options.With<SqlServerFixerService>();
+            return options
+                .With<SqlServerReflectionService>()
+                .With<SqlServerFixerService>();
         }
 
         #endregion

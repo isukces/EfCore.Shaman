@@ -113,8 +113,9 @@ Collations specific to SqlServer is recognized by reflection scaner, i.e.
 public string Code { get; set; }
 ````
 
-Moreover `SqlServerCollationAttribute` can be used for class annotation in order to set default collation for all text columns.
+Moreover `SqlServerCollationAttribute` can be used for class annotation in order to set default collation for all text columns (not supported yet).
 
+Current release allows to specify column collation while only table is created. 
 
 ## Code signing
 Assembly distributed with nuget package is signed with `key.snk` that is not included with github repository. `mksnk.bat` script file is included instead. It it running automatically during building process. 

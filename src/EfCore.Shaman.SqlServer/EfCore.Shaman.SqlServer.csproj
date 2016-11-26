@@ -125,8 +125,10 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>KnownCollations.tt</DependentUpon>
     </Compile>
+    <Compile Include="MsSqlUtils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ShamanSqlServerExtension.cs" />
+    <Compile Include="SqlServerReflectionService.cs" />
     <Compile Include="SqlServerFixerService.cs" />
     <Compile Include="_attributes\SqlServerCollationAttribute.cs" />
   </ItemGroup>
