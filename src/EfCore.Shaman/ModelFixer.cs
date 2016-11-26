@@ -66,7 +66,6 @@ namespace EfCore.Shaman
 
         private void FixOnModelCreating(MigrationBuilder migrationBuilder)
         {
-            // _info = new ModelInfo(_type);
             foreach (var table in migrationBuilder.Operations.OfType<CreateTableOperation>())
                 FixOnModelCreatingForTable(table);
         }

@@ -1,7 +1,6 @@
 ﻿#region using
 
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 
 #endregion
@@ -54,10 +53,13 @@ namespace EfCore.Shaman.ModelScanner
 
         public bool IsNotMapped { get; set; }
 
-
         public List<ColumnIndexInfo> ColumnIndexes { get; } = new List<ColumnIndexInfo>();
 
-        public IDictionary<string, object> Annotations { get; } = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+        public IDictionary<string, object> Annotations { get; } =
+            new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+
+        public bool NotNull { get; set; }
+        public int MaxLength { get; set; }
 
         #endregion
     }

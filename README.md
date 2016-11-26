@@ -94,9 +94,31 @@ public Guid InstanceUid { get; set; }
 public Guid BoxUid { get; set; }
 ````
 
+## SqlServer support
+
+In order to support SqlServer features  add nuget package `EfCore.Shaman.SqlServer` and turn on necessary options in coniguration, i.e.
+
+````csharp
+migrationBuilder.FixMigrationUp<YourDbConextClass>(ShamanOptions.Default.WithSqlServer());
+````
+and
+
+````csharp
+this.FixOnModelCreating(modelBuilder, ShamanOptions.Default.WithSqlServer());
+````
+Collations specific to SqlServer is recognized by reflection scaner, i.e.
+
+````csharp
+[SqlServerCollation(KnownCollations.Polish100CiAi)]
+public string Code { get; set; }
+````
+
+Moreover `SqlServerCollationAttribute` can be used for class annotation in order to set default collation for all text columns.
+
 
 ## Code signing
 Assembly distributed with nuget package is signed with `key.snk` that is not included with github repository. `mksnk.bat` script file is included instead. It it running automatically during building process. 
+
 
 ## Plans
 

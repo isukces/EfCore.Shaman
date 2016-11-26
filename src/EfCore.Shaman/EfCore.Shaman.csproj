@@ -117,8 +117,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Services\MaxLengthAttributeUpdater.cs" />
+    <Compile Include="Services\RequiredAttributeUpdater.cs" />
     <Compile Include="ShamanOptions.cs" />
-    <Compile Include="FixerOptionsExtension.cs" />
+    <Compile Include="ShamanOptionsExtensions.cs" />
     <Compile Include="Services\ColumnAttributeUpdater.cs" />
     <Compile Include="Services\IndexAttributeUpdater.cs" />
     <Compile Include="Services\NotMappedAttributeUpdater.cs" />

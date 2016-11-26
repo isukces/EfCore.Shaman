@@ -7,7 +7,7 @@ using EfCore.Shaman.Services;
 
 namespace EfCore.Shaman
 {
-    public static class FixerOptionsExtension
+    public static class ShamanOptionsExtensions
     {
         #region Static Methods
 
@@ -32,7 +32,7 @@ namespace EfCore.Shaman
 
         /// <summary>
         ///     Include support for TableAttribute, ColumnAttribute, NotMappedAttribute,
-        ///     IndexAttribute and UniqueIndexAttribute
+        ///     RequiredAttribute, MaxLengthAttribute, IndexAttribute and UniqueIndexAttribute
         /// </summary>
         /// <param name="options"></param>
         /// <returns></returns>
@@ -42,6 +42,8 @@ namespace EfCore.Shaman
                 .WithColumnAttribute()
                 .WithNotMappedAttribute()
                 .WithIndexAttribute()
+                .WithRequiredAttribute()
+                .WithMaxLengthAttribute()
                 .WithTableAttribute();
         }
 
@@ -67,6 +69,17 @@ namespace EfCore.Shaman
             return options.With<NotMappedAttributeUpdater>();
         }
 
+
+        /// <summary>
+        ///     Include support for RequiredAttribute
+        /// </summary>
+        /// <param name="options"></param>
+        /// <returns></returns>
+        public static ShamanOptions WithRequiredAttribute(this ShamanOptions options)
+        {
+            return options.With<RequiredAttributeUpdater>();
+        }
+
         /// <summary>
         ///     Include support for TableAttribute
         /// </summary>
@@ -77,6 +90,17 @@ namespace EfCore.Shaman
             return options.With<TableAttributeUpdater>();
         }
 
+        /// <summary>
+        ///     Include support for TableAttribute
+        /// </summary>
+        /// <param name="options"></param>
+        /// <returns></returns>
+        public static ShamanOptions WithMaxLengthAttribute(this ShamanOptions options)
+        {
+            return options.With<MaxLengthAttributeUpdater>();
+        }
+
+        
         #endregion
     }
 }
