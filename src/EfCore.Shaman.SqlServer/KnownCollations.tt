@@ -1,0 +1,53 @@
+﻿<#@ template debug="false" hostspecific="true" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.IO" #>
+<#@ output extension=".cs" #>
+<#
+var data=File
+    .ReadAllLines(this.Host.ResolvePath("KnownCollationsData.txt") );
+ 
+#>
+namespace EfCore.Shaman.SqlServer
+{
+    /// <summary>
+    /// Names and descriptions taken from MsSql Server
+    /// select name,  description, COLLATIONPROPERTY(name, 'CodePage') as Code_Page from sys.fn_HelpCollations()
+    /// </summary>
+    public static class KnownCollations
+    {
+<# 
+foreach(var line in data) {  
+    var line1 = line.Split('|');
+    var name = line1[0];
+    var desc = line1[1];
+#>
+        /// <summary>
+        /// <#= name #> <#= desc #>
+        /// </summary>
+        public const string <#= FixName(name) #> = "<#= name #>";
+<# 
+} 
+#>
+    }
+}
+<#+
+string FixName(string x) {	
+    var result = new StringBuilder(x.Length);
+    var upper = true;
+    foreach(var i in x){
+        if (i=='_') {
+            upper = true;
+            continue;
+        }
+        if (upper)
+            result.Append(char.ToUpper(i));
+        else
+            result.Append(char.ToLower(i));
+        upper = false;
+    }
+    return result.ToString();
+}
+#>
