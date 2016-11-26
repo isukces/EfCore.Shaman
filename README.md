@@ -128,5 +128,4 @@ Assembly distributed with nuget package is signed with `key.snk` that is not inc
 ## Known bugs
 
 * Not supported descending field order in indexes
-* `NotMappedAttribute` is not supported (fixed in GitHub repository, not published on Nuget)
 

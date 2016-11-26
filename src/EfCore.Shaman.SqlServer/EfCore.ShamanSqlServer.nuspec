@@ -3,12 +3,12 @@
   <metadata>
     <id>$id$</id>
     <version>$version$</version>
-    <title>EfCore.Shaman</title>
+    <title>EfCore.Shaman for MsSql</title>
     <authors>$author$</authors>
     <owners>$author$</owners>     
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Fixes for EntityFrameworkCore</description>
-    <releaseNotes>Collation related attributes</releaseNotes>
+    <releaseNotes>Collation related attributes for MsSql server</releaseNotes>
     <projectUrl>https://github.com/isukces/EfCore.Shaman</projectUrl>
     <copyright>Copyright by Internet Sukces Piotr Stęclik 2016</copyright>
     <tags>EntityFrameworkCore</tags>
