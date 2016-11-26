@@ -73,7 +73,10 @@ namespace EfCore.Shaman
         private void FixOnModelCreatingForTable(CreateTableOperation table)
         {
             var entity = _info.GetByTableName(table.Name);
-            var colsDic = entity.Properites.ToDictionary(a => a.ColumnName, StringComparer.OrdinalIgnoreCase);
+            var colsDic = entity
+                .Properites
+                .Where(a => !a.IsNotMapped)
+                .ToDictionary(a => a.ColumnName, StringComparer.OrdinalIgnoreCase);
             var natural = Enumerable.Range(0, table.Columns.Count).ToDictionary(a => table.Columns[a].Name, a => a);
             table.Columns.Sort((a, b) =>
             {

@@ -48,10 +48,13 @@ namespace EfCore.Shaman.ModelScanner
                 var columnAttribute = propertyInfo.GetCustomAttribute<ColumnAttribute>();
                 if (columnAttribute != null)
                 {
-                    if (!String.IsNullOrEmpty(columnAttribute.Name))
+                    if (!string.IsNullOrEmpty(columnAttribute.Name))
                         propertyWrapper.ColumnName = columnAttribute.Name;
                     propertyWrapper.ForceFieldOrder = columnAttribute.Order;
                 }
+                var notMappedAttribute = propertyInfo.GetCustomAttribute<NotMappedAttribute>();
+                propertyWrapper.IsNotMapped = notMappedAttribute != null;
+
                 var indexAttributes = propertyInfo.GetCustomAttributes<AbstractIndexAttribute>()?.ToArray();
                 if (indexAttributes != null && indexAttributes.Any())
                 {

@@ -1,4 +1,8 @@
-﻿using System.Collections.Generic;
+﻿#region using
+
+using System.Collections.Generic;
+
+#endregion
 
 namespace EfCore.Shaman.ModelScanner
 {
@@ -16,31 +20,41 @@ namespace EfCore.Shaman.ModelScanner
 
         #endregion
 
+        #region Instance Methods
+
+        public override string ToString() =>
+            $"Property {PropertyName} => {ColumnName}";
+
+        #endregion
+
         #region Properties
 
         /// <summary>
-        /// Index of property scanned with GetProperties() method
+        ///     Index of property scanned with GetProperties() method
         /// </summary>
         public int ReflectionIndex { get; }
 
         /// <summary>
-        /// Name of property
+        ///     Name of property
         /// </summary>
         public string PropertyName { get; set; }
 
 
         /// <summary>
-        /// Name of database column
+        ///     Name of database column
         /// </summary>
         public string ColumnName { get; set; }
 
         /// <summary>
-        /// Field order set with ColumnAttribute
+        ///     Field order set with ColumnAttribute
         /// </summary>
         public int ForceFieldOrder { get; set; }
 
+        public bool IsNotMapped { get; set; }
+
 
         public List<ColumnIndexInfo> ColumnIndexes { get; } = new List<ColumnIndexInfo>();
+
 
         #endregion
     }

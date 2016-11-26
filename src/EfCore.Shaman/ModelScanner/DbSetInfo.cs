@@ -20,6 +20,12 @@ namespace EfCore.Shaman.ModelScanner
 
         #endregion
 
+        #region Instance Methods
+
+        public override string ToString() => $"DbSet: {EntityType?.Name} => {Schema}.{TableName}";
+
+        #endregion
+
         #region Properties
 
         public string TableName { get; set; }

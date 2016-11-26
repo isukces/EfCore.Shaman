@@ -97,3 +97,13 @@ public Guid BoxUid { get; set; }
 
 ## Code signing
 Assembly distributed with nuget package is signed with `key.snk` that is not included with github repository. `mksnk.bat` script file is included instead. It it running automatically during building process. 
+
+## Plans
+
+* Column collation support
+
+## Known bugs
+
+* Not supported descending field order in indexes
+* `NotMappedAttribute` is not supported (fixed in GitHub repository, not published on Nuget)
+
