@@ -3,8 +3,8 @@
 @nugetrepo = GlobalVar["Private Nuget Repository"];
 
 
-@projName = "EfCore.Shaman";
-@slnName = projName;
+@projName = "EfCore.Shaman.SqlServer";
+@slnName = "EfCore.Shaman";
 
 
 @projDir = string.Format(@"{0}\{1}\", ConfigDir, projName);

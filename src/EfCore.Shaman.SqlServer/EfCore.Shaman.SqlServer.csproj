@@ -28,6 +28,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Release\EfCore.Shaman.SqlServer.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
@@ -134,11 +135,11 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="KnownCollations.tt">
+    <None Include="KnownCollations.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>KnownCollations.cs</LastGenOutput>
-    </Content>
-    <Content Include="KnownCollationsData.txt" />
+    </None>
+    <None Include="KnownCollationsData.txt" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
