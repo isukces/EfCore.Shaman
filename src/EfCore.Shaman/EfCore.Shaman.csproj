@@ -126,6 +126,8 @@
     <Compile Include="Services\NotMappedAttributeUpdater.cs" />
     <Compile Include="Services\TableAttributeUpdater.cs" />
     <Compile Include="_interfaces\IColumnInfoUpdateService.cs" />
+    <Compile Include="_interfaces\IDbSetInfoUpdateService.cs" />
+    <Compile Include="_interfaces\IFixMigrationUpService.cs" />
     <Compile Include="_interfaces\IShamanService.cs" />
     <Compile Include="ShamanExtension.cs" />
     <Compile Include="ModelScanner\ModelInfo.cs" />

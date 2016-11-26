@@ -1,6 +1,5 @@
 #region using
 
-using System;
 using System.Reflection;
 using EfCore.Shaman.ModelScanner;
 
@@ -15,9 +14,5 @@ namespace EfCore.Shaman
         void UpdateColumnInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo);
 
         #endregion
-    }
-    public interface IDbSetInfoUpdateService : IShamanService
-    {
-        void UpdateDbSetInfo(DbSetInfo dbSetInfo, Type entityType);
     }
 }

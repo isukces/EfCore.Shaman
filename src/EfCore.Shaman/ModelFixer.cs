@@ -30,7 +30,7 @@ namespace EfCore.Shaman
         public static void FixMigrationUp<T>(MigrationBuilder migrationBuilder, ShamanOptions shamanOptions = null) where T : DbContext
         {
             var tmp = new ModelFixer(typeof(T), shamanOptions);
-            tmp.FixOnModelCreating(migrationBuilder);
+            tmp.FixMigrationUpInternal(migrationBuilder);
         }
 
         public static void FixOnModelCreating(ModelBuilder modelBuilder, Type contextType, ShamanOptions shamanOptions = null)
@@ -64,10 +64,15 @@ namespace EfCore.Shaman
 
         #region Instance Methods
 
-        private void FixOnModelCreating(MigrationBuilder migrationBuilder)
+        private void FixMigrationUpInternal(MigrationBuilder migrationBuilder)
         {
+            var services = _shamanOptions?.Services.OfType<IFixMigrationUpService>().ToArray();
+            if (services != null)
+                foreach (var i in services)
+                    i.FixMigrationUp(migrationBuilder, _info);
+
             foreach (var table in migrationBuilder.Operations.OfType<CreateTableOperation>())
-                FixOnModelCreatingForTable(table);
+                FixOnModelCreatingForTable(table);            
         }
 
         private void FixOnModelCreatingForTable(CreateTableOperation table)
@@ -119,4 +124,5 @@ namespace EfCore.Shaman
 
         #endregion
     }
+
 }
