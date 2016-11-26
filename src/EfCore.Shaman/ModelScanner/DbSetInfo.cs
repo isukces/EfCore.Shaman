@@ -32,6 +32,7 @@ namespace EfCore.Shaman.ModelScanner
         public string Schema { get; set; }
         public Type EntityType { get; private set; }
         public List<ColumnInfo> Properites { get; } = new List<ColumnInfo>();
+        public IDictionary<string, object> Annotations { get; } = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 
         #endregion
     }

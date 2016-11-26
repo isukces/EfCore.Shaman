@@ -117,6 +117,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ShamanOptions.cs" />
+    <Compile Include="FixerOptionsExtension.cs" />
+    <Compile Include="Services\ColumnAttributeUpdater.cs" />
+    <Compile Include="Services\IndexAttributeUpdater.cs" />
+    <Compile Include="Services\NotMappedAttributeUpdater.cs" />
+    <Compile Include="Services\TableAttributeUpdater.cs" />
+    <Compile Include="_interfaces\IColumnInfoUpdateService.cs" />
+    <Compile Include="_interfaces\IShamanService.cs" />
     <Compile Include="ShamanExtension.cs" />
     <Compile Include="ModelScanner\ModelInfo.cs" />
     <Compile Include="ModelScanner\DbSetInfo.cs" />

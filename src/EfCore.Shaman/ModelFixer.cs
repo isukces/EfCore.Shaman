@@ -16,25 +16,26 @@ namespace EfCore.Shaman
     {
         #region Constructors
 
-        private ModelFixer(Type type)
+        private ModelFixer(Type type, ShamanOptions shamanOptions)
         {
             _type = type;
-            _info = new ModelInfo(type);
+            _shamanOptions = shamanOptions ?? new ShamanOptions();
+            _info = new ModelInfo(type, _shamanOptions.Services);
         }
 
         #endregion
 
         #region Static Methods
 
-        public static void FixMigrationUp<T>(MigrationBuilder migrationBuilder) where T : DbContext
+        public static void FixMigrationUp<T>(MigrationBuilder migrationBuilder, ShamanOptions shamanOptions = null) where T : DbContext
         {
-            var tmp = new ModelFixer(typeof(T));
+            var tmp = new ModelFixer(typeof(T), shamanOptions);
             tmp.FixOnModelCreating(migrationBuilder);
         }
 
-        public static void FixOnModelCreating(ModelBuilder modelBuilder, Type contextType)
+        public static void FixOnModelCreating(ModelBuilder modelBuilder, Type contextType, ShamanOptions shamanOptions = null)
         {
-            var modelFixer = new ModelFixer(contextType);
+            var modelFixer = new ModelFixer(contextType, shamanOptions);
             modelFixer.FixOnModelCreatingInternal(modelBuilder);
         }
 
@@ -65,7 +66,7 @@ namespace EfCore.Shaman
 
         private void FixOnModelCreating(MigrationBuilder migrationBuilder)
         {
-            _info = new ModelInfo(_type);
+            // _info = new ModelInfo(_type);
             foreach (var table in migrationBuilder.Operations.OfType<CreateTableOperation>())
                 FixOnModelCreatingForTable(table);
         }
@@ -115,6 +116,7 @@ namespace EfCore.Shaman
 
         private readonly Type _type;
         private ModelInfo _info;
+        private ShamanOptions _shamanOptions;
 
         #endregion
     }

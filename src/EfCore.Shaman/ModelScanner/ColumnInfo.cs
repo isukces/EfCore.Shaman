@@ -1,5 +1,7 @@
 ﻿#region using
 
+using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 
 #endregion
@@ -55,6 +57,7 @@ namespace EfCore.Shaman.ModelScanner
 
         public List<ColumnIndexInfo> ColumnIndexes { get; } = new List<ColumnIndexInfo>();
 
+        public IDictionary<string, object> Annotations { get; } = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 
         #endregion
     }

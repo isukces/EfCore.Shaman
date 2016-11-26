@@ -11,9 +11,10 @@ namespace EfCore.Shaman.ModelScanner
     {
         #region Constructors
 
-        public ModelInfo(Type contextType)
+        public ModelInfo(Type contextType, IList<IShamanService> services)
         {
             _contextType = contextType;
+            _services = services;
             Prepare();
         }
 
@@ -31,49 +32,26 @@ namespace EfCore.Shaman.ModelScanner
         }
 
 
-        private static DbSetInfo CreateDbSetWrapper(Type entityType, string propertyName)
+        private DbSetInfo CreateDbSetWrapper(Type entityType, string propertyName)
         {
-            var dbSetWrapper = new DbSetInfo(entityType, propertyName);
+            var dbSetInfoUpdateServices = _services?.OfType<IDbSetInfoUpdateService>().ToArray();
+            var dbSetInfo = new DbSetInfo(entityType, propertyName);
             {
-                var ta = entityType.GetCustomAttribute<TableAttribute>();
-                if (ta != null)
-                {
-                    dbSetWrapper.TableName = ta.Name;
-                    dbSetWrapper.Schema = ta.Schema;
-                }
+                if (dbSetInfoUpdateServices!=null)
+                    foreach (var i in dbSetInfoUpdateServices)
+                        i.UpdateDbSetInfo(dbSetInfo, entityType);
+               
             }
+            var columnInfoUpdateServices = _services?.OfType<IColumnInfoUpdateService>().ToArray();
             foreach (var propertyInfo in entityType.GetProperties())
             {
-                var propertyWrapper = new ColumnInfo(dbSetWrapper.Properites.Count, propertyInfo.Name);
-                var columnAttribute = propertyInfo.GetCustomAttribute<ColumnAttribute>();
-                if (columnAttribute != null)
-                {
-                    if (!string.IsNullOrEmpty(columnAttribute.Name))
-                        propertyWrapper.ColumnName = columnAttribute.Name;
-                    propertyWrapper.ForceFieldOrder = columnAttribute.Order;
-                }
-                var notMappedAttribute = propertyInfo.GetCustomAttribute<NotMappedAttribute>();
-                propertyWrapper.IsNotMapped = notMappedAttribute != null;
-
-                var indexAttributes = propertyInfo.GetCustomAttributes<AbstractIndexAttribute>()?.ToArray();
-                if (indexAttributes != null && indexAttributes.Any())
-                {
-                    foreach (var indexAttribute in indexAttributes)
-                    {
-                        var indexMember = new ColumnIndexInfo
-                        {
-                            IndexName = indexAttribute.Name?.Trim(),
-                            Order = indexAttribute.Order,
-                            IsDescending = indexAttribute.IsDescending,
-                            IsUnique = indexAttribute is UniqueIndexAttribute
-                        };
-                        propertyWrapper.ColumnIndexes.Add(indexMember);
-                    }
-                }
-
-                dbSetWrapper.Properites.Add(propertyWrapper);
+                var columnInfo = new ColumnInfo(dbSetInfo.Properites.Count, propertyInfo.Name);
+                if (columnInfoUpdateServices != null)
+                    foreach (var service in columnInfoUpdateServices)
+                        service.UpdateColumnInfo(columnInfo, propertyInfo);
+                dbSetInfo.Properites.Add(columnInfo);
             }
-            return dbSetWrapper;
+            return dbSetInfo;
         }
 
 
@@ -95,6 +73,7 @@ namespace EfCore.Shaman.ModelScanner
         #region Fields
 
         private readonly Type _contextType;
+        private readonly IList<IShamanService> _services;
 
 
         private readonly Dictionary<string, DbSetInfo> _dbSets =
