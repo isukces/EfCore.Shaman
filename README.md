@@ -94,6 +94,15 @@ public Guid InstanceUid { get; set; }
 public Guid BoxUid { get; set; }
 ````
 
+## Decimal columns precision
+
+`DecimalTypeAttribute` can be used for decorating decimal property. It affects changing decimal column type definition. For example 
+
+````csharp
+[DecimalType(18, 6)]
+public decimal Amount { get; set; }
+````
+
 ## SqlServer support
 
 In order to support SqlServer features  add nuget package `EfCore.Shaman.SqlServer` and turn on necessary options in coniguration, i.e.
@@ -123,7 +132,7 @@ Assembly distributed with nuget package is signed with `key.snk` that is not inc
 
 ## Plans
 
-* Column collation support
+* Full column collation support
 
 ## Known bugs
 

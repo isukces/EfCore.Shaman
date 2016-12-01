@@ -117,6 +117,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Services\DecimalTypeAttributeUpdater.cs" />
     <Compile Include="Services\MaxLengthAttributeUpdater.cs" />
     <Compile Include="Services\RequiredAttributeUpdater.cs" />
     <Compile Include="ShamanOptions.cs" />
@@ -125,6 +126,7 @@
     <Compile Include="Services\IndexAttributeUpdater.cs" />
     <Compile Include="Services\NotMappedAttributeUpdater.cs" />
     <Compile Include="Services\TableAttributeUpdater.cs" />
+    <Compile Include="_attributes\DecimalTypeAttribute.cs" />
     <Compile Include="_interfaces\IColumnInfoUpdateService.cs" />
     <Compile Include="_interfaces\IDbSetInfoUpdateService.cs" />
     <Compile Include="_interfaces\IFixMigrationUpService.cs" />

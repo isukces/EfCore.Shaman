@@ -5,6 +5,7 @@ using System.Linq;
 using EfCore.Shaman.ModelScanner;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
 
@@ -72,7 +73,7 @@ namespace EfCore.Shaman
                     i.FixMigrationUp(migrationBuilder, _info);
 
             foreach (var table in migrationBuilder.Operations.OfType<CreateTableOperation>())
-                FixOnModelCreatingForTable(table);            
+                FixOnModelCreatingForTable(table);
         }
 
         private void FixOnModelCreatingForTable(CreateTableOperation table)
@@ -102,14 +103,21 @@ namespace EfCore.Shaman
                 var allIdx = dbSet.Properites
                     .SelectMany(q => q.ColumnIndexes.Select(w => Tuple.Create(w, q.ColumnName)))
                     .GroupBy(a => a.Item1.IndexName, StringComparer.OrdinalIgnoreCase);
+                var entity = modelBuilder.Entity(dbSet.EntityType);
                 foreach (var idx in allIdx)
                 {
                     var fields = idx.OrderBy(q => q.Item1.Order).Select(q => q.Item2).ToArray();
-                    var entity = modelBuilder.Entity(dbSet.EntityType);
                     var indexBuilder = entity.HasIndex(fields);
                     TrySetIndexName(indexBuilder, idx.Key);
                     indexBuilder.IsUnique(idx.First().Item1.IsUnique);
 
+                }
+                foreach (var i in dbSet.Properites)
+                {
+                    if (i.MaxLength == null || i.DecimalPlaces == null)
+                        continue;
+                    var type = $"decimal({i.MaxLength},{i.DecimalPlaces})";
+                    entity.Property(i.PropertyName).HasColumnType(type);
                 }
             }
         }

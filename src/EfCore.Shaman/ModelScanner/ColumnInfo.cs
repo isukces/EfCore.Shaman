@@ -59,7 +59,8 @@ namespace EfCore.Shaman.ModelScanner
             new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 
         public bool NotNull { get; set; }
-        public int MaxLength { get; set; }
+        public int? MaxLength { get; set; }
+        public int? DecimalPlaces { get; set; }
 
         #endregion
     }

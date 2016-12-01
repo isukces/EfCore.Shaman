@@ -44,6 +44,7 @@ namespace EfCore.Shaman
                 .WithIndexAttribute()
                 .WithRequiredAttribute()
                 .WithMaxLengthAttribute()
+                .WithDecimalTypeAttribute()
                 .WithTableAttribute();
         }
 
@@ -100,7 +101,16 @@ namespace EfCore.Shaman
             return options.With<MaxLengthAttributeUpdater>();
         }
 
-        
+        /// <summary>
+        ///     Include support for TableAttribute
+        /// </summary>
+        /// <param name="options"></param>
+        /// <returns></returns>
+        public static ShamanOptions WithDecimalTypeAttribute(this ShamanOptions options)
+        {
+            return options.With<DecimalTypeAttributeUpdater>();
+        }
+
         #endregion
     }
 }
