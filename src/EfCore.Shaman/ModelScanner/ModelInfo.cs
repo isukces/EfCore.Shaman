@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using EfCore.Shaman.Reflection;
 using Microsoft.EntityFrameworkCore;
 
 #endregion
@@ -61,6 +62,10 @@ namespace EfCore.Shaman.ModelScanner
                 {
                     NotNull = NotNullFromPropertyType(propertyInfo.PropertyType)
                 };
+                var readerWriter = new SimplePropertyReaderWriter(entityType, propertyInfo);
+                columnInfo.ValueReader = readerWriter;
+                columnInfo.ValueWriter = readerWriter;
+
                 if (columnInfoUpdateServices != null)
                     foreach (var service in columnInfoUpdateServices)
                         service.UpdateColumnInfo(columnInfo, propertyInfo);

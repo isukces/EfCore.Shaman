@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace EfCore.Shaman.ModelScanner
 {
-    public class DbSetInfo
+    public class DbSetInfo : IFullTableName
     {
         #region Constructors
 

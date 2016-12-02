@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using EfCore.Shaman.Reflection;
 
 #endregion
 
@@ -72,6 +73,8 @@ namespace EfCore.Shaman.ModelScanner
 
         public bool IsDatabaseGenerated { get; set; }
         public bool IsIdentity { get; set; }
+        public IPropertyValueReader ValueReader { get; set; }
+        public IPropertyValueWriter ValueWriter { get; set; }
 
         #endregion
     }
