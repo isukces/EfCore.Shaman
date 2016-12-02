@@ -51,6 +51,9 @@ namespace EfCore.Shaman.ModelScanner
         /// </summary>
         public int ForceFieldOrder { get; set; }
 
+        /// <summary>
+        /// Decorated with NotMappedAttribute
+        /// </summary>
         public bool IsNotMapped { get; set; }
 
         public List<ColumnIndexInfo> ColumnIndexes { get; } = new List<ColumnIndexInfo>();
@@ -62,6 +65,13 @@ namespace EfCore.Shaman.ModelScanner
         public int? MaxLength { get; set; }
         public int? DecimalPlaces { get; set; }
         public bool IsInPrimaryKey { get; set; }
+        /// <summary>
+        /// Decorated with ForeignKeyAttribute or InversePropertyAttribute
+        /// </summary>
+        public bool IsNavigationProperty { get; set; }
+
+        public bool IsDatabaseGenerated { get; set; }
+        public bool IsIdentity { get; set; }
 
         #endregion
     }

@@ -117,7 +117,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Services\DatabaseGeneratedAttributeUpdater.cs" />
     <Compile Include="Services\DecimalTypeAttributeUpdater.cs" />
+    <Compile Include="Services\ForeignKeyAttributeUpdater.cs" />
+    <Compile Include="Services\InversePropertyAttributeUpdater.cs" />
     <Compile Include="Services\KeyAttributeUpdater.cs" />
     <Compile Include="Services\MaxLengthAttributeUpdater.cs" />
     <Compile Include="Services\RequiredAttributeUpdater.cs" />

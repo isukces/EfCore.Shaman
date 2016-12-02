@@ -67,10 +67,10 @@ namespace EfCore.Shaman.SqlServer
                 if (!createTableOperations.TryGetValue(dbSetInfo.TableName, out createTableOperation))
                     continue;
 
-                var tableCollation = GetCollation(dbSetInfo.Annotations);
+                // var tableCollation = GetCollation(dbSetInfo.Annotations);
                 var columns = createTableOperation.Columns.ToDictionary(a => a.Name, a => a,
                     StringComparer.OrdinalIgnoreCase);
-                foreach (var columnInfo in dbSetInfo.Properites.Where(a => !a.IsNotMapped))
+                foreach (var columnInfo in dbSetInfo.Properites.Where(q => !q.IsNotMapped && !q.IsNavigationProperty))
                 {
                     var columnCollation = GetCollation(columnInfo.Annotations);
                     if (string.IsNullOrEmpty(columnCollation)) continue;

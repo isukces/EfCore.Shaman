@@ -8,14 +8,14 @@ using EfCore.Shaman.ModelScanner;
 
 namespace EfCore.Shaman.Services
 {
-    internal class NotMappedAttributeUpdater : IColumnInfoUpdateService
+    internal class InversePropertyAttributeUpdater : IColumnInfoUpdateService
     {
         #region Instance Methods
 
         public void UpdateColumnInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo)
         {
-            if (propertyInfo.GetCustomAttribute<NotMappedAttribute>() != null)
-                columnInfo.IsNotMapped = true;
+            if (propertyInfo.GetCustomAttribute<InversePropertyAttribute>() != null)
+                columnInfo.IsNavigationProperty = true;
         }
 
         #endregion

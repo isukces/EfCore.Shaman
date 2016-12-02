@@ -20,106 +20,26 @@ namespace EfCore.Shaman
 
 
         /// <summary>
-        ///     Inlcude support for WithColumnAttribute
-        /// </summary>
-        /// <param name="options"></param>
-        /// <returns></returns>
-        public static ShamanOptions WithColumnAttribute(this ShamanOptions options)
-        {
-            return options.With<ColumnAttributeUpdater>();
-        }
-
-        /// <summary>
-        ///     Include support for TableAttribute
-        /// </summary>
-        /// <param name="options"></param>
-        /// <returns></returns>
-        public static ShamanOptions WithDecimalTypeAttribute(this ShamanOptions options)
-        {
-            return options.With<DecimalTypeAttributeUpdater>();
-        }
-
-
-        /// <summary>
-        ///     Include support for TableAttribute, ColumnAttribute, NotMappedAttribute,
-        ///     RequiredAttribute, MaxLengthAttribute, IndexAttribute and UniqueIndexAttribute
+        /// Include support for TableAttribute, ColumnAttribute, NotMappedAttribute,
+        /// RequiredAttribute, MaxLengthAttribute, IndexAttribute, UniqueIndexAttribute
+        /// and other
         /// </summary>
         /// <param name="options"></param>
         /// <returns></returns>
         public static ShamanOptions WithDefaultServices(this ShamanOptions options)
         {
             return options
-                .WithColumnAttribute()
-                .WithNotMappedAttribute()
-                .WithKeyAttribute()
-                .WithIndexAttribute()
-                .WithRequiredAttribute()
-                .WithMaxLengthAttribute()
-                .WithDecimalTypeAttribute()
-                .WithTableAttribute();
-        }
-
-
-        /// <summary>
-        ///     Include support for IndexAttribute and UniqueIndexAttribute
-        /// </summary>
-        /// <param name="options"></param>
-        /// <returns></returns>
-        public static ShamanOptions WithIndexAttribute(this ShamanOptions options)
-        {
-            return options.With<IndexAttributeUpdater>();
-        }
-
-        /// <summary>
-        ///     Include support for NotMappedAttribute
-        /// </summary>
-        /// <param name="options"></param>
-        /// <returns></returns>
-        public static ShamanOptions WithKeyAttribute(this ShamanOptions options)
-        {
-            return options.With<KeyAttributeUpdater>();
-        }
-
-        /// <summary>
-        ///     Include support for TableAttribute
-        /// </summary>
-        /// <param name="options"></param>
-        /// <returns></returns>
-        public static ShamanOptions WithMaxLengthAttribute(this ShamanOptions options)
-        {
-            return options.With<MaxLengthAttributeUpdater>();
-        }
-
-
-        /// <summary>
-        ///     Include support for NotMappedAttribute
-        /// </summary>
-        /// <param name="options"></param>
-        /// <returns></returns>
-        public static ShamanOptions WithNotMappedAttribute(this ShamanOptions options)
-        {
-            return options.With<NotMappedAttributeUpdater>();
-        }
-
-
-        /// <summary>
-        ///     Include support for RequiredAttribute
-        /// </summary>
-        /// <param name="options"></param>
-        /// <returns></returns>
-        public static ShamanOptions WithRequiredAttribute(this ShamanOptions options)
-        {
-            return options.With<RequiredAttributeUpdater>();
-        }
-
-        /// <summary>
-        ///     Include support for TableAttribute
-        /// </summary>
-        /// <param name="options"></param>
-        /// <returns></returns>
-        public static ShamanOptions WithTableAttribute(this ShamanOptions options)
-        {
-            return options.With<TableAttributeUpdater>();
+                .With<ColumnAttributeUpdater>()
+                .With<NotMappedAttributeUpdater>()
+                .With<ForeignKeyAttributeUpdater>()
+                .With<InversePropertyAttributeUpdater>()
+                .With<DatabaseGeneratedAttributeUpdater>()
+                .With<KeyAttributeUpdater>()
+                .With<IndexAttributeUpdater>()
+                .With<RequiredAttributeUpdater>()
+                .With<MaxLengthAttributeUpdater>()
+                .With<DecimalTypeAttributeUpdater>()
+                .With<TableAttributeUpdater>();
         }
 
         #endregion
