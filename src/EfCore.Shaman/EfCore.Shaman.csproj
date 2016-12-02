@@ -125,6 +125,7 @@
     <Compile Include="Services\KeyAttributeUpdater.cs" />
     <Compile Include="Services\MaxLengthAttributeUpdater.cs" />
     <Compile Include="Services\RequiredAttributeUpdater.cs" />
+    <Compile Include="ShamanDbContext.cs" />
     <Compile Include="ShamanOptions.cs" />
     <Compile Include="ShamanOptionsExtensions.cs" />
     <Compile Include="Services\ColumnAttributeUpdater.cs" />
@@ -134,6 +135,8 @@
     <Compile Include="_attributes\DecimalTypeAttribute.cs" />
     <Compile Include="_interfaces\IColumnInfoUpdateService.cs" />
     <Compile Include="_interfaces\IDbSetInfoUpdateService.cs" />
+    <Compile Include="_interfaces\IDirectSaver.cs" />
+    <Compile Include="_interfaces\IDirectSaverFactory.cs" />
     <Compile Include="_interfaces\IFixMigrationUpService.cs" />
     <Compile Include="_interfaces\IFullTableName.cs" />
     <Compile Include="_interfaces\IPropertyValueReader.cs" />
@@ -153,6 +156,9 @@
   <ItemGroup>
     <None Include="key.snk" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="DirectSql\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

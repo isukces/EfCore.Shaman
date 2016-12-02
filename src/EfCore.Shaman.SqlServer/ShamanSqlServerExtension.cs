@@ -2,6 +2,7 @@
 
 using System;
 using EfCore.Shaman.SqlServer;
+using EfCore.Shaman.SqlServer.DirectSql;
 
 #endregion
 
@@ -17,6 +18,7 @@ namespace EfCore.Shaman
         {
             return options
                 .With<SqlServerReflectionService>()
+                .With<SqlServerDirectSaverFactoryService>()
                 .With<SqlServerFixerService>();
         }
 

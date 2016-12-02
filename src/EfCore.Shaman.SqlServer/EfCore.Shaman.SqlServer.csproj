@@ -120,6 +120,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DirectSql\DirectSqlBase.cs" />
+    <Compile Include="DirectSql\InsertBuilder.cs" />
+    <Compile Include="DirectSql\SqlServerDirectSaver.cs" />
+    <Compile Include="DirectSql\UpdateBuilder.cs" />
     <Compile Include="KnownCollations.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -128,6 +132,7 @@
     <Compile Include="MsSqlUtils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ShamanSqlServerExtension.cs" />
+    <Compile Include="DirectSql\SqlServerDirectSaverFactoryService.cs" />
     <Compile Include="SqlServerReflectionService.cs" />
     <Compile Include="SqlServerFixerService.cs" />
     <Compile Include="_attributes\SqlServerCollationAttribute.cs" />
