@@ -19,7 +19,6 @@ namespace EfCore.Shaman
 
         private ModelFixer(Type type, ShamanOptions shamanOptions)
         {
-            _type = type;
             _shamanOptions = shamanOptions ?? new ShamanOptions();
             _info = new ModelInfo(type, _shamanOptions.Services);
         }
@@ -126,9 +125,8 @@ namespace EfCore.Shaman
 
         #region Fields
 
-        private readonly Type _type;
-        private ModelInfo _info;
-        private ShamanOptions _shamanOptions;
+        private readonly ModelInfo _info;
+        private readonly ShamanOptions _shamanOptions;
 
         #endregion
     }

@@ -29,6 +29,16 @@ namespace EfCore.Shaman
             return options.With<ColumnAttributeUpdater>();
         }
 
+        /// <summary>
+        ///     Include support for TableAttribute
+        /// </summary>
+        /// <param name="options"></param>
+        /// <returns></returns>
+        public static ShamanOptions WithDecimalTypeAttribute(this ShamanOptions options)
+        {
+            return options.With<DecimalTypeAttributeUpdater>();
+        }
+
 
         /// <summary>
         ///     Include support for TableAttribute, ColumnAttribute, NotMappedAttribute,
@@ -41,6 +51,7 @@ namespace EfCore.Shaman
             return options
                 .WithColumnAttribute()
                 .WithNotMappedAttribute()
+                .WithKeyAttribute()
                 .WithIndexAttribute()
                 .WithRequiredAttribute()
                 .WithMaxLengthAttribute()
@@ -57,6 +68,26 @@ namespace EfCore.Shaman
         public static ShamanOptions WithIndexAttribute(this ShamanOptions options)
         {
             return options.With<IndexAttributeUpdater>();
+        }
+
+        /// <summary>
+        ///     Include support for NotMappedAttribute
+        /// </summary>
+        /// <param name="options"></param>
+        /// <returns></returns>
+        public static ShamanOptions WithKeyAttribute(this ShamanOptions options)
+        {
+            return options.With<KeyAttributeUpdater>();
+        }
+
+        /// <summary>
+        ///     Include support for TableAttribute
+        /// </summary>
+        /// <param name="options"></param>
+        /// <returns></returns>
+        public static ShamanOptions WithMaxLengthAttribute(this ShamanOptions options)
+        {
+            return options.With<MaxLengthAttributeUpdater>();
         }
 
 
@@ -89,26 +120,6 @@ namespace EfCore.Shaman
         public static ShamanOptions WithTableAttribute(this ShamanOptions options)
         {
             return options.With<TableAttributeUpdater>();
-        }
-
-        /// <summary>
-        ///     Include support for TableAttribute
-        /// </summary>
-        /// <param name="options"></param>
-        /// <returns></returns>
-        public static ShamanOptions WithMaxLengthAttribute(this ShamanOptions options)
-        {
-            return options.With<MaxLengthAttributeUpdater>();
-        }
-
-        /// <summary>
-        ///     Include support for TableAttribute
-        /// </summary>
-        /// <param name="options"></param>
-        /// <returns></returns>
-        public static ShamanOptions WithDecimalTypeAttribute(this ShamanOptions options)
-        {
-            return options.With<DecimalTypeAttributeUpdater>();
         }
 
         #endregion

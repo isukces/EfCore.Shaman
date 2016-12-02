@@ -61,6 +61,7 @@ namespace EfCore.Shaman.ModelScanner
         public bool NotNull { get; set; }
         public int? MaxLength { get; set; }
         public int? DecimalPlaces { get; set; }
+        public bool IsInPrimaryKey { get; set; }
 
         #endregion
     }
