@@ -2,7 +2,7 @@
 
 There is still a lot of flaws in EntityFrameworkCore. Many of them is really irritating. That's why first name of this library was EfCore.Irritation :).
 
-EfCore.Shaman offers simple solution for some of problems.
+EfCore.Shaman offers simple solution for some of problems. For more information please visit [http://efcoreshaman.com/](http://efcoreshaman.com/).
 
 ## Quick start - 3 steps to fix many problems
 
