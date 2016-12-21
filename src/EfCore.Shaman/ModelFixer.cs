@@ -77,7 +77,13 @@ namespace EfCore.Shaman
 
         private void FixOnModelCreatingForTable(CreateTableOperation table)
         {
+            if (table == null)
+                throw new ArgumentNullException(nameof(table));
+            if (_info == null)
+                throw new NullReferenceException(nameof(_info));
             var entity = _info.GetByTableName(table.Name);
+            if (entity == null)
+                throw new Exception($"Unable to find table {table.Name}.");
             var colsDic = entity
                 .Properites
                 .Where(info => !info.IsNotMapped && !info.IsNavigationProperty)

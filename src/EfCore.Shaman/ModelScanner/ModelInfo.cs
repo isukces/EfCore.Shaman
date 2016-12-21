@@ -2,7 +2,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using System.Reflection;
 using EfCore.Shaman.Reflection;
 using Microsoft.EntityFrameworkCore;
 
@@ -34,6 +36,12 @@ namespace EfCore.Shaman.ModelScanner
             return false;
         }
 
+        private static string GetTableName(Type entityType, string propertyName)
+        {
+            var a = entityType.GetCustomAttribute<TableAttribute>();
+            return string.IsNullOrEmpty(a?.Name) ? propertyName : a.Name;
+        }
+
         #endregion
 
         #region Instance Methods
@@ -49,7 +57,8 @@ namespace EfCore.Shaman.ModelScanner
         private DbSetInfo CreateDbSetWrapper(Type entityType, string propertyName)
         {
             var dbSetInfoUpdateServices = _services?.OfType<IDbSetInfoUpdateService>().ToArray();
-            var dbSetInfo = new DbSetInfo(entityType, propertyName);
+
+            var dbSetInfo = new DbSetInfo(entityType, GetTableName(entityType, propertyName));
             {
                 if (dbSetInfoUpdateServices != null)
                     foreach (var i in dbSetInfoUpdateServices)
