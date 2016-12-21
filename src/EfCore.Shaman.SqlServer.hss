@@ -1,4 +1,4 @@
-@VisualStudio = GlobalVar["VisualStudio 2015"];
+@VisualStudio = GlobalVar["VisualStudio 2017"];
 @nugetexe = GlobalVar["Nuget"];
 @nugetrepo = GlobalVar["Private Nuget Repository"];
 
