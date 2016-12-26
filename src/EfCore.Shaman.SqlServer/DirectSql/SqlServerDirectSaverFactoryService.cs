@@ -10,9 +10,9 @@ namespace EfCore.Shaman.SqlServer.DirectSql
     {
         #region Instance Methods
 
-        public IDirectSaver<T> GetDirectSaver<T>(Type contextType)
+        public IDirectSaver<T> GetDirectSaver<T>(Type contextType, Func<ShamanOptions> optionsFactory = null)
         {
-            return SqlServerDirectSaver<T>.FromContext(contextType);
+            return SqlServerDirectSaver<T>.FromContext(contextType, optionsFactory);
         }
 
         #endregion

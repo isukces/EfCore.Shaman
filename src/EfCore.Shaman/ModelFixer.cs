@@ -103,6 +103,8 @@ namespace EfCore.Shaman
 
         private void FixOnModelCreatingInternal(ModelBuilder modelBuilder)
         {
+            if (!string.IsNullOrEmpty(_info.DefaultSchema))
+                modelBuilder = modelBuilder.HasDefaultSchema(_info.DefaultSchema);
             foreach (var dbSet in _info.DbSets)
             {
                 var allIdx = dbSet.Properites

@@ -6,7 +6,7 @@ namespace EfCore.Shaman
     {
         #region Instance Methods
 
-        IDirectSaver<T> GetDirectSaver<T>(Type contextType);
+        IDirectSaver<T> GetDirectSaver<T>(Type contextType, Func<ShamanOptions> optionsFactory = null);
 
         #endregion
     }

@@ -11,11 +11,11 @@ namespace EfCore.Shaman.ModelScanner
     {
         #region Constructors
 
-        public DbSetInfo(Type entityType, string tableName)
+        public DbSetInfo(Type entityType, string tableName, string schema = "")
         {
             EntityType = entityType;
             TableName = tableName;
-            Schema = "dbo";
+            Schema = schema;
         }
 
         #endregion

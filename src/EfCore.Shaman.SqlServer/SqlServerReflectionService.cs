@@ -29,8 +29,10 @@ namespace EfCore.Shaman.SqlServer
 
         #endregion
 
-        public void UpdateDbSetInfo(DbSetInfo dbSetInfo, Type entityType)
+        public void UpdateDbSetInfo(DbSetInfo dbSetInfo, Type entityType, Type contextType)
         {
+            if (string.IsNullOrEmpty(dbSetInfo.Schema))
+                dbSetInfo.Schema = "dbo";
             var attribute = entityType.GetCustomAttribute<SqlServerCollationAttribute>();
             var collation = attribute?.Collation?.Trim();
             if (string.IsNullOrEmpty(collation)) return;

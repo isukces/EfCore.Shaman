@@ -120,6 +120,7 @@
     <Compile Include="Reflection\SimplePropertyReaderWriter.cs" />
     <Compile Include="Services\DatabaseGeneratedAttributeUpdater.cs" />
     <Compile Include="Services\DecimalTypeAttributeUpdater.cs" />
+    <Compile Include="Services\DefaultSchemaUpdater.cs" />
     <Compile Include="Services\ForeignKeyAttributeUpdater.cs" />
     <Compile Include="Services\InversePropertyAttributeUpdater.cs" />
     <Compile Include="Services\KeyAttributeUpdater.cs" />
@@ -133,6 +134,7 @@
     <Compile Include="Services\NotMappedAttributeUpdater.cs" />
     <Compile Include="Services\TableAttributeUpdater.cs" />
     <Compile Include="_attributes\DecimalTypeAttribute.cs" />
+    <Compile Include="_attributes\DefaultSchemaAttribute.cs" />
     <Compile Include="_interfaces\IColumnInfoUpdateService.cs" />
     <Compile Include="_interfaces\IDbSetInfoUpdateService.cs" />
     <Compile Include="_interfaces\IDirectSaver.cs" />

@@ -13,12 +13,13 @@ namespace EfCore.Shaman.Services
     {
         #region Instance Methods
 
-        public void UpdateDbSetInfo(DbSetInfo dbSetInfo, Type entityType)
+        public void UpdateDbSetInfo(DbSetInfo dbSetInfo, Type entityType, Type contextType)
         {
             var ta = entityType.GetCustomAttribute<TableAttribute>();
             if (ta == null) return;
             dbSetInfo.TableName = ta.Name;
-            dbSetInfo.Schema = ta.Schema;
+            if (!string.IsNullOrEmpty(ta.Schema))
+                dbSetInfo.Schema = ta.Schema;
         }
 
         #endregion

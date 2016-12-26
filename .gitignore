@@ -242,3 +242,4 @@ ModelManifest.xml
 .fake/
 /src/compile.log
 *.snk
+/src/*.bak

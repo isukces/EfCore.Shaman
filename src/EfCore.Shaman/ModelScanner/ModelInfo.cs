@@ -6,6 +6,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Reflection;
 using EfCore.Shaman.Reflection;
+using EfCore.Shaman.Services;
 using Microsoft.EntityFrameworkCore;
 
 #endregion
@@ -57,12 +58,11 @@ namespace EfCore.Shaman.ModelScanner
         private DbSetInfo CreateDbSetWrapper(Type entityType, string propertyName)
         {
             var dbSetInfoUpdateServices = _services?.OfType<IDbSetInfoUpdateService>().ToArray();
-
-            var dbSetInfo = new DbSetInfo(entityType, GetTableName(entityType, propertyName));
+            var dbSetInfo = new DbSetInfo(entityType, GetTableName(entityType, propertyName), DefaultSchema);
             {
                 if (dbSetInfoUpdateServices != null)
                     foreach (var i in dbSetInfoUpdateServices)
-                        i.UpdateDbSetInfo(dbSetInfo, entityType);
+                        i.UpdateDbSetInfo(dbSetInfo, entityType, _contextType);
             }
             var columnInfoUpdateServices = _services?.OfType<IColumnInfoUpdateService>().ToArray();
             foreach (var propertyInfo in entityType.GetProperties())
@@ -86,6 +86,8 @@ namespace EfCore.Shaman.ModelScanner
 
         private void Prepare()
         {
+            // todo: bad design - make service
+            DefaultSchema = DefaultSchemaUpdater.GetDefaultSchema(_contextType);
             foreach (var property in _contextType.GetProperties())
             {
                 var propertyType = property.PropertyType;
@@ -100,6 +102,8 @@ namespace EfCore.Shaman.ModelScanner
         #endregion
 
         #region Properties
+
+        public string DefaultSchema { get; set; }
 
         public IEnumerable<DbSetInfo> DbSets => _dbSets.Values;
 

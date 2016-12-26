@@ -27,7 +27,7 @@ namespace EfCore.Shaman
 
         #region Instance Methods
 
-        public IDirectSaver<T> GetDirectSaver<T>()
+        public IDirectSaver<T> GetDirectSaver<T>(Func<ShamanOptions> optionsFactory = null)
         {
             _lock.EnterUpgradeableReadLock();
             try
@@ -41,7 +41,7 @@ namespace EfCore.Shaman
                     var o = ShamanOptions?.Services.OfType<IDirectSaverFactory>().FirstOrDefault();
                     if (o == null)
                         throw new Exception("Unable to find IDirectSaverFactory in ShamanOptions.Services.");
-                    var result = o.GetDirectSaver<T>(GetType());
+                    var result = o.GetDirectSaver<T>(GetType(), optionsFactory);
                     _directSaverCache[typeof(T)] = result;
                     return result;
                 }
