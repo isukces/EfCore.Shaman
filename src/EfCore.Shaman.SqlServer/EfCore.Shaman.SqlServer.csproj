@@ -37,9 +37,6 @@
     <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="EfCore.Shaman, Version=1.0.16361.9, Culture=neutral, PublicKeyToken=f6ce7e425a161c84, processorArchitecture=MSIL">
-      <HintPath>..\packages\EfCore.Shaman.1.0.16361.9\lib\net451\EfCore.Shaman.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.EntityFrameworkCore, Version=1.1.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.EntityFrameworkCore.1.1.0\lib\net451\Microsoft.EntityFrameworkCore.dll</HintPath>
       <Private>True</Private>
@@ -149,6 +146,12 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\EfCore.Shaman\EfCore.Shaman.csproj">
+      <Project>{D8CECFB3-BAB9-4189-B999-F94A02E0A741}</Project>
+      <Name>EfCore.Shaman</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

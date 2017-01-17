@@ -1,41 +1,16 @@
-@VisualStudio = GlobalVar["VisualStudio 2017"];
-@nugetexe = GlobalVar["Nuget"];
-@nugetrepo = GlobalVar["Private Nuget Repository"];
+var builder = new ProjectBuilder(){
+	VisualStudioExe = GlobalVar["VisualStudio 2015"],
+	NugetExe = GlobalVar["Nuget"],
+	NugetRepositoryDir =  GlobalVar["Private Nuget Repository"],
+	SolutionName = "EfCore.Shaman",
+	SolutionDir = ConfigDir,
+	ProjectName = "EfCore.Shaman.SqlServer",	
+};
 
 
-@projName = "EfCore.Shaman.SqlServer";
-@slnName = "EfCore.Shaman";
+builder.FixNuspec(null, "EfCore.Shaman");
+builder.UpdateVersion();
+builder.Build();
+builder.MakeNuget();
 
-
-@projDir = string.Format(@"{0}\{1}\", ConfigDir, projName);
-
-// task: update version
-// if (false)
-{
-	var pi = projDir + @"\Properties\AssemblyInfo.cs";
-	var currentVer = CsProject.GetAssemblyFileVersion(pi);
-	var newVer = CsProject.UpdateVersion(currentVer);
-	MakeMessage("update version {0} -> {1}", currentVer, newVer);
-	CsProject.UpdateAssemblyFileVersion(pi, newVer);
-	CsProject.UpdateAssemblyVersion(pi, newVer);
-}
-
-var log = CombinePath(ConfigDir, "compile.log");
-DeleteFile(log);
-
-
-
-// task: clean
-Execute(VisualStudio, CombinePath(ConfigDir, slnName+".sln"), "/clean", "Release");
-
-// task: build 
-Execute(VisualStudio, CombinePath(ConfigDir, slnName+".sln"), "/build", "Release", "/out", log);
-
-
-Execute(nugetexe, "pack", projDir+ projName + ".csproj", "-IncludeReferencedProjects -Prop Configuration=RELEASE");
-  
-var version = GetAssemblyVersion(projDir + string.Format(@"bin\Release\{0}.dll", projName));
-Console.WriteLine(version);
-var nugetPackage = string.Format(@"{0}\{1}.{2}.nupkg",ConfigDir, projName, version);
-CopyFile(nugetPackage, nugetrepo);
-DeleteFile(nugetPackage);
+Console.WriteLine("--FINISHED--");
