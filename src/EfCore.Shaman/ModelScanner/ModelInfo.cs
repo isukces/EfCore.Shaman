@@ -65,16 +65,19 @@ namespace EfCore.Shaman.ModelScanner
                         i.UpdateDbSetInfo(dbSetInfo, entityType, _contextType);
             }
             var columnInfoUpdateServices = _services?.OfType<IColumnInfoUpdateService>().ToArray();
+            var useDirectSaverForType = entityType.GetCustomAttribute<NoDirectSaverAttribute>()==null;
             foreach (var propertyInfo in entityType.GetProperties())
             {
                 var columnInfo = new ColumnInfo(dbSetInfo.Properites.Count, propertyInfo.Name)
                 {
                     NotNull = NotNullFromPropertyType(propertyInfo.PropertyType)
                 };
-                var readerWriter = new SimplePropertyReaderWriter(entityType, propertyInfo);
-                columnInfo.ValueReader = readerWriter;
-                columnInfo.ValueWriter = readerWriter;
-
+                if (useDirectSaverForType)
+                {
+                    var readerWriter = new SimplePropertyReaderWriter(entityType, propertyInfo);
+                    columnInfo.ValueReader = readerWriter;
+                    columnInfo.ValueWriter = readerWriter;
+                }
                 if (columnInfoUpdateServices != null)
                     foreach (var service in columnInfoUpdateServices)
                         service.UpdateColumnInfo(columnInfo, propertyInfo);

@@ -135,6 +135,7 @@
     <Compile Include="Services\TableAttributeUpdater.cs" />
     <Compile Include="_attributes\DecimalTypeAttribute.cs" />
     <Compile Include="_attributes\DefaultSchemaAttribute.cs" />
+    <Compile Include="_attributes\NoDirectSaverAttribute.cs" />
     <Compile Include="_interfaces\IColumnInfoUpdateService.cs" />
     <Compile Include="_interfaces\IDbSetInfoUpdateService.cs" />
     <Compile Include="_interfaces\IDirectSaver.cs" />
