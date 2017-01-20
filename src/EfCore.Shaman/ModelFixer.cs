@@ -17,10 +17,10 @@ namespace EfCore.Shaman
     {
         #region Constructors
 
-        private ModelFixer(Type type, ShamanOptions shamanOptions)
+        public ModelFixer(Type type, ShamanOptions shamanOptions, ModelInfo modelInfo = null)
         {
             _shamanOptions = shamanOptions ?? new ShamanOptions();
-            _info = new ModelInfo(type, _shamanOptions.Services);
+            _info = modelInfo ?? new ModelInfo(type, _shamanOptions.Services);
         }
 
         #endregion
@@ -30,13 +30,13 @@ namespace EfCore.Shaman
         public static void FixMigrationUp<T>(MigrationBuilder migrationBuilder, ShamanOptions shamanOptions = null) where T : DbContext
         {
             var tmp = new ModelFixer(typeof(T), shamanOptions);
-            tmp.FixMigrationUpInternal(migrationBuilder);
+            tmp.FixMigrationUp(migrationBuilder);
         }
 
         public static void FixOnModelCreating(ModelBuilder modelBuilder, Type contextType, ShamanOptions shamanOptions = null)
         {
             var modelFixer = new ModelFixer(contextType, shamanOptions);
-            modelFixer.FixOnModelCreatingInternal(modelBuilder);
+            modelFixer.FixOnModelCreating(modelBuilder);
         }
 
 
@@ -64,7 +64,7 @@ namespace EfCore.Shaman
 
         #region Instance Methods
 
-        private void FixMigrationUpInternal(MigrationBuilder migrationBuilder)
+        public void FixMigrationUp(MigrationBuilder migrationBuilder)
         {
             var services = _shamanOptions?.Services.OfType<IFixMigrationUpService>().ToArray();
             if (services != null)
@@ -101,14 +101,14 @@ namespace EfCore.Shaman
             });
         }
 
-        private void FixOnModelCreatingInternal(ModelBuilder modelBuilder)
+        public void FixOnModelCreating(ModelBuilder modelBuilder)
         {
             if (!string.IsNullOrEmpty(_info.DefaultSchema))
                 modelBuilder = modelBuilder.HasDefaultSchema(_info.DefaultSchema);
             foreach (var dbSet in _info.DbSets)
             {
                 var allIdx = dbSet.Properites
-                    .SelectMany(q => q.ColumnIndexes.Select(w => Tuple.Create(w, q.ColumnName)))
+                    .SelectMany(q => q.ColumnIndexes.Select(columnIndexInfo => Tuple.Create(columnIndexInfo, q.ColumnName)))
                     .GroupBy(a => a.Item1.IndexName, StringComparer.OrdinalIgnoreCase);
                 var entity = modelBuilder.Entity(dbSet.EntityType);
                 foreach (var idx in allIdx)
