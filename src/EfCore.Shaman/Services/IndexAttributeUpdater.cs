@@ -18,14 +18,19 @@ namespace EfCore.Shaman.Services
             if ((indexAttributes == null) || !indexAttributes.Any()) return;
             foreach (var indexAttribute in indexAttributes)
             {
-                var indexMember = new ColumnIndexInfo
+                var indexName = indexAttribute.Name?.Trim() ?? "";
+                var indexInfo = columnInfo.ColumnIndexes.SingleOrDefault(a => a.IndexName == indexName);
+                if (indexInfo == null)
                 {
-                    IndexName = indexAttribute.Name?.Trim(),
-                    Order = indexAttribute.Order,
-                    IsDescending = indexAttribute.IsDescending,
-                    IsUnique = indexAttribute is UniqueIndexAttribute
-                };
-                columnInfo.ColumnIndexes.Add(indexMember);
+                    indexInfo = new ColumnIndexInfo
+                    {
+                        IndexName = indexName
+                    };
+                    columnInfo.ColumnIndexes.Add(indexInfo);
+                }
+                indexInfo.Order = indexAttribute.Order;
+                indexInfo.IsDescending = indexAttribute.IsDescending;
+                indexInfo.IsUnique = indexAttribute is UniqueIndexAttribute;
             }
         }
 
