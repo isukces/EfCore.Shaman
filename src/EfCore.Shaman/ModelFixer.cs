@@ -5,7 +5,6 @@ using System.Linq;
 using EfCore.Shaman.ModelScanner;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
 
@@ -27,22 +26,28 @@ namespace EfCore.Shaman
 
         #region Static Methods
 
-        public static void FixMigrationUp<T>(MigrationBuilder migrationBuilder, ShamanOptions shamanOptions = null) where T : DbContext
+        public static void FixMigrationUp<T>(MigrationBuilder migrationBuilder, ShamanOptions shamanOptions = null)
+            where T : DbContext
         {
             var tmp = new ModelFixer(typeof(T), shamanOptions);
             tmp.FixMigrationUp(migrationBuilder);
         }
 
-        public static void FixOnModelCreating(ModelBuilder modelBuilder, Type contextType, ShamanOptions shamanOptions = null)
+        public static bool FixOnModelCreating(ModelBuilder modelBuilder, Type contextType, DbContext dbContextInstance,
+            ShamanOptions shamanOptions = null)
         {
+            var x = dbContextInstance as IShamanFriendlyDbContext;
+            if (x != null && x.CreationMode == DbContextCreationMode.WithoutModelFixing)
+                return false;
             var modelFixer = new ModelFixer(contextType, shamanOptions);
             modelFixer.FixOnModelCreating(modelBuilder);
+            return true;
         }
 
 
         private static int ComparePropertyWrapper(ColumnInfo a, ColumnInfo b)
         {
-            if ((a == null) && (b == null)) return 0;
+            if (a == null && b == null) return 0;
             if (a == null) return -1;
             if (b == null) return 1;
 
@@ -75,6 +80,33 @@ namespace EfCore.Shaman
                 FixOnModelCreatingForTable(table);
         }
 
+        public void FixOnModelCreating(ModelBuilder modelBuilder)
+        {
+            if (!string.IsNullOrEmpty(_info.DefaultSchema))
+                modelBuilder = modelBuilder.HasDefaultSchema(_info.DefaultSchema);
+
+            var dict = modelBuilder.Model.GetEntityTypes().ToDictionary(a => a.ClrType, a => a.Relational());
+
+            foreach (var dbSet in _info.DbSets)
+            {
+                var entity = modelBuilder.Entity(dbSet.EntityType);
+                foreach (var idx in dbSet.Indexes)
+                {
+                    var fields = idx.Fields.Select(a => a.FieldName).ToArray();
+                    var indexBuilder = entity.HasIndex(fields);
+                    TrySetIndexName(indexBuilder, idx.IndexName);
+                    indexBuilder.IsUnique(idx.IsUnique);
+                }
+                foreach (var i in dbSet.Properites)
+                {
+                    if (i.MaxLength == null || i.DecimalPlaces == null)
+                        continue;
+                    var type = $"decimal({i.MaxLength},{i.DecimalPlaces})";
+                    entity.Property(i.PropertyName).HasColumnType(type);
+                }
+            }
+        }
+
         private void FixOnModelCreatingForTable(CreateTableOperation table)
         {
             if (table == null)
@@ -101,34 +133,6 @@ namespace EfCore.Shaman
             });
         }
 
-        public void FixOnModelCreating(ModelBuilder modelBuilder)
-        {
-            if (!string.IsNullOrEmpty(_info.DefaultSchema))
-                modelBuilder = modelBuilder.HasDefaultSchema(_info.DefaultSchema);
-            foreach (var dbSet in _info.DbSets)
-            {
-                var allIdx = dbSet.Properites
-                    .SelectMany(q => q.ColumnIndexes.Select(columnIndexInfo => Tuple.Create(columnIndexInfo, q.ColumnName)))
-                    .GroupBy(a => a.Item1.IndexName, StringComparer.OrdinalIgnoreCase);
-                var entity = modelBuilder.Entity(dbSet.EntityType);
-                foreach (var idx in allIdx)
-                {
-                    var fields = idx.OrderBy(q => q.Item1.Order).Select(q => q.Item2).ToArray();
-                    var indexBuilder = entity.HasIndex(fields);
-                    TrySetIndexName(indexBuilder, idx.Key);
-                    indexBuilder.IsUnique(idx.First().Item1.IsUnique);
-
-                }
-                foreach (var i in dbSet.Properites)
-                {
-                    if (i.MaxLength == null || i.DecimalPlaces == null)
-                        continue;
-                    var type = $"decimal({i.MaxLength},{i.DecimalPlaces})";
-                    entity.Property(i.PropertyName).HasColumnType(type);
-                }
-            }
-        }
-
         #endregion
 
         #region Fields
@@ -138,5 +142,4 @@ namespace EfCore.Shaman
 
         #endregion
     }
-
 }
