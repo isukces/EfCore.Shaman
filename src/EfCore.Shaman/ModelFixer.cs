@@ -19,7 +19,7 @@ namespace EfCore.Shaman
 
         public ModelFixer(Type type, ShamanOptions shamanOptions, ModelInfo modelInfo = null)
         {
-            _shamanOptions = shamanOptions ?? new ShamanOptions();
+            _shamanOptions = shamanOptions ?? ShamanOptions.Default;
             _info = modelInfo ?? new ModelInfo(type, _shamanOptions.Services);
         }
 
