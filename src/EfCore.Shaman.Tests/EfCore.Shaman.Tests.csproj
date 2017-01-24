@@ -137,6 +137,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ModelInfoTests.cs" />
+    <Compile Include="Model\EmptyService.cs" />
     <Compile Include="Model\MyEntityWithDifferentTableName.cs" />
     <Compile Include="Model\MyEntityWithUniqueIndex.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

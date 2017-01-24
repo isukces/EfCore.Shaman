@@ -60,7 +60,7 @@ namespace EfCore.Shaman
         {
             base.OnModelCreating(modelBuilder);
             OnModelCreatingInternal(modelBuilder);
-            this.FixOnModelCreating(modelBuilder, this, ShamanOptions);
+            this.FixOnModelCreating(modelBuilder, ShamanOptions);
         }
 
         protected virtual void OnModelCreatingInternal(ModelBuilder modelBuilder)

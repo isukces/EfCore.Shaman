@@ -85,6 +85,15 @@ namespace EfCore.Shaman.Tests
             });
         }
 
+
+        [Fact]
+        public void T04_ShouldHaveEmptyService()
+        {
+            var services = ShamanOptions.CreateShamanOptions(typeof(TestDbContext)).Services;
+            var cnt = services.Count(a => a is EmptyService);
+            Assert.Equal(1, cnt);
+        }
+
         #endregion
     }
 }

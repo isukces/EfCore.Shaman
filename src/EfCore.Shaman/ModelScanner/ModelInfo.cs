@@ -19,10 +19,10 @@ namespace EfCore.Shaman.ModelScanner
     {
         #region Constructors
 
-        public ModelInfo(Type contextType, IList<IShamanService> services)
+        public ModelInfo(Type dbContextType, IList<IShamanService> services = null)
         {
-            _contextType = contextType;
-            _services = services;
+            _dbContextType = dbContextType;
+            _services = services ?? ShamanOptions.CreateShamanOptions(dbContextType).Services;
             Prepare();
         }
 
@@ -73,7 +73,7 @@ namespace EfCore.Shaman.ModelScanner
             {
                 if (dbSetInfoUpdateServices != null)
                     foreach (var i in dbSetInfoUpdateServices)
-                        i.UpdateDbSetInfo(dbSetInfo, entityType, _contextType);
+                        i.UpdateDbSetInfo(dbSetInfo, entityType, _dbContextType);
             }
             var columnInfoUpdateServices = _services?.OfType<IColumnInfoUpdateService>().ToArray();
             var useDirectSaverForType = entityType.GetCustomAttribute<NoDirectSaverAttribute>() == null;
@@ -100,7 +100,7 @@ namespace EfCore.Shaman.ModelScanner
         static IReadOnlyDictionary<Type, string> GetTableNamesFromModel(IModel model)
         {
             var result = new Dictionary<Type, string>();
-            foreach (var entityType in model.GetEntityTypes()) 
+            foreach (var entityType in model.GetEntityTypes())
                 result[entityType.ClrType] = entityType.Relational().TableName;
             return result;
         }
@@ -109,7 +109,7 @@ namespace EfCore.Shaman.ModelScanner
         {
             // todo: bad design - make service
 
-            var instance = TryCreateInstance(_contextType);
+            var instance = TryCreateInstance(_dbContextType);
             IReadOnlyDictionary<Type, string> tableNames = null;
             if (instance != null)
             {
@@ -117,9 +117,9 @@ namespace EfCore.Shaman.ModelScanner
                 var model = ((DbContext)instance).Model;
                 tableNames = GetTableNamesFromModel(model);
             }
-            DefaultSchema = DefaultSchemaUpdater.GetDefaultSchema(_contextType);
+            DefaultSchema = DefaultSchemaUpdater.GetDefaultSchema(_dbContextType);
 
-            foreach (var property in _contextType.GetProperties())
+            foreach (var property in _dbContextType.GetProperties())
             {
                 var propertyType = property.PropertyType;
                 if (!propertyType.IsGenericType) continue;
@@ -151,7 +151,7 @@ namespace EfCore.Shaman.ModelScanner
 
         #region Fields
 
-        private readonly Type _contextType;
+        private readonly Type _dbContextType;
         private readonly IList<IShamanService> _services;
 
 

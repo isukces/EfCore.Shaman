@@ -18,10 +18,10 @@ namespace EfCore.Shaman
             ModelFixer.FixMigrationUp<T>(migrationBuilder, shamanOptions);
         }
 
-        public static void FixOnModelCreating(this DbContext context, ModelBuilder modelBuilder, DbContext dbContextInstance, ShamanOptions shamanOptions = null)
+        public static void FixOnModelCreating(this DbContext context, ModelBuilder modelBuilder, ShamanOptions shamanOptions = null)
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
-            ModelFixer.FixOnModelCreating(modelBuilder, context.GetType(), dbContextInstance, shamanOptions);
+            ModelFixer.FixOnModelCreating(modelBuilder, context.GetType(), context, shamanOptions);
         }
 
         public static bool FixOnModelCreating<T>(this ModelBuilder modelBuilder, T dbContextInstance, ShamanOptions shamanOptions = null) where T : DbContext

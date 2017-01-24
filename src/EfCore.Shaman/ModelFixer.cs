@@ -16,10 +16,10 @@ namespace EfCore.Shaman
     {
         #region Constructors
 
-        public ModelFixer(Type type, ShamanOptions shamanOptions, ModelInfo modelInfo = null)
+        public ModelFixer(Type dbContextType, ShamanOptions shamanOptions, ModelInfo modelInfo = null)
         {
-            _shamanOptions = shamanOptions ?? ShamanOptions.Default;
-            _info = modelInfo ?? new ModelInfo(type, _shamanOptions.Services);
+            _shamanOptions = shamanOptions ?? ShamanOptions.CreateShamanOptions(dbContextType);
+            _info = modelInfo ?? new ModelInfo(dbContextType, _shamanOptions.Services);
         }
 
         #endregion

@@ -16,7 +16,16 @@ namespace EfCore.Shaman.Tests.Model
         {
         }
 
+        #endregion
 
+        #region Static Methods
+
+        private static ShamanOptions GetShamanOptions()
+        {
+            return ShamanOptions
+                .Default
+                .With<EmptyService>();
+        }
 
         #endregion
 
@@ -27,7 +36,8 @@ namespace EfCore.Shaman.Tests.Model
             base.OnModelCreating(modelBuilder);
 
             // manual changes 
-            var er = modelBuilder.Model.GetEntityTypes().Single(a => a.ClrType == typeof(MyEntityWithDifferentTableName));
+            var er = modelBuilder.Model.GetEntityTypes()
+                .Single(a => a.ClrType == typeof(MyEntityWithDifferentTableName));
             er.Relational().TableName = "ManualChange";
             if (modelBuilder.FixOnModelCreating(this))
                 ExternalCheckModel?.Invoke(modelBuilder);
