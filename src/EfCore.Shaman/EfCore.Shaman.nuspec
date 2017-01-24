@@ -62,6 +62,7 @@
       <dependency id="System.Threading.Timer" version="4.3.0" />
       <dependency id="System.Xml.ReaderWriter" version="4.3.0" />
       <dependency id="System.Xml.XDocument" version="4.3.0" />
+      <dependency id="Microsoft.EntityFrameworkCore.InMemory" version="1.1.0" />
     </dependencies>
   </metadata>
   <files>

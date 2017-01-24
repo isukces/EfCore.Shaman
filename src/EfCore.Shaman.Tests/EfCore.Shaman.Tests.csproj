@@ -143,7 +143,9 @@
     <Compile Include="Model\TestDbContext.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\EfCore.Shaman\EfCore.Shaman.csproj">
