@@ -9,7 +9,6 @@ using EfCore.Shaman.Reflection;
 using EfCore.Shaman.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 #endregion
 
@@ -22,7 +21,7 @@ namespace EfCore.Shaman.ModelScanner
         public ModelInfo(Type dbContextType, IList<IShamanService> services = null)
         {
             _dbContextType = dbContextType;
-            _services = services ?? ShamanOptions.CreateShamanOptions(dbContextType).Services;
+            UsedServices = services ?? ShamanOptions.CreateShamanOptions(dbContextType).Services;
             Prepare();
         }
 
@@ -39,7 +38,8 @@ namespace EfCore.Shaman.ModelScanner
             return false;
         }
 
-        private static string GetTableName(Type entityType, string propertyName, IReadOnlyDictionary<Type, string> tableNames)
+        private static string GetTableName(Type entityType, string propertyName,
+            IReadOnlyDictionary<Type, string> tableNames)
         {
             if (tableNames != null)
             {
@@ -49,6 +49,15 @@ namespace EfCore.Shaman.ModelScanner
             }
             var a = entityType.GetCustomAttribute<TableAttribute>();
             return string.IsNullOrEmpty(a?.Name) ? propertyName : a.Name;
+        }
+
+        private static IReadOnlyDictionary<Type, string> GetTableNamesFromModel(IModel model)
+        {
+            if (model == null) return null;
+            var result = new Dictionary<Type, string>();
+            foreach (var entityType in model.GetEntityTypes())
+                result[entityType.ClrType] = entityType.Relational().TableName;
+            return result;
         }
 
         #endregion
@@ -66,16 +75,17 @@ namespace EfCore.Shaman.ModelScanner
         }
 
 
-        private DbSetInfo CreateDbSetWrapper(Type entityType, string propertyName, IReadOnlyDictionary<Type, string> tableNames)
+        private DbSetInfo CreateDbSetWrapper(Type entityType, string propertyName,
+            IReadOnlyDictionary<Type, string> tableNames)
         {
-            var dbSetInfoUpdateServices = _services?.OfType<IDbSetInfoUpdateService>().ToArray();
+            var dbSetInfoUpdateServices = UsedServices?.OfType<IDbSetInfoUpdateService>().ToArray();
             var dbSetInfo = new DbSetInfo(entityType, GetTableName(entityType, propertyName, tableNames), DefaultSchema);
             {
                 if (dbSetInfoUpdateServices != null)
                     foreach (var i in dbSetInfoUpdateServices)
                         i.UpdateDbSetInfo(dbSetInfo, entityType, _dbContextType);
             }
-            var columnInfoUpdateServices = _services?.OfType<IColumnInfoUpdateService>().ToArray();
+            var columnInfoUpdateServices = UsedServices?.OfType<IColumnInfoUpdateService>().ToArray();
             var useDirectSaverForType = entityType.GetCustomAttribute<NoDirectSaverAttribute>() == null;
             foreach (var propertyInfo in entityType.GetProperties())
             {
@@ -97,28 +107,21 @@ namespace EfCore.Shaman.ModelScanner
             return dbSetInfo;
         }
 
-        static IReadOnlyDictionary<Type, string> GetTableNamesFromModel(IModel model)
-        {
-            var result = new Dictionary<Type, string>();
-            foreach (var entityType in model.GetEntityTypes())
-                result[entityType.ClrType] = entityType.Relational().TableName;
-            return result;
-        }
-
         private void Prepare()
         {
             // todo: bad design - make service
-
-            var instance = TryCreateInstance(_dbContextType);
-            IReadOnlyDictionary<Type, string> tableNames = null;
-            if (instance != null)
+            IModel model = null;
             {
-                instance.CreationMode = DbContextCreationMode.WithoutModelFixing;
-                var model = ((DbContext)instance).Model;
-                tableNames = GetTableNamesFromModel(model);
+                var instance = TryCreateInstance(_dbContextType);
+                UsedDbContextModel = instance != null;
+                if (instance != null)
+                {
+                    instance.CreationMode = DbContextCreationMode.WithoutModelFixing;
+                    model = ((DbContext)instance).Model;
+                }
             }
-            DefaultSchema = DefaultSchemaUpdater.GetDefaultSchema(_dbContextType);
-
+            var tableNames = GetTableNamesFromModel(model);
+            DefaultSchema = DefaultSchemaUpdater.GetDefaultSchema(_dbContextType, model);         
             foreach (var property in _dbContextType.GetProperties())
             {
                 var propertyType = property.PropertyType;
@@ -130,12 +133,15 @@ namespace EfCore.Shaman.ModelScanner
             }
         }
 
+
         private IShamanFriendlyDbContext TryCreateInstance(Type contextType)
         {
             if (contextType == null) throw new ArgumentNullException(nameof(contextType));
-            var implementsMyInterface = contextType.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IShamanFriendlyDbContext));
+            var implementsMyInterface =
+                contextType.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IShamanFriendlyDbContext));
             if (!implementsMyInterface)
-                return null; // can't create instance because it can affect stackoverflowexception due to calling FixOnModelCreating
+                return null;
+            // can't create instance because it can affect stackoverflowexception due to calling FixOnModelCreating
             return InstanceCreator.CreateInstance(contextType) as IShamanFriendlyDbContext;
         }
 
@@ -147,12 +153,18 @@ namespace EfCore.Shaman.ModelScanner
 
         public IEnumerable<DbSetInfo> DbSets => _dbSets.Values;
 
+        public IList<IShamanService> UsedServices { get; private set; }
+
+        /// <summary>
+        ///     IModel from DbContext has been used in modelinfo building
+        /// </summary>
+        public bool UsedDbContextModel { get; private set; }
+
         #endregion
 
         #region Fields
 
         private readonly Type _dbContextType;
-        private readonly IList<IShamanService> _services;
 
 
         private readonly Dictionary<string, DbSetInfo> _dbSets =
