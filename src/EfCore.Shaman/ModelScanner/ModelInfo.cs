@@ -8,7 +8,6 @@ using System.Reflection;
 using EfCore.Shaman.Reflection;
 using EfCore.Shaman.Services;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
 
 #endregion
 
@@ -56,12 +55,12 @@ namespace EfCore.Shaman.ModelScanner
             return string.IsNullOrEmpty(a?.Name) ? propertyName : a.Name;
         }
 
-        private static IReadOnlyDictionary<Type, string> GetTableNamesFromModel(IModel model)
+        private static IReadOnlyDictionary<Type, string> GetTableNamesFromModel(EfModelWrapper model)
         {
             if (model == null) return null;
             var result = new Dictionary<Type, string>();
-            foreach (var entityType in model.GetEntityTypes())
-                result[entityType.ClrType] = entityType.Relational().TableName;
+            foreach (var entityType in model.EntityTypes)
+                result[entityType.ClrType] = entityType.TableName;
             return result;
         }
 
@@ -112,19 +111,12 @@ namespace EfCore.Shaman.ModelScanner
             return dbSetInfo;
         }
 
+        // [Serializable]
         private void Prepare()
         {
             // todo: bad design - make service
-            IModel model = null;
-            {
-                var instance = TryCreateInstance(_dbContextType);
-                UsedDbContextModel = instance != null;
-                if (instance != null)
-                {
-                    instance.CreationMode = DbContextCreationMode.WithoutModelFixing;
-                    model = ((DbContext)instance).Model;
-                }
-            }
+            var model = ModelsCachedContainer.GetRawModel(_dbContextType);
+            UsedDbContextModel = model != null;
             var tableNames = GetTableNamesFromModel(model);
             DefaultSchema = DefaultSchemaUpdater.GetDefaultSchema(_dbContextType, model);
             foreach (var property in _dbContextType.GetProperties())
@@ -138,17 +130,7 @@ namespace EfCore.Shaman.ModelScanner
             }
         }
 
-
-        private IShamanFriendlyDbContext TryCreateInstance(Type contextType)
-        {
-            if (contextType == null) throw new ArgumentNullException(nameof(contextType));
-            var implementsMyInterface =
-                contextType.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IShamanFriendlyDbContext));
-            if (!implementsMyInterface)
-                return null;
-            // can't create instance because it can affect stackoverflowexception due to calling FixOnModelCreating
-            return InstanceCreator.CreateInstance(contextType) as IShamanFriendlyDbContext;
-        }
+ 
 
         #endregion
 

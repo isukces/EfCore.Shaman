@@ -121,9 +121,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ModelScanner\EfModelWrapper.cs" />
     <Compile Include="ModelScanner\InstanceCreator.cs" />
+    <Compile Include="ModelScanner\ModelsCachedContainer.cs" />
     <Compile Include="ModelScanner\TableIndexFieldInfo.cs" />
-    <Compile Include="_interfaces\IShamanFriendlyDbContext.cs" />
+    <Compile Include="Services\_additional\PrefixedTableNameService.cs" />
+    <Compile Include="Services\_additional\RemovePluralizingTableNameService.cs" />
     <Compile Include="_interfaces\ITableIndexFieldInfo.cs" />
     <Compile Include="_interfaces\ITableIndexInfo.cs" />
     <Compile Include="ModelScanner\TableIndexInfo.cs" />

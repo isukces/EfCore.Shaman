@@ -1,20 +1,24 @@
 ﻿#region using
 
-using System;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using System.Reflection;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 #endregion
 
 namespace EfCore.Shaman.Tests.Model
 {
     [DefaultSchema("testSchema")]
-    internal class TestDbContext : DbContext, IShamanFriendlyDbContext
+    internal class TestDbContext : VisitableDbContext
     {
         #region Constructors
 
         public TestDbContext(DbContextOptions options) : base(options)
         {
+
         }
 
         #endregion
@@ -40,17 +44,14 @@ namespace EfCore.Shaman.Tests.Model
             var er = modelBuilder.Model.GetEntityTypes()
                 .Single(a => a.ClrType == typeof(MyEntityWithDifferentTableName));
             er.Relational().TableName = "ManualChange";
-            if (modelBuilder.FixOnModelCreating(this))
-                ExternalCheckModel?.Invoke(modelBuilder);
+
+            modelBuilder.FixOnModelCreating(this);
+            ExternalCheckModel?.Invoke(modelBuilder);
         }
 
         #endregion
 
         #region Properties
-
-        DbContextCreationMode IShamanFriendlyDbContext.CreationMode { get; set; }
-
-        public Action<ModelBuilder> ExternalCheckModel { get; set; }
 
         public DbSet<MyEntityWithUniqueIndex> EntityWithUniqueIndex { get; set; }
         public DbSet<MyEntityWithDifferentTableName> EntityWithDifferentTableName { get; set; }

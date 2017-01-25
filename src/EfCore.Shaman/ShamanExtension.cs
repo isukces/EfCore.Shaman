@@ -1,6 +1,7 @@
 ﻿#region using
 
 using System;
+using EfCore.Shaman.ModelScanner;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 
@@ -24,10 +25,11 @@ namespace EfCore.Shaman
             ModelFixer.FixOnModelCreating(modelBuilder, context.GetType(), context, shamanOptions);
         }
 
-        public static bool FixOnModelCreating<T>(this ModelBuilder modelBuilder, T dbContextInstance, ShamanOptions shamanOptions = null) where T : DbContext
+        public static void FixOnModelCreating<T>(this ModelBuilder modelBuilder, T dbContextInstance, ShamanOptions shamanOptions = null) where T : DbContext
         {
             if (modelBuilder == null) throw new ArgumentNullException(nameof(modelBuilder));
-            return ModelFixer.FixOnModelCreating(modelBuilder, typeof(T), dbContextInstance, shamanOptions);
+            ModelsCachedContainer.SetRawModel(typeof(T), modelBuilder.Model);
+            ModelFixer.FixOnModelCreating(modelBuilder, typeof(T), dbContextInstance, shamanOptions);
         }
 
         #endregion

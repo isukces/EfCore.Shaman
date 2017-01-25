@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Reflection;
+﻿using System.Reflection;
 using EfCore.Shaman.ModelScanner;
 
 namespace EfCore.Shaman.Services

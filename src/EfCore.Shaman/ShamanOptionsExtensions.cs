@@ -31,7 +31,7 @@ namespace EfCore.Shaman
 
             var concurrencyDetector = databaseFacade.GetService<IConcurrencyDetector>();
 
-            using(concurrencyDetector.EnterCriticalSection())
+            using (concurrencyDetector.EnterCriticalSection())
             {
                 var rawSqlCommand = databaseFacade
                     .GetService<IRawSqlCommandBuilder>()
@@ -48,6 +48,14 @@ namespace EfCore.Shaman
         {
             if (options == null) throw new ArgumentNullException(nameof(options));
             options.Services.Add(new T());
+            return options;
+        }
+
+        public static ShamanOptions With(this ShamanOptions options, IShamanService service)
+        {
+            if (options == null) throw new ArgumentNullException(nameof(options));
+            if (service == null) throw new ArgumentNullException(nameof(service));
+            options.Services.Add(service);
             return options;
         }
 

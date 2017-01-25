@@ -1,6 +1,7 @@
 ﻿#region using
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using EfCore.Shaman.ModelScanner;
 using EfCore.Shaman.Tests.Model;
@@ -16,22 +17,31 @@ namespace EfCore.Shaman.Tests
     {
         #region Static Methods
 
-        private static void DoTestOnModelBuilder(Action<ModelBuilder> checkMethod)
+        private static void DoTestOnModelBuilder<T>(Action<ModelBuilder> checkMethod) where T : VisitableDbContext
         {
-            var options = new DbContextOptionsBuilder<TestDbContext>()
+            var options = new DbContextOptionsBuilder<T>()
                 .UseInMemoryDatabase(nameof(T02_ShouldHaveUniqueIndex))
                 .Options;
-
-            using(var context = new TestDbContext(options))
+            var count = 0;
+            using(var context = InstanceCreator.CreateInstance<T>(options))
             {
-                context.ExternalCheckModel = checkMethod;
-                var list = context.EntityWithUniqueIndex.ToArray(); // force build model
+                context.ExternalCheckModel = b =>
+                {
+                    count++;
+                    checkMethod?.Invoke(b);
+                };
+                var tmp = context.Settings.ToArray(); // enforce to create model
+                var model = context.Model;
+                if (model == null) // enforce to create model
+                    throw new NullReferenceException();
             }
+            if (count == 0)
+                throw new Exception("checkMethod has not been invoked");
         }
 
-        private static ModelInfo GetModelInfo()
+        private static ModelInfo GetModelInfo<T>(IList<IShamanService> services = null)
         {
-            var aa = new ModelInfo(typeof(TestDbContext), ShamanOptions.Default.Services);
+            var aa = new ModelInfo(typeof(T), services);
             return aa;
         }
 
@@ -61,9 +71,10 @@ namespace EfCore.Shaman.Tests
         [Fact]
         public void T02_ShouldHaveUniqueIndex()
         {
-            DoTestOnModelBuilder(mb =>
+            // todo: xunit tests (each test in separate appdomain). DbContext creates Model only once  
+            DoTestOnModelBuilder<TestDbContext>(mb =>
             {
-                var modelInfo = GetModelInfo();
+                var modelInfo = GetModelInfo<TestDbContext>();
                 var dbSet = modelInfo.DbSet<MyEntityWithUniqueIndex>();
                 Assert.NotNull(dbSet);
                 var idxs = SerializeToTest(dbSet.Indexes);
@@ -76,9 +87,9 @@ namespace EfCore.Shaman.Tests
         [Fact]
         public void T03_ShouldHaveManuallyChangedTableName()
         {
-            DoTestOnModelBuilder(mb =>
+            DoTestOnModelBuilder<TestDbContext>(mb =>
             {
-                var modelInfo = GetModelInfo();
+                var modelInfo = GetModelInfo<TestDbContext>();
                 var dbSet = modelInfo.DbSet<MyEntityWithDifferentTableName>();
                 Assert.NotNull(dbSet);
                 Assert.Equal("ManualChange", dbSet.TableName);
@@ -99,6 +110,40 @@ namespace EfCore.Shaman.Tests
         {
             var mi = ModelInfo.Make<TestDbContext>();
             Assert.Equal("testSchema", mi.DefaultSchema);
+        }
+
+        [Fact]
+        public void T06_ShouldHaveSingularTableNames()
+        {
+            const string expectedTableName = "myPrefixUser";
+
+            DoTestOnModelBuilder<PrefixedTableNamesDbContext>(mb =>
+            {
+                var t = mb.Model.GetEntityTypes().Single(a => a.ClrType == typeof(User));
+                Assert.NotNull(t);
+                Assert.Equal(expectedTableName, t.Relational().TableName);
+
+                // without patching
+                {
+                    var modelInfo = GetModelInfo<PrefixedTableNamesDbContext>(ShamanOptions.Default.Services);
+                    var dbSet = modelInfo.DbSet<User>();
+                    Assert.NotNull(dbSet);
+                    Assert.Equal("User", dbSet.TableName);
+                }
+                // with patching
+                {
+                    var modelInfo = GetModelInfo<PrefixedTableNamesDbContext>();
+                    var dbSet = modelInfo.DbSet<User>();
+                    Assert.NotNull(dbSet);
+                    Assert.Equal(expectedTableName, dbSet.TableName);
+                }
+            });
+
+            {
+                var mi = ModelInfo.Make<PrefixedTableNamesDbContext>();
+                var dbSet = mi.DbSets.Single(a => a.EntityType == typeof(User));
+                Assert.Equal(expectedTableName, dbSet.TableName);
+            }
         }
 
         #endregion

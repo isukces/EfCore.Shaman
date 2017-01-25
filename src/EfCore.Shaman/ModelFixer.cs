@@ -33,15 +33,20 @@ namespace EfCore.Shaman
             tmp.FixMigrationUp(migrationBuilder);
         }
 
-        public static bool FixOnModelCreating(ModelBuilder modelBuilder, Type contextType, DbContext dbContextInstance,
+        public static void FixOnModelCreating(ModelBuilder modelBuilder, Type contextType, DbContext dbContextInstance,
             ShamanOptions shamanOptions = null)
         {
-            var x = dbContextInstance as IShamanFriendlyDbContext;
-            if (x != null && x.CreationMode == DbContextCreationMode.WithoutModelFixing)
-                return false;
             var modelFixer = new ModelFixer(contextType, shamanOptions);
             modelFixer.FixOnModelCreating(modelBuilder);
-            return true;
+        }
+
+        private static void ChangeTableName(EntityTypeBuilder entity, IFullTableName dbSet)
+        {
+            if (string.IsNullOrEmpty(dbSet.TableName)) return;
+            if (string.IsNullOrEmpty(dbSet.Schema))
+                entity.ToTable(dbSet.TableName);
+            else
+                entity.ToTable(dbSet.TableName, dbSet.Schema);
         }
 
 
@@ -84,10 +89,11 @@ namespace EfCore.Shaman
         {
             if (!string.IsNullOrEmpty(_info.DefaultSchema))
                 modelBuilder = modelBuilder.HasDefaultSchema(_info.DefaultSchema);
-            
+
             foreach (var dbSet in _info.DbSets)
             {
                 var entity = modelBuilder.Entity(dbSet.EntityType);
+                ChangeTableName(entity, dbSet);
                 foreach (var idx in dbSet.Indexes)
                 {
                     var fields = idx.Fields.Select(a => a.FieldName).ToArray();
