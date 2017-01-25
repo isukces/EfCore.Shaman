@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EfCore.Shaman.Tests.Model
 {
+    [DefaultSchema("testSchema")]
     internal class TestDbContext : DbContext, IShamanFriendlyDbContext
     {
         #region Constructors

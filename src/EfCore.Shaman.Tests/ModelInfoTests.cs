@@ -94,6 +94,13 @@ namespace EfCore.Shaman.Tests
             Assert.Equal(1, cnt);
         }
 
+        [Fact]
+        public void T05_ShouldHaveDefaultSchema()
+        {
+            var mi = ModelInfo.Make<TestDbContext>();
+            Assert.Equal("testSchema", mi.DefaultSchema);
+        }
+
         #endregion
     }
 }

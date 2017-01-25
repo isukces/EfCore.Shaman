@@ -29,6 +29,11 @@ namespace EfCore.Shaman.ModelScanner
 
         #region Static Methods
 
+        public static ModelInfo Make<T>(IList<IShamanService> services = null)
+        {
+            return new ModelInfo(typeof(T), services);
+        }
+
         public static bool NotNullFromPropertyType(Type type)
         {
             if (type == typeof(string)) return false;
@@ -121,7 +126,7 @@ namespace EfCore.Shaman.ModelScanner
                 }
             }
             var tableNames = GetTableNamesFromModel(model);
-            DefaultSchema = DefaultSchemaUpdater.GetDefaultSchema(_dbContextType, model);         
+            DefaultSchema = DefaultSchemaUpdater.GetDefaultSchema(_dbContextType, model);
             foreach (var property in _dbContextType.GetProperties())
             {
                 var propertyType = property.PropertyType;
