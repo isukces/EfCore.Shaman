@@ -45,7 +45,7 @@ namespace EfCore.Shaman.Tests.Model
                 .Single(a => a.ClrType == typeof(MyEntityWithDifferentTableName));
             er.Relational().TableName = "ManualChange";
 
-            modelBuilder.FixOnModelCreating(this);
+            this.FixOnModelCreating(modelBuilder);
             ExternalCheckModel?.Invoke(modelBuilder);
         }
 

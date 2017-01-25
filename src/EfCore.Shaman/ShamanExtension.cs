@@ -19,17 +19,29 @@ namespace EfCore.Shaman
             ModelFixer.FixMigrationUp<T>(migrationBuilder, shamanOptions);
         }
 
+        /// <summary>
+        /// Call this method at the end of <see cref="DbContext.OnModelCreating"/>
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="modelBuilder"></param>
+        /// <param name="shamanOptions"></param>
         public static void FixOnModelCreating(this DbContext context, ModelBuilder modelBuilder, ShamanOptions shamanOptions = null)
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
-            ModelFixer.FixOnModelCreating(modelBuilder, context.GetType(), context, shamanOptions);
+            ModelFixer.FixOnModelCreating(modelBuilder, context.GetType(), shamanOptions);
         }
 
-        public static void FixOnModelCreating<T>(this ModelBuilder modelBuilder, T dbContextInstance, ShamanOptions shamanOptions = null) where T : DbContext
+        /// <summary>
+        /// Call this method at the end of <see cref="DbContext.OnModelCreating"/>
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="modelBuilder"></param>
+        /// <param name="shamanOptions"></param>
+        public static void FixOnModelCreating<T>(this ModelBuilder modelBuilder, ShamanOptions shamanOptions = null) where T : DbContext
         {
             if (modelBuilder == null) throw new ArgumentNullException(nameof(modelBuilder));
             ModelsCachedContainer.SetRawModel(typeof(T), modelBuilder.Model);
-            ModelFixer.FixOnModelCreating(modelBuilder, typeof(T), dbContextInstance, shamanOptions);
+            ModelFixer.FixOnModelCreating(modelBuilder, typeof(T), shamanOptions);
         }
 
         #endregion

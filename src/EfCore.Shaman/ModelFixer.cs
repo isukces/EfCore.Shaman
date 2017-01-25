@@ -33,7 +33,7 @@ namespace EfCore.Shaman
             tmp.FixMigrationUp(migrationBuilder);
         }
 
-        public static void FixOnModelCreating(ModelBuilder modelBuilder, Type contextType, DbContext dbContextInstance,
+        public static void FixOnModelCreating(ModelBuilder modelBuilder, Type contextType,
             ShamanOptions shamanOptions = null)
         {
             var modelFixer = new ModelFixer(contextType, shamanOptions);

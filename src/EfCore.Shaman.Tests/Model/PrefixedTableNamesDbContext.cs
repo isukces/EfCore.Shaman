@@ -32,7 +32,7 @@ namespace EfCore.Shaman.Tests.Model
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.FixOnModelCreating(this);
+            this.FixOnModelCreating(modelBuilder);
             ExternalCheckModel?.Invoke(modelBuilder);
         }
 
