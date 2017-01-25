@@ -113,7 +113,7 @@ namespace EfCore.Shaman.Tests
         }
 
         [Fact]
-        public void T06_ShouldHaveSingularTableNames()
+        public void T06_ShouldHaveTableNameWithPrefix()
         {
             const string expectedTableName = "myPrefixUser";
 
