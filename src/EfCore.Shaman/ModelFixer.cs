@@ -84,9 +84,7 @@ namespace EfCore.Shaman
         {
             if (!string.IsNullOrEmpty(_info.DefaultSchema))
                 modelBuilder = modelBuilder.HasDefaultSchema(_info.DefaultSchema);
-
-            var dict = modelBuilder.Model.GetEntityTypes().ToDictionary(a => a.ClrType, a => a.Relational());
-
+            
             foreach (var dbSet in _info.DbSets)
             {
                 var entity = modelBuilder.Entity(dbSet.EntityType);
