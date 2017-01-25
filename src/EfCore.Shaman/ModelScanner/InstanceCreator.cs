@@ -55,11 +55,12 @@ namespace EfCore.Shaman.ModelScanner
                 values = null;
                 return true;
             }
-            values = new object[] {parameters.Length};
+            values = new object[] { parameters.Length };
+            var dbCtx = typeof(DbContextOptions<>).MakeGenericType(dbContextType);
             for (var index = 0; index < parameters.Length; index++)
             {
                 var ii = parameters[index];
-                if (ii.ParameterType == typeof(DbContextOptions))
+                if (ii.ParameterType.IsAssignableFrom(dbCtx))
                 {
                     values[index] = CreateDbContextOptions(dbContextType);
                     continue;
