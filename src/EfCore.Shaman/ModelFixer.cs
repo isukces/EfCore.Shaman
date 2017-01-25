@@ -1,6 +1,7 @@
 ﻿#region using
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using EfCore.Shaman.ModelScanner;
 using Microsoft.EntityFrameworkCore;
@@ -36,8 +37,11 @@ namespace EfCore.Shaman
         public static void FixOnModelCreating(ModelBuilder modelBuilder, Type contextType,
             ShamanOptions shamanOptions = null)
         {
-            var modelFixer = new ModelFixer(contextType, shamanOptions);
-            modelFixer.FixOnModelCreating(modelBuilder);
+            fixingHolder.TryFix(contextType, () =>
+            {
+                var modelFixer = new ModelFixer(contextType, shamanOptions);
+                modelFixer.FixOnModelCreating(modelBuilder);
+            });
         }
 
         private static void ChangeTableName(EntityTypeBuilder entity, IFullTableName dbSet)
@@ -139,10 +143,54 @@ namespace EfCore.Shaman
 
         #endregion
 
+        #region Static Fields
+
+        private static readonly FixingHolder fixingHolder = new FixingHolder();
+
+        #endregion
+
         #region Fields
 
         private readonly ModelInfo _info;
         private readonly ShamanOptions _shamanOptions;
+
+        #endregion
+
+        #region Nested
+
+        private class FixingHolder
+        {
+            #region Instance Methods
+
+            public void TryFix(Type contextType, Action action)
+            {
+                lock(_typesUnderProcessing)
+                {
+                    if (_typesUnderProcessing.Contains(contextType))
+                        return;
+                    _typesUnderProcessing.Add(contextType);
+                }
+                try
+                {
+                    action();
+                }
+                finally
+                {
+                    lock(_typesUnderProcessing)
+                    {
+                        _typesUnderProcessing.Remove(contextType);
+                    }
+                }
+            }
+
+            #endregion
+
+            #region Fields
+
+            private readonly HashSet<Type> _typesUnderProcessing = new HashSet<Type>();
+
+            #endregion
+        }
 
         #endregion
     }
