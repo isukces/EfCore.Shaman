@@ -130,9 +130,17 @@ Current release allows to specify column collation while only table is created.
 Assembly distributed with nuget package is signed with `key.snk` that is not included with github repository. `mksnk.bat` script file is included instead. It it running automatically during building process. 
 
 
+# .NET Core version
+
+Due to [MsBuild issue](https://github.com/Microsoft/msbuild/issues/394) csproj and packages.config can't coexist with xproj and project.json. 
+
+My own priority (sorry) is to maintain .Net framework version so files necessary for .NET Core compilation are provided in separate directory. 
+
+
 ## Plans
 
 * Full column collation support
+* .NetCore and .NetFramework release in the same time
 
 ## Known bugs
 
