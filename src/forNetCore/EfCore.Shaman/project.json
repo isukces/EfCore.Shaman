@@ -1,0 +1,30 @@
+﻿{
+  "version": "1.0.0-*",
+  "runtimes": {
+    "win": {
+
+    }
+  },
+  "frameworks": {
+    "netstandard1.6": {
+      "imports": "dnxcore50",
+      "dependencies": {
+        "Microsoft.EntityFrameworkCore": "1.1.0",
+        "Microsoft.EntityFrameworkCore.Design": "1.1.0",
+        "Microsoft.EntityFrameworkCore.InMemory": "1.0.0",
+        "NETStandard.Library": "1.6.1"
+      }
+    },
+    "net451": {
+      "dependencies": {
+        "Microsoft.EntityFrameworkCore": "1.1.0",
+        "Microsoft.EntityFrameworkCore.Design": "1.1.0",
+        "Microsoft.EntityFrameworkCore.InMemory": "1.0.0",
+        "NETStandard.Library": "1.6.1"
+      }
+    }
+  },
+  "buildOptions": {
+    "define": [ "NETCORE" ]
+  }
+}
