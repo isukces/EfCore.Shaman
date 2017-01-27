@@ -24,7 +24,7 @@ namespace EfCore.Shaman.Reflection
                     _reader = Expression.Lambda<Func<object, object>>(convertedToObject, instance).Compile();
                 }
             }
-            catch (Exception e)
+            catch 
             {
                 // use reflection
             }
@@ -49,7 +49,7 @@ namespace EfCore.Shaman.Reflection
                     _writer = expr.Compile();
                 }
             }
-            catch (Exception e)
+            catch 
             {
                 // use reflection
             }

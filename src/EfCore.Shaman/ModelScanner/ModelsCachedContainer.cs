@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace EfCore.Shaman.ModelScanner
 {
-    public class ModelsCachedContainer : MarshalByRefObject
+    public class ModelsCachedContainer 
     {
         #region Static Methods
 

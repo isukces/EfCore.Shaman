@@ -33,7 +33,7 @@ namespace EfCore.Shaman.SqlServer
         {
             if (string.IsNullOrEmpty(dbSetInfo.Schema))
                 dbSetInfo.Schema = "dbo";
-            var attribute = entityType.GetCustomAttribute<SqlServerCollationAttribute>();
+            var attribute = entityType.GetTypeInfo().GetCustomAttribute<SqlServerCollationAttribute>();
             var collation = attribute?.Collation?.Trim();
             if (string.IsNullOrEmpty(collation)) return;
             dbSetInfo.Annotations[Ck] = collation;

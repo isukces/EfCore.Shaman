@@ -36,9 +36,10 @@ namespace EfCore.Shaman.ModelScanner
         public static bool NotNullFromPropertyType(Type type)
         {
             if (type == typeof(string)) return false;
-            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
+            var typeInfo = type.GetTypeInfo();
+            if (typeInfo.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
                 return false;
-            if (type.IsEnum || type.IsValueType) return true;
+            if (typeInfo.IsEnum || typeInfo.IsValueType) return true;
             return false;
         }
 
@@ -51,7 +52,7 @@ namespace EfCore.Shaman.ModelScanner
                 if (tableNames.TryGetValue(entityType, out name))
                     return name;
             }
-            var a = entityType.GetCustomAttribute<TableAttribute>();
+            var a = entityType.GetTypeInfo().GetCustomAttribute<TableAttribute>();
             return string.IsNullOrEmpty(a?.Name) ? propertyName : a.Name;
         }
 
@@ -90,7 +91,7 @@ namespace EfCore.Shaman.ModelScanner
                         i.UpdateDbSetInfo(dbSetInfo, entityType, _dbContextType);
             }
             var columnInfoUpdateServices = UsedServices?.OfType<IColumnInfoUpdateService>().ToArray();
-            var useDirectSaverForType = entityType.GetCustomAttribute<NoDirectSaverAttribute>() == null;
+            var useDirectSaverForType = entityType.GetTypeInfo().GetCustomAttribute<NoDirectSaverAttribute>() == null;
             foreach (var propertyInfo in entityType.GetProperties())
             {
                 var columnInfo = new ColumnInfo(dbSetInfo.Properites.Count, propertyInfo.Name)
@@ -122,7 +123,7 @@ namespace EfCore.Shaman.ModelScanner
             foreach (var property in _dbContextType.GetProperties())
             {
                 var propertyType = property.PropertyType;
-                if (!propertyType.IsGenericType) continue;
+                if (!propertyType.GetTypeInfo().IsGenericType) continue;
                 if (propertyType.GetGenericTypeDefinition() != typeof(DbSet<>)) continue;
                 var entityType = propertyType.GetGenericArguments()[0];
                 var entity = CreateDbSetWrapper(entityType, property.Name, tableNames);

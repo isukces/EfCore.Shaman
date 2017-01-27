@@ -14,7 +14,7 @@ namespace EfCore.Shaman.Services
 
         public static string GetDefaultSchema(Type type, EfModelWrapper model)
         {
-            var schema = type.GetCustomAttribute<DefaultSchemaAttribute>()?.Schema?.Trim();
+            var schema = type.GetTypeInfo().GetCustomAttribute<DefaultSchemaAttribute>()?.Schema?.Trim();
             if (!string.IsNullOrEmpty(schema))
                 return schema;
             schema = model.DefaultSchema;

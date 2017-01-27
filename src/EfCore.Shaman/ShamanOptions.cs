@@ -15,13 +15,17 @@ namespace EfCore.Shaman
         public static ShamanOptions CreateShamanOptions(Type dbContextType)
         {
             if (dbContextType == null) throw new ArgumentNullException(nameof(dbContextType));
+#if NETCORE
+            var method = dbContextType
+                .GetMethod("GetShamanOptions", new Type[0]);
+#else
             var method = dbContextType
                 .GetMethod("GetShamanOptions",
                     BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic,
                     null,
                     new Type[0],
                     null);
-
+#endif
             if (method == null || method.ReturnType != typeof(ShamanOptions))
                 return Default;
             return (ShamanOptions)method.Invoke(null, null);

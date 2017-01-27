@@ -15,7 +15,7 @@ namespace EfCore.Shaman.Services
 
         public void UpdateDbSetInfo(DbSetInfo dbSetInfo, Type entityType, Type contextType)
         {
-            var ta = entityType.GetCustomAttribute<TableAttribute>();
+            var ta = entityType.GetTypeInfo().GetCustomAttribute<TableAttribute>();
             if (ta == null) return;
             dbSetInfo.TableName = ta.Name;
             if (!string.IsNullOrEmpty(ta.Schema))
