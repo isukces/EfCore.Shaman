@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 #endregion
@@ -17,7 +18,11 @@ namespace EfCore.Shaman
             if (dbContextType == null) throw new ArgumentNullException(nameof(dbContextType));
 #if NETCORE
             var method = dbContextType
-                .GetMethod("GetShamanOptions", new Type[0]);
+                .GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
+                .FirstOrDefault(a => 
+                    a.Name=="GetShamanOptions" 
+                    && a.GetParameters().Length==0 
+                    && a.ReturnType==typeof(ShamanOptions));
 #else
             var method = dbContextType
                 .GetMethod("GetShamanOptions",

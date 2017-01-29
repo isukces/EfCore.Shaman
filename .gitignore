@@ -243,3 +243,4 @@ ModelManifest.xml
 /src/compile.log
 *.snk
 /src/*.bak
+/src/forNetCore/*.bak
