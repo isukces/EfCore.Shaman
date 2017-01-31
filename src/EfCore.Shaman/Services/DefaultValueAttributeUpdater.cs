@@ -1,16 +1,24 @@
-﻿using System.Reflection;
+﻿#region using
+
+using System.ComponentModel;
+using System.Reflection;
 using EfCore.Shaman.ModelScanner;
+
+#endregion
 
 namespace EfCore.Shaman.Services
 {
-    class DefaultValueAttributeUpdater : IColumnInfoUpdateService
+    internal class DefaultValueAttributeUpdater : IColumnInfoUpdateService
     {
+        #region Instance Methods
+
         public void UpdateColumnInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo)
         {
             var attribute = propertyInfo.GetCustomAttribute<DefaultValueAttribute>();
-            if (attribute == null) return;
-            columnInfo.DefaultValue = new ValueInfo(attribute.DefaultValue);
+            if (attribute != null)
+                columnInfo.DefaultValue = ValueInfo.FromClrValue(attribute.Value);
         }
+
+        #endregion
     }
-   
 }

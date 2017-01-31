@@ -84,8 +84,20 @@ namespace EfCore.Shaman
 
         private static void UpdateDefaultValue(ColumnInfo info, EntityTypeBuilder entity)
         {
+            var dv = info.DefaultValue;
             if (info.DefaultValue == null) return;
-            entity.Property(info.PropertyName).HasDefaultValue(info.DefaultValue.ClrValue);
+
+            switch (dv.Kind)
+            {
+                case ValueInfoKind.Clr:
+                    entity.Property(info.PropertyName).HasDefaultValue(info.DefaultValue.ClrValue);
+                    break;
+                case ValueInfoKind.Sql:
+                    entity.Property(info.PropertyName).HasDefaultValueSql(info.DefaultValue.SqlValue);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
 
         #endregion

@@ -18,7 +18,6 @@ using Xunit;
 
 namespace EfCore.Shaman.Tests
 {
-    [Serializable]
     public class ModelInfoTests
     {
         #region Static Methods
@@ -29,7 +28,7 @@ namespace EfCore.Shaman.Tests
                 .UseInMemoryDatabase(nameof(T02_ShouldHaveUniqueIndex))
                 .Options;
             var count = 0;
-            using(var context = InstanceCreator.CreateInstance<T>(options))
+            using (var context = InstanceCreator.CreateInstance<T>(options))
             {
                 context.ExternalCheckModel = b =>
                 {
@@ -163,45 +162,30 @@ namespace EfCore.Shaman.Tests
                 var col = dbSet.Properites.SingleOrDefault(a => a.ColumnName == "ElevenDefaultValue");
                 Assert.NotNull(col);
                 Assert.NotNull(col.DefaultValue);
+                Assert.Equal(ValueInfoKind.Clr, col.DefaultValue.Kind);
                 Assert.Equal(11, col.DefaultValue.ClrValue);
+            });
+        }
+
+
+        [Fact]
+        public void T08_ShouldHaveSqlDefaultValue()
+        {
+            DoTestOnModelBuilder<TestDbContext>(mb =>
+            {
+                var modelInfo = GetModelInfo<TestDbContext>();
+                var dbSet = modelInfo.DbSet<MyEntityWithDifferentTableName>();
+                Assert.NotNull(dbSet);
+                var col = dbSet.Properites.SingleOrDefault(a => a.ColumnName == "NoneDefaultSqlValue");
+                Assert.NotNull(col);
+                Assert.NotNull(col.DefaultValue);
+                Assert.Equal(ValueInfoKind.Sql, col.DefaultValue.Kind);
+                Assert.Equal("NONE123", col.DefaultValue.SqlValue);
             });
         }
 
         #endregion
 
-        #region Nested
-
-        [Serializable]
-        private sealed class MyCaller
-        {
-            #region Constructors
-
-            static MyCaller()
-            {
-                // Note: this type is marked as 'beforefieldinit'.
-                CallerInstance = new MyCaller();
-            }
-
-            #endregion
-
-            #region Static Methods
-
-            internal static void MyMethod()
-            {
-                Console.Write("");
-            }
-
-            #endregion
-
-            #region Static Fields
-
-            public static readonly MyCaller CallerInstance;
-            public static CrossAppDomainDelegate DelegateInstance;
-
-            #endregion
-        }
-
-        #endregion
     }
 
 

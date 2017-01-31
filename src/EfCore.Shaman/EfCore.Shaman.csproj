@@ -122,8 +122,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ModelScanner\ValueInfo.cs" />
+    <Compile Include="Services\DefaultValueSqlAttributeUpdater.cs" />
+    <Compile Include="_attributes\DefaultValueSqlAttribute.cs" />
+    <Compile Include="_extensions\ShamanReflectionExtensions.cs" />
     <Compile Include="Services\DefaultValueAttributeUpdater.cs" />
-    <Compile Include="_attributes\DefaultValueAttribute.cs" />
     <Compile Include="_exceptions\EmptyConnectionStringException.cs" />
     <Compile Include="ModelScanner\EfModelWrapper.cs" />
     <Compile Include="ModelScanner\InstanceCreator.cs" />
@@ -162,7 +164,7 @@
     <Compile Include="_interfaces\IPropertyValueReader.cs" />
     <Compile Include="_interfaces\IPropertyValueWriter.cs" />
     <Compile Include="_interfaces\IShamanService.cs" />
-    <Compile Include="ShamanExtension.cs" />
+    <Compile Include="_extensions\ShamanExtension.cs" />
     <Compile Include="ModelScanner\ModelInfo.cs" />
     <Compile Include="ModelScanner\DbSetInfo.cs" />
     <Compile Include="ModelScanner\ColumnIndexInfo.cs" />

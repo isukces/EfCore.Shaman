@@ -1,4 +1,6 @@
-﻿namespace EfCore.Shaman.Tests.Model
+﻿using System.ComponentModel;
+
+namespace EfCore.Shaman.Tests.Model
 {
     internal class MyEntityWithDifferentTableName
     {
@@ -9,6 +11,9 @@
 
         [DefaultValue(11)]
         public int ElevenDefaultValue { get; set; }
+
+        [DefaultValueSql("NONE123")]
+        public string NoneDefaultSqlValue { get; set; }
         #endregion
     }
 }

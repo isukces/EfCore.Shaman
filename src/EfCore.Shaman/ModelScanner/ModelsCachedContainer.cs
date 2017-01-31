@@ -1,8 +1,9 @@
-#region using
+ï»¿#region using
 
 using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
@@ -10,15 +11,15 @@ using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace EfCore.Shaman.ModelScanner
 {
-    public class ModelsCachedContainer 
+    public class ModelsCachedContainer
     {
-        #region Static Methods
+        #region Staticï¿½Methods
 
         public static EfModelWrapper GetRawModel(Type dbContextType)
         {
             return Cache.GetOrAdd(dbContextType, t =>
             {
-                var model=GetModel(t, false);
+                var model = GetModel(t, false);
                 return model;
             });
         }
@@ -57,13 +58,16 @@ namespace EfCore.Shaman.ModelScanner
         {
             var instance = TryCreateInstance(DbContextType);
             if (instance == null) return null;
-            var model = EfModelWrapper.FromModel(((DbContext)instance)?.Model);
+            var model = EfModelWrapper.FromModel(instance.Model);
             return model;
         }
 
         private DbContext TryCreateInstance(Type contextType)
         {
             if (contextType == null) throw new ArgumentNullException(nameof(contextType));
+            var method = contextType.FindStaticMethodWihoutParameters("GetDbContext");
+            if (method != null && contextType.IsAssignableFrom(method.ReturnType))
+                return (DbContext)method.Invoke(null, null);
             return InstanceCreator.CreateInstance(contextType) as DbContext;
         }
 

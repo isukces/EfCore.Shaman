@@ -6,7 +6,9 @@ using System;
 
 namespace EfCore.Shaman
 {
+#if net45
     [Serializable]
+#endif
     public class EmptyConnectionStringException : Exception
     {
         #region Constructors
