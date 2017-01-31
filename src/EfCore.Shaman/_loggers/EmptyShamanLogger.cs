@@ -1,10 +1,10 @@
 ﻿namespace EfCore.Shaman
 {
-    public class EmptyShamanLogger : IShamanLogger
+    public sealed class EmptyShamanLogger : IShamanLogger
     {
         #region Instance Methods
 
-        public void Log(string source, string message)
+        public void Log(ShamanLogMessage info)
         {
         }
 

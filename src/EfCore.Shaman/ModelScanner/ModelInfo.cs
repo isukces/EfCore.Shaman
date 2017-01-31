@@ -58,12 +58,16 @@ namespace EfCore.Shaman.ModelScanner
             return string.IsNullOrEmpty(a?.Name) ? propertyName : a.Name;
         }
 
-        private static IReadOnlyDictionary<Type, string> GetTableNamesFromModel(EfModelWrapper model)
+        private static IReadOnlyDictionary<Type, string> GetTableNamesFromModel(EfModelWrapper model, IShamanLogger logger)
         {
             if (model == null) return null;
             var result = new Dictionary<Type, string>();
             foreach (var entityType in model.EntityTypes)
+            {
                 result[entityType.ClrType] = entityType.TableName;
+                logger.Log(typeof(ModelInfo), nameof(GetTableNamesFromModel),
+                    $"Table name for {entityType.ClrType.Name}: {entityType.TableName}");
+            }
             return result;
         }
 
@@ -116,20 +120,19 @@ namespace EfCore.Shaman.ModelScanner
 
         private void Log(string methodName, string message)
         {
-            _logger.Log(nameof(ModelInfo) + "." + methodName, message);
+            _logger.Log(typeof(ModelInfo), methodName, message);
         }
 
-        // [Serializable]
         private void Prepare()
         {
             // todo: bad design - make service
             var model = ModelsCachedContainer.GetRawModel(_dbContextType);
             UsedDbContextModel = model != null;
-            if (UsedDbContextModel)
-                Log(nameof(Prepare), "Use dbContext model");
-            else
-                Log(nameof(Prepare), "Don't use dbContext model");
-            var tableNames = GetTableNamesFromModel(model);
+            Log(nameof(Prepare),
+                UsedDbContextModel
+                ? "Use dbContext model"
+                : "Don't use dbContext model");
+            var tableNames = GetTableNamesFromModel(model, _logger);
             DefaultSchema = DefaultSchemaUpdater.GetDefaultSchema(_dbContextType, model, _logger);
             foreach (var property in _dbContextType.GetProperties())
             {

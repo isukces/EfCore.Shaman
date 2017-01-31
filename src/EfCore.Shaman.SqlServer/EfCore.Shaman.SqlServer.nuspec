@@ -62,7 +62,7 @@
       <dependency id="System.Threading.Timer" version="4.3.0" />
       <dependency id="System.Xml.ReaderWriter" version="4.3.0" />
       <dependency id="System.Xml.XDocument" version="4.3.0" />
-      <dependency id="EfCore.Shaman" version="1.0.17031.25" />
+      <dependency id="EfCore.Shaman" version="1.0.17031.26" />
     </dependencies>
   </metadata>
   <files>
