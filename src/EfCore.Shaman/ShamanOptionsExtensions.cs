@@ -80,6 +80,8 @@ namespace EfCore.Shaman
                 .With<RequiredAttributeUpdater>()
                 .With<MaxLengthAttributeUpdater>()
                 .With<DecimalTypeAttributeUpdater>()
+                .With<DefaultValueAttributeUpdater>()
+                .With<DefaultValueSqlAttributeUpdater>()
                 .With<TableAttributeUpdater>();
         }
 

@@ -102,6 +102,19 @@ public Guid BoxUid { get; set; }
 [DecimalType(18, 6)]
 public decimal Amount { get; set; }
 ````
+## Specify Default values for columns
+
+`DefaultValueAttribute` and `DefaultValueSqlAttribute` can be used for setting default values on columns. For example 
+
+````csharp
+[DefaultValue(true)]
+public bool IsActive { get; set; }
+````
+
+````csharp
+[DefaultValueSql("getdate()")]
+public DateTime DateCreated { get; set; }
+````
 
 ## SqlServer support
 

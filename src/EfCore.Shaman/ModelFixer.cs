@@ -107,10 +107,21 @@ namespace EfCore.Shaman
                 }
                 foreach (var i in dbSet.Properites)
                 {
-                    if (i.MaxLength == null || i.DecimalPlaces == null)
-                        continue;
-                    var type = $"decimal({i.MaxLength},{i.DecimalPlaces})";
-                    entity.Property(i.PropertyName).HasColumnType(type);
+                    if (i.MaxLength != null && i.DecimalPlaces != null)
+                    {
+                        var type = $"decimal({i.MaxLength},{i.DecimalPlaces})";
+                        entity.Property(i.PropertyName).HasColumnType(type);
+                    }
+
+                    if (i.DefaultValue != null)
+                    {
+                        entity.Property(i.PropertyName).HasDefaultValue(i.DefaultValue);
+                    }
+
+                    if (i.DefaultValueSql != null)
+                    {
+                        entity.Property(i.PropertyName).HasDefaultValueSql(i.DefaultValueSql);
+                    }
                 }
             }
         }
