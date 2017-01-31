@@ -121,6 +121,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EmptyShamanLogger.cs" />
+    <Compile Include="_interfaces\IShamanLogger.cs" />
     <Compile Include="ModelScanner\ValueInfo.cs" />
     <Compile Include="Services\DefaultValueSqlAttributeUpdater.cs" />
     <Compile Include="_attributes\DefaultValueSqlAttribute.cs" />

@@ -35,6 +35,8 @@ namespace EfCore.Shaman
 
         public IList<IShamanService> Services { get; } = new List<IShamanService>();
 
+        public IShamanLogger Logger { get; set; } = EmptyShamanLogger.Instance;
+
         #endregion
     }
 }

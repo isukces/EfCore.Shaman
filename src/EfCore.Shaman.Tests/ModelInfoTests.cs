@@ -44,9 +44,9 @@ namespace EfCore.Shaman.Tests
                 throw new Exception("checkMethod has not been invoked");
         }
 
-        private static ModelInfo GetModelInfo<T>(IList<IShamanService> services = null)
+        private static ModelInfo GetModelInfo<T>(ShamanOptions options = null)
         {
-            var aa = new ModelInfo(typeof(T), services);
+            var aa = new ModelInfo(typeof(T), options);
             return aa;
         }
 
@@ -130,7 +130,7 @@ namespace EfCore.Shaman.Tests
 
                 // without patching
                 {
-                    var modelInfo = GetModelInfo<PrefixedTableNamesDbContext>(ShamanOptions.Default.Services);
+                    var modelInfo = GetModelInfo<PrefixedTableNamesDbContext>(ShamanOptions.Default);
                     var dbSet = modelInfo.DbSet<User>();
                     Assert.NotNull(dbSet);
                     Assert.Equal("User", dbSet.TableName);

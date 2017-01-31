@@ -17,10 +17,12 @@ namespace EfCore.Shaman.ModelScanner
     {
         #region Constructors
 
-        public ModelInfo(Type dbContextType, IList<IShamanService> services = null)
+        public ModelInfo(Type dbContextType, ShamanOptions options = null)
         {
             _dbContextType = dbContextType;
-            UsedServices = services ?? ShamanOptions.CreateShamanOptions(dbContextType).Services;
+            options = options ?? ShamanOptions.CreateShamanOptions(dbContextType);
+            UsedServices = options.Services;
+            _logger = options.Logger ?? EmptyShamanLogger.Instance;
             Prepare();
         }
 
@@ -28,9 +30,9 @@ namespace EfCore.Shaman.ModelScanner
 
         #region Static Methods
 
-        public static ModelInfo Make<T>(IList<IShamanService> services = null)
+        public static ModelInfo Make<T>(ShamanOptions options = null)
         {
-            return new ModelInfo(typeof(T), services);
+            return new ModelInfo(typeof(T), options);
         }
 
         public static bool NotNullFromPropertyType(Type type)
@@ -112,14 +114,23 @@ namespace EfCore.Shaman.ModelScanner
             return dbSetInfo;
         }
 
+        private void Log(string methodName, string message)
+        {
+            _logger.Log(nameof(ModelInfo) + "." + methodName, message);
+        }
+
         // [Serializable]
         private void Prepare()
         {
             // todo: bad design - make service
             var model = ModelsCachedContainer.GetRawModel(_dbContextType);
             UsedDbContextModel = model != null;
+            if (UsedDbContextModel)
+                Log(nameof(Prepare), "Use dbContext model");
+            else
+                Log(nameof(Prepare), "Don't use dbContext model");
             var tableNames = GetTableNamesFromModel(model);
-            DefaultSchema = DefaultSchemaUpdater.GetDefaultSchema(_dbContextType, model);
+            DefaultSchema = DefaultSchemaUpdater.GetDefaultSchema(_dbContextType, model, _logger);
             foreach (var property in _dbContextType.GetProperties())
             {
                 var propertyType = property.PropertyType;
@@ -130,8 +141,6 @@ namespace EfCore.Shaman.ModelScanner
                 _dbSets[entity.TableName] = entity;
             }
         }
-
- 
 
         #endregion
 
@@ -157,6 +166,8 @@ namespace EfCore.Shaman.ModelScanner
 
         private readonly Dictionary<string, DbSetInfo> _dbSets =
             new Dictionary<string, DbSetInfo>(StringComparer.OrdinalIgnoreCase);
+
+        private readonly IShamanLogger _logger;
 
         #endregion
     }

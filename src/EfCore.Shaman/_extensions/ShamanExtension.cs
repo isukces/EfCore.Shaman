@@ -15,6 +15,7 @@ namespace EfCore.Shaman
 
         public static void FixMigrationUp<T>(this MigrationBuilder migrationBuilder, ShamanOptions shamanOptions = null) where T : DbContext
         {
+            return;
             if (migrationBuilder == null) throw new ArgumentNullException(nameof(migrationBuilder));
             ModelFixer.FixMigrationUp<T>(migrationBuilder, shamanOptions);
         }

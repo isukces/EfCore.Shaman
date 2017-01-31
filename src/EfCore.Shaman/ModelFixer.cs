@@ -20,7 +20,7 @@ namespace EfCore.Shaman
         public ModelFixer(Type dbContextType, ShamanOptions shamanOptions, ModelInfo modelInfo = null)
         {
             _shamanOptions = shamanOptions ?? ShamanOptions.CreateShamanOptions(dbContextType);
-            _info = modelInfo ?? new ModelInfo(dbContextType, _shamanOptions.Services);
+            _info = modelInfo ?? new ModelInfo(dbContextType, _shamanOptions);
         }
 
         #endregion
