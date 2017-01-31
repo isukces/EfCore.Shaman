@@ -131,11 +131,8 @@
     <Compile Include="ModelScanner\InstanceCreator.cs" />
     <Compile Include="ModelScanner\ModelsCachedContainer.cs" />
     <Compile Include="ModelScanner\TableIndexFieldInfo.cs" />
-    <Compile Include="Services\DefaultValueAttributeUpdater.cs" />
-    <Compile Include="Services\DefaultValueSqlAttributeUpdater.cs" />
     <Compile Include="Services\_additional\PrefixedTableNameService.cs" />
     <Compile Include="Services\_additional\RemovePluralizingTableNameService.cs" />
-    <Compile Include="_attributes\DefaultValueSqlAttribute.cs" />
     <Compile Include="_interfaces\ITableIndexFieldInfo.cs" />
     <Compile Include="_interfaces\ITableIndexInfo.cs" />
     <Compile Include="ModelScanner\TableIndexInfo.cs" />
