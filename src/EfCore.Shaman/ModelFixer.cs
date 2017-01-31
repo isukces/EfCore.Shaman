@@ -74,6 +74,32 @@ namespace EfCore.Shaman
             indexBuilder.HasName(indexName);
         }
 
+        private static void UpdateDecimalPlaces(ColumnInfo info, EntityTypeBuilder entity)
+        {
+            if (info.MaxLength == null || info.DecimalPlaces == null)
+                return;
+            var type = $"decimal({info.MaxLength},{info.DecimalPlaces})";
+            entity.Property(info.PropertyName).HasColumnType(type);
+        }
+
+        private static void UpdateDefaultValue(ColumnInfo info, EntityTypeBuilder entity)
+        {
+            var dv = info.DefaultValue;
+            if (info.DefaultValue == null) return;
+
+            switch (dv.Kind)
+            {
+                case ValueInfoKind.Clr:
+                    entity.Property(info.PropertyName).HasDefaultValue(info.DefaultValue.ClrValue);
+                    break;
+                case ValueInfoKind.Sql:
+                    entity.Property(info.PropertyName).HasDefaultValueSql(info.DefaultValue.SqlValue);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
         #endregion
 
         #region Instance Methods
@@ -105,23 +131,10 @@ namespace EfCore.Shaman
                     TrySetIndexName(indexBuilder, idx.IndexName);
                     indexBuilder.IsUnique(idx.IsUnique);
                 }
-                foreach (var i in dbSet.Properites)
+                foreach (var info in dbSet.Properites)
                 {
-                    if (i.MaxLength != null && i.DecimalPlaces != null)
-                    {
-                        var type = $"decimal({i.MaxLength},{i.DecimalPlaces})";
-                        entity.Property(i.PropertyName).HasColumnType(type);
-                    }
-
-                    if (i.DefaultValue != null)
-                    {
-                        entity.Property(i.PropertyName).HasDefaultValue(i.DefaultValue);
-                    }
-
-                    if (i.DefaultValueSql != null)
-                    {
-                        entity.Property(i.PropertyName).HasDefaultValueSql(i.DefaultValueSql);
-                    }
+                    UpdateDecimalPlaces(info, entity);
+                    UpdateDefaultValue(info, entity);
                 }
             }
         }

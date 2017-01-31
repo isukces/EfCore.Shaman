@@ -1,7 +1,10 @@
-﻿using System.Reflection;
-using EfCore.Shaman.ModelScanner;
+﻿#region using
+
 using System.ComponentModel;
-using System;
+using System.Reflection;
+using EfCore.Shaman.ModelScanner;
+
+#endregion
 
 namespace EfCore.Shaman.Services
 {
@@ -12,8 +15,8 @@ namespace EfCore.Shaman.Services
         public void UpdateColumnInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo)
         {
             var attribute = propertyInfo.GetCustomAttribute<DefaultValueAttribute>();
-            if (attribute == null) return;
-            columnInfo.DefaultValue = attribute.Value;
+            if (attribute != null)
+                columnInfo.DefaultValue = ValueInfo.FromClrValue(attribute.Value);
         }
 
         #endregion

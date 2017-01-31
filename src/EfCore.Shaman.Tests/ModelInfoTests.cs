@@ -28,7 +28,7 @@ namespace EfCore.Shaman.Tests
                 .UseInMemoryDatabase(nameof(T02_ShouldHaveUniqueIndex))
                 .Options;
             var count = 0;
-            using(var context = InstanceCreator.CreateInstance<T>(options))
+            using (var context = InstanceCreator.CreateInstance<T>(options))
             {
                 context.ExternalCheckModel = b =>
                 {
@@ -151,20 +151,56 @@ namespace EfCore.Shaman.Tests
             }
         }
 
+        [Fact]
+        public void T07_ShouldHaveDefaultValue()
+        {
+            DoTestOnModelBuilder<TestDbContext>(mb =>
+            {
+                var modelInfo = GetModelInfo<TestDbContext>();
+                var dbSet = modelInfo.DbSet<MyEntityWithDifferentTableName>();
+                Assert.NotNull(dbSet);
+                var col = dbSet.Properites.SingleOrDefault(a => a.ColumnName == "ElevenDefaultValue");
+                Assert.NotNull(col);
+                Assert.NotNull(col.DefaultValue);
+                Assert.Equal(ValueInfoKind.Clr, col.DefaultValue.Kind);
+                Assert.Equal(11, col.DefaultValue.ClrValue);
+            });
+        }
+
+
+        [Fact]
+        public void T08_ShouldHaveSqlDefaultValue()
+        {
+            DoTestOnModelBuilder<TestDbContext>(mb =>
+            {
+                var modelInfo = GetModelInfo<TestDbContext>();
+                var dbSet = modelInfo.DbSet<MyEntityWithDifferentTableName>();
+                Assert.NotNull(dbSet);
+                var col = dbSet.Properites.SingleOrDefault(a => a.ColumnName == "NoneDefaultSqlValue");
+                Assert.NotNull(col);
+                Assert.NotNull(col.DefaultValue);
+                Assert.Equal(ValueInfoKind.Sql, col.DefaultValue.Kind);
+                Assert.Equal("NONE123", col.DefaultValue.SqlValue);
+            });
+        }
+
         #endregion
+
     }
 
 
     public class TestInMemoryTransactionManager : InMemoryTransactionManager
     {
-        private IDbContextTransaction _currentTransaction;
+        #region Constructors
 
         public TestInMemoryTransactionManager(ILogger<InMemoryTransactionManager> logger)
             : base(logger)
         {
         }
 
-        public override IDbContextTransaction CurrentTransaction => _currentTransaction;
+        #endregion
+
+        #region Instance Methods
 
         public override IDbContextTransaction BeginTransaction()
         {
@@ -172,7 +208,8 @@ namespace EfCore.Shaman.Tests
             return _currentTransaction;
         }
 
-        public override Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default(CancellationToken))
+        public override Task<IDbContextTransaction> BeginTransactionAsync(
+            CancellationToken cancellationToken = default(CancellationToken))
         {
             _currentTransaction = new TestInMemoryTransaction(this);
             return Task.FromResult(_currentTransaction);
@@ -182,21 +219,41 @@ namespace EfCore.Shaman.Tests
 
         public override void RollbackTransaction() => CurrentTransaction.Rollback();
 
+        #endregion
+
+        #region Properties
+
+        public override IDbContextTransaction CurrentTransaction => _currentTransaction;
+
+        #endregion
+
+        #region Fields
+
+        private IDbContextTransaction _currentTransaction;
+
+        #endregion
+
+        #region Nested
+
         private class TestInMemoryTransaction : IDbContextTransaction
         {
+            #region Constructors
+
             public TestInMemoryTransaction(TestInMemoryTransactionManager transactionManager)
             {
                 TransactionManager = transactionManager;
             }
 
-            private TestInMemoryTransactionManager TransactionManager { get; }
+            #endregion
 
-            public void Dispose()
+            #region Instance Methods
+
+            public void Commit()
             {
                 TransactionManager._currentTransaction = null;
             }
 
-            public void Commit()
+            public void Dispose()
             {
                 TransactionManager._currentTransaction = null;
             }
@@ -205,6 +262,16 @@ namespace EfCore.Shaman.Tests
             {
                 TransactionManager._currentTransaction = null;
             }
+
+            #endregion
+
+            #region Properties
+
+            private TestInMemoryTransactionManager TransactionManager { get; }
+
+            #endregion
         }
+
+        #endregion
     }
 }

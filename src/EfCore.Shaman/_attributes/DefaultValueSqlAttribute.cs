@@ -6,21 +6,24 @@ using System;
 
 namespace EfCore.Shaman
 {
-    [AttributeUsage(AttributeTargets.Property)]
+    /// <summary>
+    /// Allows to set default value as SqlValue
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
     public class DefaultValueSqlAttribute : Attribute
     {
         #region Constructors
 
-        public DefaultValueSqlAttribute(string valueSql)
+        public DefaultValueSqlAttribute(string defaultValueSql)
         {
-            ValueSql = valueSql;
+            DefaultValueSql = defaultValueSql;
         }
 
         #endregion
 
         #region Properties
 
-        public string ValueSql { get; set; }
+        public string DefaultValueSql { get; set; }
 
         #endregion
     }

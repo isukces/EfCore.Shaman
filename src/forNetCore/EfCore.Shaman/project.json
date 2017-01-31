@@ -1,32 +1,24 @@
 ﻿{
-  "version": "1.0.0-*",
-  "testRunner": "xunit",
-  "runtimes": {
-    "win7-x64": {
+    "version": "1.0.0-*",
+    "frameworks": {
+        "netstandard1.6": {
+            "imports": "dnxcore50",
+            "dependencies": {
+                "Microsoft.EntityFrameworkCore": "1.1.0",
+                "Microsoft.EntityFrameworkCore.Design": "1.1.0",
+                "Microsoft.EntityFrameworkCore.InMemory": "1.1.0",
+                "NETStandard.Library": "1.6.1"
+            }
+        },
 
+        "net451": {
+            "dependencies": {
+                "newtonsoft.json": "9.0.1",
+                "Microsoft.EntityFrameworkCore": "1.1.0",
+                "Microsoft.EntityFrameworkCore.Design": "1.1.0",
+                "Microsoft.EntityFrameworkCore.InMemory": "1.1.0",
+                "NETStandard.Library": "1.6.1"
+            }
+        }
     }
-  },
-  "frameworks": {
-    "netcoreapp1.0": {
-      "dependencies": {       
-        "xunit": "2.2.0-beta2-build3300",
-        "dotnet-test-xunit": "2.2.0-preview2-build1029",
-        "EfCore.Shaman": "*",
-        "EfCore.Shaman.SqlServer": "*"
-      }
-    },
-
-    "net451": {
-      "dependencies": {
-        "xunit": "2.0.0",
-        "newtonsoft.json": "9.0.1",  
-        "Microsoft.EntityFrameworkCore": "1.1.0",
-        "Microsoft.EntityFrameworkCore.Design": "1.1.0",
-        "Microsoft.EntityFrameworkCore.InMemory": "1.1.0",
-        "NETStandard.Library": "1.6.1",
-        "EfCore.Shaman": "*",
-        "EfCore.Shaman.SqlServer": "*"
-      }
-    }
-  }
 }
