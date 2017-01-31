@@ -121,6 +121,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="_exceptions\EmptyConnectionStringException.cs" />
     <Compile Include="ModelScanner\EfModelWrapper.cs" />
     <Compile Include="ModelScanner\InstanceCreator.cs" />
     <Compile Include="ModelScanner\ModelsCachedContainer.cs" />

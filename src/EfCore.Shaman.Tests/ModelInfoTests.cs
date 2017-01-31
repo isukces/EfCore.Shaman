@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using EfCore.Shaman.ModelScanner;
@@ -18,30 +19,74 @@ using Xunit;
 
 namespace EfCore.Shaman.Tests
 {
+
+    [Serializable]
     public class ModelInfoTests
     {
         #region Static Methods
 
+
+
+        [Serializable]
+        private sealed class MyCaller
+        {
+            public static readonly MyCaller CallerInstance;
+            public static CrossAppDomainDelegate DelegateInstance;
+            static MyCaller()
+            {
+                // Note: this type is marked as 'beforefieldinit'.
+                CallerInstance = new MyCaller();
+            }
+            internal static void MyMethod()
+            {
+                Console.Write("");
+            }
+        }
+
+
         private static void DoTestOnModelBuilder<T>(Action<ModelBuilder> checkMethod) where T : VisitableDbContext
         {
-            var options = new DbContextOptionsBuilder<T>()
-                .UseInMemoryDatabase(nameof(T02_ShouldHaveUniqueIndex))
-                .Options;
-            var count = 0;
-            using(var context = InstanceCreator.CreateInstance<T>(options))
+            var testDomain = AppDomain.CreateDomain("test", AppDomain.CurrentDomain.Evidence,
+                 AppDomain.CurrentDomain.SetupInformation);
+            try
             {
-                context.ExternalCheckModel = b =>
+
+
+                CrossAppDomainDelegate myDelegate;
+                if ((myDelegate = MyCaller.DelegateInstance) == null)
                 {
-                    count++;
-                    checkMethod?.Invoke(b);
-                };
-                var tmp = context.Settings.ToArray(); // enforce to create model
-                var model = context.Model;
-                if (model == null) // enforce to create model
-                    throw new NullReferenceException();
+                    MyCaller.DelegateInstance = new CrossAppDomainDelegate(MyCaller.MyMethod);
+                    myDelegate = MyCaller.DelegateInstance;
+                }
+                testDomain.DoCallBack(myDelegate);
+
+
+                testDomain.DoCallBack(() =>
+                {
+                    var options = new DbContextOptionsBuilder<T>()
+                        .UseInMemoryDatabase(nameof(T02_ShouldHaveUniqueIndex))
+                        .Options;
+                    var count = 0;
+                    using (var context = InstanceCreator.CreateInstance<T>(options))
+                    {
+                        context.ExternalCheckModel = b =>
+                        {
+                            count++;
+                            checkMethod?.Invoke(b);
+                        };
+                        var tmp = context.Settings.ToArray(); // enforce to create model
+                        var model = context.Model;
+                        if (model == null) // enforce to create model
+                            throw new NullReferenceException();
+                    }
+                    if (count == 0)
+                        throw new Exception("checkMethod has not been invoked");
+                });
             }
-            if (count == 0)
-                throw new Exception("checkMethod has not been invoked");
+            finally
+            {
+                AppDomain.Unload(testDomain);
+            }
         }
 
         private static ModelInfo GetModelInfo<T>(IList<IShamanService> services = null)

@@ -38,7 +38,8 @@ namespace EfCore.Shaman
                 _lock.EnterWriteLock();
                 try
                 {
-                    var o = ShamanOptions?.Services.OfType<IDirectSaverFactory>().FirstOrDefault();
+                    var options = ShamanOptions.CreateShamanOptions(GetType());
+                    var o = options?.Services.OfType<IDirectSaverFactory>().FirstOrDefault();
                     if (o == null)
                         throw new Exception("Unable to find IDirectSaverFactory in ShamanOptions.Services.");
                     var result = o.GetDirectSaver<T>(GetType(), optionsFactory);
@@ -56,23 +57,6 @@ namespace EfCore.Shaman
             }
         }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            base.OnModelCreating(modelBuilder);
-            OnModelCreatingInternal(modelBuilder);
-            this.FixOnModelCreating(modelBuilder, ShamanOptions);
-        }
-
-        protected virtual void OnModelCreatingInternal(ModelBuilder modelBuilder)
-        {
-            // nothing to do by default
-        }
-
-        #endregion
-
-        #region Properties
-
-        public ShamanOptions ShamanOptions { get; set; } = ShamanOptions.Default;
 
         #endregion
 
