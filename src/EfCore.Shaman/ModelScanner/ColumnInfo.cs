@@ -65,8 +65,6 @@ namespace EfCore.Shaman.ModelScanner
         public int? MaxLength { get; set; }
         public int? DecimalPlaces { get; set; }
         public bool IsInPrimaryKey { get; set; }
-        public object DefaultValue { get; set; }
-        public string DefaultValueSql { get; set; }
         /// <summary>
         /// Decorated with ForeignKeyAttribute or InversePropertyAttribute
         /// </summary>
