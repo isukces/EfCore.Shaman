@@ -74,6 +74,7 @@ namespace EfCore.Shaman.ModelScanner
         public bool IsIdentity { get; set; }
         public IPropertyValueReader ValueReader { get; set; }
         public IPropertyValueWriter ValueWriter { get; set; }
+        public ValueInfo DefaultValue { get; set; }
 
         #endregion
     }

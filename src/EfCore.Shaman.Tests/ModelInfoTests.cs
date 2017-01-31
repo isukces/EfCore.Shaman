@@ -3,7 +3,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using EfCore.Shaman.ModelScanner;
@@ -19,74 +18,31 @@ using Xunit;
 
 namespace EfCore.Shaman.Tests
 {
-
     [Serializable]
     public class ModelInfoTests
     {
         #region Static Methods
 
-
-
-        [Serializable]
-        private sealed class MyCaller
-        {
-            public static readonly MyCaller CallerInstance;
-            public static CrossAppDomainDelegate DelegateInstance;
-            static MyCaller()
-            {
-                // Note: this type is marked as 'beforefieldinit'.
-                CallerInstance = new MyCaller();
-            }
-            internal static void MyMethod()
-            {
-                Console.Write("");
-            }
-        }
-
-
         private static void DoTestOnModelBuilder<T>(Action<ModelBuilder> checkMethod) where T : VisitableDbContext
         {
-            var testDomain = AppDomain.CreateDomain("test", AppDomain.CurrentDomain.Evidence,
-                 AppDomain.CurrentDomain.SetupInformation);
-            try
+            var options = new DbContextOptionsBuilder<T>()
+                .UseInMemoryDatabase(nameof(T02_ShouldHaveUniqueIndex))
+                .Options;
+            var count = 0;
+            using(var context = InstanceCreator.CreateInstance<T>(options))
             {
-
-
-                CrossAppDomainDelegate myDelegate;
-                if ((myDelegate = MyCaller.DelegateInstance) == null)
+                context.ExternalCheckModel = b =>
                 {
-                    MyCaller.DelegateInstance = new CrossAppDomainDelegate(MyCaller.MyMethod);
-                    myDelegate = MyCaller.DelegateInstance;
-                }
-                testDomain.DoCallBack(myDelegate);
-
-
-                testDomain.DoCallBack(() =>
-                {
-                    var options = new DbContextOptionsBuilder<T>()
-                        .UseInMemoryDatabase(nameof(T02_ShouldHaveUniqueIndex))
-                        .Options;
-                    var count = 0;
-                    using (var context = InstanceCreator.CreateInstance<T>(options))
-                    {
-                        context.ExternalCheckModel = b =>
-                        {
-                            count++;
-                            checkMethod?.Invoke(b);
-                        };
-                        var tmp = context.Settings.ToArray(); // enforce to create model
-                        var model = context.Model;
-                        if (model == null) // enforce to create model
-                            throw new NullReferenceException();
-                    }
-                    if (count == 0)
-                        throw new Exception("checkMethod has not been invoked");
-                });
+                    count++;
+                    checkMethod?.Invoke(b);
+                };
+                var tmp = context.Settings.ToArray(); // enforce to create model
+                var model = context.Model;
+                if (model == null) // enforce to create model
+                    throw new NullReferenceException();
             }
-            finally
-            {
-                AppDomain.Unload(testDomain);
-            }
+            if (count == 0)
+                throw new Exception("checkMethod has not been invoked");
         }
 
         private static ModelInfo GetModelInfo<T>(IList<IShamanService> services = null)
@@ -196,20 +152,71 @@ namespace EfCore.Shaman.Tests
             }
         }
 
+        [Fact]
+        public void T07_ShouldHaveDefaultValue()
+        {
+            DoTestOnModelBuilder<TestDbContext>(mb =>
+            {
+                var modelInfo = GetModelInfo<TestDbContext>();
+                var dbSet = modelInfo.DbSet<MyEntityWithDifferentTableName>();
+                Assert.NotNull(dbSet);
+                var col = dbSet.Properites.SingleOrDefault(a => a.ColumnName == "ElevenDefaultValue");
+                Assert.NotNull(col);
+                Assert.NotNull(col.DefaultValue);
+                Assert.Equal(11, col.DefaultValue.ClrValue);
+            });
+        }
+
+        #endregion
+
+        #region Nested
+
+        [Serializable]
+        private sealed class MyCaller
+        {
+            #region Constructors
+
+            static MyCaller()
+            {
+                // Note: this type is marked as 'beforefieldinit'.
+                CallerInstance = new MyCaller();
+            }
+
+            #endregion
+
+            #region Static Methods
+
+            internal static void MyMethod()
+            {
+                Console.Write("");
+            }
+
+            #endregion
+
+            #region Static Fields
+
+            public static readonly MyCaller CallerInstance;
+            public static CrossAppDomainDelegate DelegateInstance;
+
+            #endregion
+        }
+
         #endregion
     }
 
 
     public class TestInMemoryTransactionManager : InMemoryTransactionManager
     {
-        private IDbContextTransaction _currentTransaction;
+        #region Constructors
 
         public TestInMemoryTransactionManager(ILogger<InMemoryTransactionManager> logger)
             : base(logger)
         {
         }
 
-        public override IDbContextTransaction CurrentTransaction => _currentTransaction;
+        #endregion
+
+        #region Instance Methods
 
         public override IDbContextTransaction BeginTransaction()
         {
@@ -217,7 +224,8 @@ namespace EfCore.Shaman.Tests
             return _currentTransaction;
         }
 
-        public override Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default(CancellationToken))
+        public override Task<IDbContextTransaction> BeginTransactionAsync(
+            CancellationToken cancellationToken = default(CancellationToken))
         {
             _currentTransaction = new TestInMemoryTransaction(this);
             return Task.FromResult(_currentTransaction);
@@ -227,21 +235,41 @@ namespace EfCore.Shaman.Tests
 
         public override void RollbackTransaction() => CurrentTransaction.Rollback();
 
+        #endregion
+
+        #region Properties
+
+        public override IDbContextTransaction CurrentTransaction => _currentTransaction;
+
+        #endregion
+
+        #region Fields
+
+        private IDbContextTransaction _currentTransaction;
+
+        #endregion
+
+        #region Nested
+
         private class TestInMemoryTransaction : IDbContextTransaction
         {
+            #region Constructors
+
             public TestInMemoryTransaction(TestInMemoryTransactionManager transactionManager)
             {
                 TransactionManager = transactionManager;
             }
 
-            private TestInMemoryTransactionManager TransactionManager { get; }
+            #endregion
 
-            public void Dispose()
+            #region Instance Methods
+
+            public void Commit()
             {
                 TransactionManager._currentTransaction = null;
             }
 
-            public void Commit()
+            public void Dispose()
             {
                 TransactionManager._currentTransaction = null;
             }
@@ -250,6 +278,16 @@ namespace EfCore.Shaman.Tests
             {
                 TransactionManager._currentTransaction = null;
             }
+
+            #endregion
+
+            #region Properties
+
+            private TestInMemoryTransactionManager TransactionManager { get; }
+
+            #endregion
         }
+
+        #endregion
     }
 }

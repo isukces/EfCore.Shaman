@@ -74,6 +74,20 @@ namespace EfCore.Shaman
             indexBuilder.HasName(indexName);
         }
 
+        private static void UpdateDecimalPlaces(ColumnInfo info, EntityTypeBuilder entity)
+        {
+            if (info.MaxLength == null || info.DecimalPlaces == null)
+                return;
+            var type = $"decimal({info.MaxLength},{info.DecimalPlaces})";
+            entity.Property(info.PropertyName).HasColumnType(type);
+        }
+
+        private static void UpdateDefaultValue(ColumnInfo info, EntityTypeBuilder entity)
+        {
+            if (info.DefaultValue == null) return;
+            entity.Property(info.PropertyName).HasDefaultValue(info.DefaultValue.ClrValue);
+        }
+
         #endregion
 
         #region Instance Methods
@@ -105,12 +119,10 @@ namespace EfCore.Shaman
                     TrySetIndexName(indexBuilder, idx.IndexName);
                     indexBuilder.IsUnique(idx.IsUnique);
                 }
-                foreach (var i in dbSet.Properites)
+                foreach (var info in dbSet.Properites)
                 {
-                    if (i.MaxLength == null || i.DecimalPlaces == null)
-                        continue;
-                    var type = $"decimal({i.MaxLength},{i.DecimalPlaces})";
-                    entity.Property(i.PropertyName).HasColumnType(type);
+                    UpdateDecimalPlaces(info, entity);
+                    UpdateDefaultValue(info, entity);
                 }
             }
         }

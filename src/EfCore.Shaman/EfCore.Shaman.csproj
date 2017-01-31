@@ -121,6 +121,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ModelScanner\ValueInfo.cs" />
+    <Compile Include="Services\DefaultValueAttributeUpdater.cs" />
+    <Compile Include="_attributes\DefaultValueAttribute.cs" />
     <Compile Include="_exceptions\EmptyConnectionStringException.cs" />
     <Compile Include="ModelScanner\EfModelWrapper.cs" />
     <Compile Include="ModelScanner\InstanceCreator.cs" />
