@@ -59,6 +59,13 @@ namespace EfCore.Shaman
             return options;
         }
 
+        public static ShamanOptions WithLogger(this ShamanOptions options, IShamanLogger logger)
+        {
+            if (options == null) throw new ArgumentNullException(nameof(options));
+            options.Logger = logger ?? EmptyShamanLogger.Instance;
+            return options;
+        }
+
 
         /// <summary>
         ///     Include support for TableAttribute, ColumnAttribute, NotMappedAttribute,
