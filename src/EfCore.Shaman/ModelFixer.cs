@@ -40,6 +40,11 @@ namespace EfCore.Shaman
             shamanOptions = shamanOptions ?? ShamanOptions.CreateShamanOptions(contextType);
             Action<string> log = message =>
                 shamanOptions.Logger.Log(typeof(ModelFixer), nameof(FixOnModelCreating), message);
+
+            log("Before SetRawModel");
+            ModelsCachedContainer.SetRawModel(contextType, modelBuilder.Model, shamanOptions.Logger);
+            log("After SetRawModel");
+
             var fix = fixingHolder.TryFix(contextType, () =>
             {
                 log("Fixing...");
@@ -108,7 +113,10 @@ namespace EfCore.Shaman
         public void FixOnModelCreating(ModelBuilder modelBuilder)
         {
             if (!string.IsNullOrEmpty(_info.DefaultSchema))
+            {
+                Log(nameof(FixOnModelCreating), $"calling modelBuilder.HasDefaultSchema(\"{_info.DefaultSchema}\")");
                 modelBuilder = modelBuilder.HasDefaultSchema(_info.DefaultSchema);
+            }
 
             foreach (var dbSet in _info.DbSets)
             {
@@ -227,7 +235,7 @@ namespace EfCore.Shaman
 
             public bool TryFix(Type contextType, Action action)
             {
-                lock(_typesUnderProcessing)
+                lock (_typesUnderProcessing)
                 {
                     if (_typesUnderProcessing.Contains(contextType))
                         return false;
@@ -240,7 +248,7 @@ namespace EfCore.Shaman
                 }
                 finally
                 {
-                    lock(_typesUnderProcessing)
+                    lock (_typesUnderProcessing)
                     {
                         _typesUnderProcessing.Remove(contextType);
                     }
