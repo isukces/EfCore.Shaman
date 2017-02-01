@@ -2,6 +2,7 @@ var deps = @"
 Microsoft.EntityFrameworkCore
 Microsoft.EntityFrameworkCore.InMemory
 Microsoft.EntityFrameworkCore.Relational
+Microsoft.EntityFrameworkCore.SqlServer
 ";
 
 var builder = new ProjectBuilder(){

@@ -121,6 +121,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="_interfaces\IValueProviderService.cs" />
     <Compile Include="_loggers\EmptyShamanLogger.cs" />
     <Compile Include="_loggers\MethodCallLogger.cs" />
     <Compile Include="_interfaces\IShamanLogger.cs" />

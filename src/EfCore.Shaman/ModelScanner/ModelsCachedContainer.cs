@@ -2,7 +2,9 @@
 
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
@@ -42,7 +44,9 @@ namespace EfCore.Shaman.ModelScanner
             }
             else
                 log($"Method GetDbContext not found in type {contextType}");
-            return InstanceCreator.CreateInstance(contextType, Logger) as DbContext;
+            var services = ShamanOptions.CreateShamanOptions(contextType).Services.OfType<IValueProviderService>();
+            var constructorParameters = services.SelectMany(a => a.CreateObjects()).ToArray();
+            return InstanceCreator.CreateInstance(contextType, Logger, constructorParameters) as DbContext;
         }
 
         #endregion

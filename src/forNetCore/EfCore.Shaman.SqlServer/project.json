@@ -12,6 +12,7 @@
         "Microsoft.EntityFrameworkCore": "1.1.0",
         "Microsoft.EntityFrameworkCore.Design": "1.1.0",
         "Microsoft.EntityFrameworkCore.InMemory": "1.1.0",
+        "Microsoft.EntityFrameworkCore.SqlServer": "1.1.0",
         "NETStandard.Library": "1.6.1",
         "EfCore.Shaman": "*"
       }
@@ -21,6 +22,7 @@
         "Microsoft.EntityFrameworkCore": "1.1.0",
         "Microsoft.EntityFrameworkCore.Design": "1.1.0",
         "Microsoft.EntityFrameworkCore.InMemory": "1.1.0",
+        "Microsoft.EntityFrameworkCore.SqlServer": "1.1.0",
         "NETStandard.Library": "1.6.1",
         "EfCore.Shaman": "*"
       }

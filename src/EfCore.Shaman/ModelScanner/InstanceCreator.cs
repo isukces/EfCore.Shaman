@@ -25,13 +25,13 @@ namespace EfCore.Shaman.ModelScanner
 
         public static T CreateInstance<T>(IShamanLogger logger, params object[] values)
         {
-            var inst = new InstanceCreator(logger) {Values = values?.ToList() ?? new List<object>()};
+            var inst = new InstanceCreator(logger) { ConstructorParameters = values?.ToList() ?? new List<object>() };
             return (T)inst.CreateInstanceInternal(typeof(T));
         }
 
-        public static object CreateInstance(Type contextType, IShamanLogger logger, params object[] values)
+        public static object CreateInstance(Type contextType, IShamanLogger logger, params object[] constructorParameters)
         {
-            var inst = new InstanceCreator(logger) {Values = values?.ToList() ?? new List<object>()};
+            var inst = new InstanceCreator(logger) { ConstructorParameters = constructorParameters?.ToList() ?? new List<object>() };
             return inst.CreateInstanceInternal(contextType);
         }
 
@@ -42,9 +42,9 @@ namespace EfCore.Shaman.ModelScanner
         private object CreateDbContextOptions(Type dbContextType)
         {
             var m = typeof(InstanceCreator).GetMethod(nameof(CreateDbContextOptionsInternal),
-                    BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
+                    BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
                 .MakeGenericMethod(dbContextType);
-            var options = m.Invoke(null, null);
+            var options = m.Invoke(this, null);
             return options;
         }
 
@@ -72,6 +72,7 @@ namespace EfCore.Shaman.ModelScanner
                 var parameters = constructorInfo.GetParameters();
                 object[] values;
                 if (!PrepareMethodParameters(parameters, contextType, out values)) continue;
+                log($"Call constructor {constructorInfo}");
                 var instance = constructorInfo.Invoke(values);
                 return instance;
             }
@@ -81,12 +82,16 @@ namespace EfCore.Shaman.ModelScanner
 
         private object CreateParameter(Type parameterType, Type dbContextType)
         {
-            foreach (var i in Values)
-                if (parameterType.IsInstanceOfType(i))
-                    return i;
+            foreach (var value in ConstructorParameters)
+                if (parameterType.IsInstanceOfType(value))
+                {
+                    Log(nameof(CreateParameter), $"Using injected value of type {parameterType}");
+                    return value;
+                }
             var dbCtx = typeof(DbContextOptions<>).MakeGenericType(dbContextType);
             if (parameterType.IsAssignableFrom(dbCtx))
                 return CreateDbContextOptions(dbContextType);
+            Log(nameof(CreateParameter), $"Unable to create value of type {parameterType}");
             return null;
         }
 
@@ -103,7 +108,7 @@ namespace EfCore.Shaman.ModelScanner
                 values = null;
                 return true;
             }
-            values = new object[] {parameters.Count};
+            values = new object[] { parameters.Count };
             for (var index = 0; index < parameters.Count; index++)
             {
                 var ii = parameters[index];
@@ -122,7 +127,7 @@ namespace EfCore.Shaman.ModelScanner
 
         #region Properties
 
-        public List<object> Values { get; private set; } = new List<object>();
+        public List<object> ConstructorParameters { get; private set; } = new List<object>();
 
         #endregion
 
