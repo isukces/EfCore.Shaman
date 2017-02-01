@@ -126,7 +126,7 @@ namespace EfCore.Shaman.ModelScanner
         private void Prepare()
         {
             // todo: bad design - make service
-            var model = ModelsCachedContainer.GetRawModel(_dbContextType);
+            var model = ModelsCachedContainer.GetRawModel(_dbContextType, _logger);
             UsedDbContextModel = model != null;
             Log(nameof(Prepare),
                 UsedDbContextModel

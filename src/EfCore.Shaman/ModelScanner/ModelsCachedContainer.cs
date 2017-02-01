@@ -2,8 +2,7 @@
 
 using System;
 using System.Collections.Concurrent;
-using System.Diagnostics;
-using System.Reflection;
+using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
@@ -13,48 +12,9 @@ namespace EfCore.Shaman.ModelScanner
 {
     public class ModelsCachedContainer
     {
-        #region Static�Methods
-
-        public static EfModelWrapper GetRawModel(Type dbContextType)
-        {
-            return Cache.GetOrAdd(dbContextType, t =>
-            {
-                var model = GetModel(t, false);
-                return model;
-            });
-        }
-
-
-        public static void SetRawModel(Type type, IMutableModel modelBuilderModel)
-        {
-            var value = EfModelWrapper.FromModel(modelBuilderModel);
-            Cache.TryAdd(type, value);
-        }
-
-        private static EfModelWrapper GetModel(Type dbContextType, bool raw)
-        {
-            try
-            {
-                var sandboxed = new ModelsCachedContainer
-                {
-                    DbContextType = dbContextType,
-                    Raw = raw
-                };
-                return sandboxed.GetModel();
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine(e.Message);
-                throw;
-            }
-        }
-
-
-        #endregion
-
         #region Instance Methods
 
-        private EfModelWrapper GetModel()
+        private EfModelWrapper GetModelInternal()
         {
             var instance = TryCreateInstance(DbContextType);
             if (instance == null) return null;
@@ -64,10 +24,24 @@ namespace EfCore.Shaman.ModelScanner
 
         private DbContext TryCreateInstance(Type contextType)
         {
+            Action<string> log = message =>
+                     Logger.Log(typeof(ModelsCachedContainer), nameof(TryCreateInstance), message);
             if (contextType == null) throw new ArgumentNullException(nameof(contextType));
             var method = contextType.FindStaticMethodWihoutParameters("GetDbContext");
-            if (method != null && contextType.IsAssignableFrom(method.ReturnType))
-                return (DbContext)method.Invoke(null, null);
+            if (method != null)
+            {
+                var methodName = $"{method.DeclaringType?.Name}.{method.Name}".TrimStart('.');
+                log($"Found method {methodName}");
+                if (contextType.IsAssignableFrom(method.ReturnType))
+                {
+                    log($"Call method {methodName}");
+                    return (DbContext)method.Invoke(null, null);
+                }
+                log(
+                    $"Skip calling method {methodName} because of return type {method.ReturnType} instead of {contextType}.");
+            }
+            else
+                log($"Method GetDbContext not found in type {contextType}");
             return InstanceCreator.CreateInstance(contextType) as DbContext;
         }
 
@@ -85,6 +59,54 @@ namespace EfCore.Shaman.ModelScanner
 
         private static readonly ConcurrentDictionary<Type, EfModelWrapper> Cache =
             new ConcurrentDictionary<Type, EfModelWrapper>();
+
+        #endregion
+
+        #region Static Methods
+
+        public static EfModelWrapper GetRawModel(Type dbContextType, IShamanLogger logger)
+        {
+            return Cache.GetOrAdd(dbContextType, t =>
+            {
+                var model = GetModel(t, false, logger);
+                return model;
+            });
+        }
+
+
+        public static void SetRawModel(Type type, IMutableModel model, IShamanLogger logger)
+        {
+            Action<string> log = message => logger.Log(typeof(ModelsCachedContainer), nameof(SetRawModel), message);
+            var tables = from i in model.GetEntityTypes()
+                         let r = i.Relational()
+                         select $"{r.Schema}.{r.TableName}";
+            log($"Try set model containing tables: {string.Join(",", tables)}");
+            var value = EfModelWrapper.FromModel(model);
+            var result = Cache.TryAdd(type, value);
+            log(result ? "Success" : "Skipped");
+        }
+
+        private static EfModelWrapper GetModel(Type dbContextType, bool raw, IShamanLogger logger)
+        {
+            Action<string> log = message => logger.Log(typeof(ModelsCachedContainer), nameof(GetModelInternal), message);
+            try
+            {
+                var instance = new ModelsCachedContainer
+                {
+                    DbContextType = dbContextType,
+                    Raw = raw,
+                    Logger = logger
+                };
+                return instance.GetModelInternal();
+            }
+            catch (Exception e)
+            {
+                log("Exception " + e.Message);
+                throw;
+            }
+        }
+
+        public IShamanLogger Logger { get; set; } = EmptyShamanLogger.Instance;
 
         #endregion
     }

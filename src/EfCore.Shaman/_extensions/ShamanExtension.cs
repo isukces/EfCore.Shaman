@@ -41,7 +41,8 @@ namespace EfCore.Shaman
         public static void FixOnModelCreating<T>(this ModelBuilder modelBuilder, ShamanOptions shamanOptions = null) where T : DbContext
         {
             if (modelBuilder == null) throw new ArgumentNullException(nameof(modelBuilder));
-            ModelsCachedContainer.SetRawModel(typeof(T), modelBuilder.Model);
+            shamanOptions = shamanOptions ?? ShamanOptions.CreateShamanOptions(typeof(T));
+            ModelsCachedContainer.SetRawModel(typeof(T), modelBuilder.Model, shamanOptions.Logger);
             ModelFixer.FixOnModelCreating(modelBuilder, typeof(T), shamanOptions);
         }
 

@@ -1,3 +1,9 @@
+var deps = @"
+Microsoft.EntityFrameworkCore
+Microsoft.EntityFrameworkCore.InMemory
+Microsoft.EntityFrameworkCore.Relational
+";
+
 var builder = new ProjectBuilder(){
 	VisualStudioExe = GlobalVar["VisualStudio 2015"],
 	NugetExe = GlobalVar["Nuget"],
@@ -5,6 +11,7 @@ var builder = new ProjectBuilder(){
 	SolutionName = "EfCore.Shaman",
 	SolutionDir = ConfigDir,
 	ProjectName = "EfCore.Shaman",	
+	OnlySelectedPackages = deps.Split('\r', '\n', ',')
 };
 
 
