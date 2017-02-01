@@ -47,8 +47,7 @@ namespace EfCore.Shaman
         public static ShamanOptions With<T>(this ShamanOptions options) where T : IShamanService, new()
         {
             if (options == null) throw new ArgumentNullException(nameof(options));
-            options.Services.Add(new T());
-            return options;
+            return options.With(new T());
         }
 
         public static ShamanOptions With(this ShamanOptions options, IShamanService service)
@@ -56,6 +55,8 @@ namespace EfCore.Shaman
             if (options == null) throw new ArgumentNullException(nameof(options));
             if (service == null) throw new ArgumentNullException(nameof(service));
             options.Services.Add(service);
+            var modificationService = service as IShamanOptionModificationService;
+            modificationService?.ModifyShamanOptions(options);
             return options;
         }
 
