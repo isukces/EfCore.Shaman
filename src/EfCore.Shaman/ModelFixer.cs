@@ -37,20 +37,32 @@ namespace EfCore.Shaman
         public static void FixOnModelCreating(ModelBuilder modelBuilder, Type contextType,
             ShamanOptions shamanOptions = null)
         {
-            fixingHolder.TryFix(contextType, () =>
+            shamanOptions = shamanOptions ?? ShamanOptions.CreateShamanOptions(contextType);
+            Action<string> log = message =>
+                shamanOptions.Logger.Log(typeof(ModelFixer), nameof(FixOnModelCreating), message);
+            var fix = fixingHolder.TryFix(contextType, () =>
             {
+                log("Fixing...");
                 var modelFixer = new ModelFixer(contextType, shamanOptions);
                 modelFixer.FixOnModelCreating(modelBuilder);
             });
+            if (!fix)
+                log("Skip");
         }
 
-        private static void ChangeTableName(EntityTypeBuilder entity, IFullTableName dbSet)
+        private void ChangeTableName(EntityTypeBuilder entity, DbSetInfo dbSet)
         {
             if (string.IsNullOrEmpty(dbSet.TableName)) return;
             if (string.IsNullOrEmpty(dbSet.Schema))
+            {
+                LogFix(nameof(ChangeTableName), dbSet.EntityType, $"ToTable(\"{dbSet.TableName}\")");
                 entity.ToTable(dbSet.TableName);
+            }
             else
+            {
+                LogFix(nameof(ChangeTableName), dbSet.EntityType, $"ToTable(\"{dbSet.TableName}\", \"{dbSet.Schema}\")");
                 entity.ToTable(dbSet.TableName, dbSet.Schema);
+            }
         }
 
 
@@ -67,37 +79,12 @@ namespace EfCore.Shaman
             return 0; // should never occur
         }
 
+
         private static void TrySetIndexName(IndexBuilder indexBuilder, string indexName)
         {
             indexName = indexName?.Trim();
             if (string.IsNullOrEmpty(indexName) || indexName.StartsWith("@")) return;
             indexBuilder.HasName(indexName);
-        }
-
-        private static void UpdateDecimalPlaces(ColumnInfo info, EntityTypeBuilder entity)
-        {
-            if (info.MaxLength == null || info.DecimalPlaces == null)
-                return;
-            var type = $"decimal({info.MaxLength},{info.DecimalPlaces})";
-            entity.Property(info.PropertyName).HasColumnType(type);
-        }
-
-        private static void UpdateDefaultValue(ColumnInfo info, EntityTypeBuilder entity)
-        {
-            var dv = info.DefaultValue;
-            if (info.DefaultValue == null) return;
-
-            switch (dv.Kind)
-            {
-                case ValueInfoKind.Clr:
-                    entity.Property(info.PropertyName).HasDefaultValue(info.DefaultValue.ClrValue);
-                    break;
-                case ValueInfoKind.Sql:
-                    entity.Property(info.PropertyName).HasDefaultValueSql(info.DefaultValue.SqlValue);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
         }
 
         #endregion
@@ -108,8 +95,11 @@ namespace EfCore.Shaman
         {
             var services = _shamanOptions?.Services.OfType<IFixMigrationUpService>().ToArray();
             if (services != null)
-                foreach (var i in services)
-                    i.FixMigrationUp(migrationBuilder, _info);
+                foreach (var service in services)
+                {
+                    Log(nameof(FixMigrationUp), $"calling service {service}");
+                    service.FixMigrationUp(migrationBuilder, _info);
+                }
 
             foreach (var table in migrationBuilder.Operations.OfType<CreateTableOperation>())
                 FixOnModelCreatingForTable(table);
@@ -133,8 +123,8 @@ namespace EfCore.Shaman
                 }
                 foreach (var info in dbSet.Properites)
                 {
-                    UpdateDecimalPlaces(info, entity);
-                    UpdateDefaultValue(info, entity);
+                    UpdateDecimalPlaces(info, entity, dbSet.EntityType);
+                    UpdateDefaultValue(info, entity, dbSet.EntityType);
                 }
             }
         }
@@ -165,6 +155,55 @@ namespace EfCore.Shaman
             });
         }
 
+        private void Log(string methodName, string message)
+        {
+            _shamanOptions.Logger.Log(typeof(ModelFixer), methodName, message);
+        }
+
+        private void LogFix(string methodName, ColumnInfo columnInfo, Type entityType, string action)
+        {
+            string logMessage = $"calling {action} for {entityType.Name}.{columnInfo.PropertyName}";
+            Log(methodName, logMessage);
+        }
+
+        private void LogFix(string methodName, Type entityType, string action)
+        {
+            string logMessage = $"calling {action} for {entityType.Name}";
+            Log(methodName, logMessage);
+        }
+
+        private void UpdateDecimalPlaces(ColumnInfo info, EntityTypeBuilder entity, Type entityType)
+        {
+            if (info.MaxLength == null || info.DecimalPlaces == null)
+                return;
+            var type = $"decimal({info.MaxLength},{info.DecimalPlaces})";
+            string action = $"HasColumnType(\"{type}\")";
+            LogFix(nameof(UpdateDecimalPlaces), info, entityType, action);
+            entity.Property(info.PropertyName).HasColumnType(type);
+        }
+
+        private void UpdateDefaultValue(ColumnInfo columnInfo, EntityTypeBuilder entity, Type entityType)
+        {
+            var dv = columnInfo.DefaultValue;
+            if (columnInfo.DefaultValue == null) return;
+            string action;
+            switch (dv.Kind)
+            {
+                case ValueInfoKind.Clr:
+                    action = $"HasDefaultValue(\"{columnInfo.DefaultValue.ClrValue}\")";
+                    LogFix(nameof(UpdateDefaultValue), columnInfo, entityType, action);
+                    entity.Property(columnInfo.PropertyName).HasDefaultValue(columnInfo.DefaultValue.ClrValue);
+                    break;
+                case ValueInfoKind.Sql:
+                    action = $"HasDefaultValueSql(\"{columnInfo.DefaultValue.SqlValue}\")";
+                    LogFix(nameof(UpdateDefaultValue), columnInfo, entityType, action);
+                    entity.Property(columnInfo.PropertyName).HasDefaultValueSql(columnInfo.DefaultValue.SqlValue);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
         #endregion
 
         #region Static Fields
@@ -186,17 +225,18 @@ namespace EfCore.Shaman
         {
             #region Instance Methods
 
-            public void TryFix(Type contextType, Action action)
+            public bool TryFix(Type contextType, Action action)
             {
                 lock(_typesUnderProcessing)
                 {
                     if (_typesUnderProcessing.Contains(contextType))
-                        return;
+                        return false;
                     _typesUnderProcessing.Add(contextType);
                 }
                 try
                 {
                     action();
+                    return true;
                 }
                 finally
                 {
