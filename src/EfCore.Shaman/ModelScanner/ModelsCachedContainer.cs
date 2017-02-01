@@ -42,7 +42,7 @@ namespace EfCore.Shaman.ModelScanner
             }
             else
                 log($"Method GetDbContext not found in type {contextType}");
-            return InstanceCreator.CreateInstance(contextType) as DbContext;
+            return InstanceCreator.CreateInstance(contextType, Logger) as DbContext;
         }
 
         #endregion

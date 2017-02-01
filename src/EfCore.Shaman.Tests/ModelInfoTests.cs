@@ -28,7 +28,7 @@ namespace EfCore.Shaman.Tests
                 .UseInMemoryDatabase(nameof(T02_ShouldHaveUniqueIndex))
                 .Options;
             var count = 0;
-            using (var context = InstanceCreator.CreateInstance<T>(options))
+            using (var context = InstanceCreator.CreateInstance<T>(EmptyShamanLogger.Instance, options))
             {
                 context.ExternalCheckModel = b =>
                 {

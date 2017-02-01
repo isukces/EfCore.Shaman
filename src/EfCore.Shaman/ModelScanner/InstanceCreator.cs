@@ -12,21 +12,34 @@ namespace EfCore.Shaman.ModelScanner
 {
     public class InstanceCreator
     {
+        #region Constructors
+
+        public InstanceCreator(IShamanLogger logger)
+        {
+            _logger = logger;
+        }
+
+        #endregion
+
         #region Static Methods
 
-        public static T CreateInstance<T>(params object[] values)
+        public static T CreateInstance<T>(IShamanLogger logger, params object[] values)
         {
-            var inst = new InstanceCreator {Values = values?.ToList() ?? new List<object>()};
+            var inst = new InstanceCreator(logger) {Values = values?.ToList() ?? new List<object>()};
             return (T)inst.CreateInstanceInternal(typeof(T));
         }
 
-        public static object CreateInstance(Type contextType, params object[] values)
+        public static object CreateInstance(Type contextType, IShamanLogger logger, params object[] values)
         {
-            var inst = new InstanceCreator {Values = values?.ToList() ?? new List<object>()};
+            var inst = new InstanceCreator(logger) {Values = values?.ToList() ?? new List<object>()};
             return inst.CreateInstanceInternal(contextType);
         }
 
-        private static object CreateDbContextOptions(Type dbContextType)
+        #endregion
+
+        #region Instance Methods
+
+        private object CreateDbContextOptions(Type dbContextType)
         {
             var m = typeof(InstanceCreator).GetMethod(nameof(CreateDbContextOptionsInternal),
                     BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
@@ -35,33 +48,34 @@ namespace EfCore.Shaman.ModelScanner
             return options;
         }
 
-        private static DbContextOptions<T> CreateDbContextOptionsInternal<T>() where T : DbContext
+        private DbContextOptions<T> CreateDbContextOptionsInternal<T>() where T : DbContext
         {
+            Log(nameof(CreateDbContextOptionsInternal), $"Create {typeof(DbContextOptions<T>)} with InMemoryDatabase");
             var options = new DbContextOptionsBuilder<T>()
                 .UseInMemoryDatabase()
                 .Options;
             return options;
         }
 
-        #endregion
-
-        #region Instance Methods
-
         private object CreateInstanceInternal(Type contextType)
         {
+            Action<string> log = message => Log(nameof(CreateInstanceInternal), message);
+            var dbContextOptionsType = typeof(DbContextOptions<>).MakeGenericType(contextType);
             var constructors =
                 contextType
                     .GetConstructors(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                    .OrderBy(a => a.GetParameters().Length)
+                    .OrderBy(info => info, new ConstructorInfoComparer(dbContextOptionsType))
                     .ToArray();
             foreach (var constructorInfo in constructors)
             {
+                log($"Try constructor {constructorInfo}");
                 var parameters = constructorInfo.GetParameters();
                 object[] values;
                 if (!PrepareMethodParameters(parameters, contextType, out values)) continue;
                 var instance = constructorInfo.Invoke(values);
                 return instance;
             }
+            log($"Unable to create instance of type {contextType}");
             return null;
         }
 
@@ -74,6 +88,11 @@ namespace EfCore.Shaman.ModelScanner
             if (parameterType.IsAssignableFrom(dbCtx))
                 return CreateDbContextOptions(dbContextType);
             return null;
+        }
+
+        private void Log(string methodName, string message)
+        {
+            _logger.Log(typeof(InstanceCreator), methodName, message);
         }
 
         private bool PrepareMethodParameters(IReadOnlyList<ParameterInfo> parameters, Type dbContextType,
@@ -104,6 +123,57 @@ namespace EfCore.Shaman.ModelScanner
         #region Properties
 
         public List<object> Values { get; private set; } = new List<object>();
+
+        #endregion
+
+        #region Fields
+
+        private readonly IShamanLogger _logger;
+
+        #endregion
+
+        #region Nested
+
+        private class ConstructorInfoComparer : IComparer<ConstructorInfo>
+        {
+            #region Constructors
+
+            public ConstructorInfoComparer(Type dbContextOptionsType)
+            {
+                _dbContextOptionsType = dbContextOptionsType;
+            }
+
+            #endregion
+
+            #region Instance Methods
+
+            public int Compare(ConstructorInfo x, ConstructorInfo y)
+            {
+                var xParameterPriority = GetParameterPriority(x);
+                var yParameterPriority = GetParameterPriority(y);
+                var compare = xParameterPriority.CompareTo(yParameterPriority);
+                if (compare != 0) return -compare; // descending;
+                var xGetParametersLength = x.GetParameters().Length;
+                var yGetParametersLength = y.GetParameters().Length;
+                return xGetParametersLength.CompareTo(yGetParametersLength);
+            }
+
+            private int GetParameterPriority(ConstructorInfo constructorInfo)
+            {
+                var p = constructorInfo.GetParameters();
+                var dbOpt = p.Count(i => i.ParameterType.IsAssignableFrom(_dbContextOptionsType));
+                var other = p.Length - dbOpt;
+                return dbOpt - other;
+            }
+
+            #endregion
+
+            #region Fields
+
+            private readonly Type _dbContextOptionsType;
+
+            #endregion
+        }
 
         #endregion
     }
