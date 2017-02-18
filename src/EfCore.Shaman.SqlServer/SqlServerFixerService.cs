@@ -59,7 +59,7 @@ namespace EfCore.Shaman.SqlServer
             var createTableOperations = new Dictionary<string, CreateTableOperation>(StringComparer.OrdinalIgnoreCase);
             foreach (var i in migrationBuilder.Operations.OfType<CreateTableOperation>())
                 createTableOperations[i.Name] = i;
-
+            var logger = info.UsedShamanOptions.Logger ?? EmptyShamanLogger.Instance;
             foreach (var dbSetInfo in info.DbSets)
             {
                 // looking for create operation
@@ -74,16 +74,20 @@ namespace EfCore.Shaman.SqlServer
                 {
                     var columnCollation = GetCollation(columnInfo.Annotations);
                     if (string.IsNullOrEmpty(columnCollation)) continue;
+                    var escapedTableName = MsSqlUtils.Escape(dbSetInfo.Schema, dbSetInfo.TableName);
+                    var escapedColumnName = MsSqlUtils.Escape(columnInfo.ColumnName);
+                    logger.Log(typeof(SqlServerFixerService), nameof(FixMigrationUp),
+                        $"Change collation {escapedTableName}.{escapedColumnName} => {columnCollation}");
                     // looking for column for operation
                     AddColumnOperation addColumnOperation;
                     if (!columns.TryGetValue(columnInfo.ColumnName, out addColumnOperation)) continue;
                     var qu = new StringBuilder();
                     qu.Append("ALTER TABLE ");
-                    qu.Append(MsSqlUtils.Escape(dbSetInfo.Schema, dbSetInfo.TableName));
+                    qu.Append(escapedTableName);
                     qu.Append(" ALTER COLUMN ");
-                    qu.Append(MsSqlUtils.Escape(columnInfo.ColumnName));
+                    qu.Append(escapedColumnName);
                     qu.Append(addColumnOperation.IsUnicode == true ? " nvarchar" : " varchar");
-                    qu.Append("(" + MsSqlUtils.GetStringLength(addColumnOperation.MaxLength) + ")");
+                    qu.Append($"({MsSqlUtils.GetStringLength(addColumnOperation.MaxLength)})");
                     qu.Append(" COLLATE " + columnCollation);
                     qu.Append(addColumnOperation.IsNullable ? " NULL" : " NOT NULL");
                     migrationBuilder.Sql(qu.ToString());

@@ -7,6 +7,7 @@ using System.Linq;
 using System.Reflection;
 using EfCore.Shaman.Reflection;
 using EfCore.Shaman.Services;
+using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 
 #endregion
@@ -21,7 +22,7 @@ namespace EfCore.Shaman.ModelScanner
         {
             _dbContextType = dbContextType;
             options = options ?? ShamanOptions.CreateShamanOptions(dbContextType);
-            UsedServices = options.Services;
+            UsedShamanOptions = options;
             _logger = options.Logger ?? EmptyShamanLogger.Instance;
             Prepare();
         }
@@ -58,7 +59,8 @@ namespace EfCore.Shaman.ModelScanner
             return string.IsNullOrEmpty(a?.Name) ? propertyName : a.Name;
         }
 
-        private static IReadOnlyDictionary<Type, string> GetTableNamesFromModel(EfModelWrapper model, IShamanLogger logger)
+        private static IReadOnlyDictionary<Type, string> GetTableNamesFromModel(EfModelWrapper model,
+            IShamanLogger logger)
         {
             if (model == null) return null;
             var result = new Dictionary<Type, string>();
@@ -89,14 +91,14 @@ namespace EfCore.Shaman.ModelScanner
         private DbSetInfo CreateDbSetWrapper(Type entityType, string propertyName,
             IReadOnlyDictionary<Type, string> tableNames)
         {
-            var dbSetInfoUpdateServices = UsedServices?.OfType<IDbSetInfoUpdateService>().ToArray();
+            var dbSetInfoUpdateServices = UsedShamanOptions.Services?.OfType<IDbSetInfoUpdateService>().ToArray();
             var dbSetInfo = new DbSetInfo(entityType, GetTableName(entityType, propertyName, tableNames), DefaultSchema);
             {
                 if (dbSetInfoUpdateServices != null)
                     foreach (var i in dbSetInfoUpdateServices)
                         i.UpdateDbSetInfo(dbSetInfo, entityType, _dbContextType);
             }
-            var columnInfoUpdateServices = UsedServices?.OfType<IColumnInfoUpdateService>().ToArray();
+            var columnInfoUpdateServices = UsedShamanOptions.Services?.OfType<IColumnInfoUpdateService>().ToArray();
             var useDirectSaverForType = entityType.GetTypeInfo().GetCustomAttribute<NoDirectSaverAttribute>() == null;
             foreach (var propertyInfo in entityType.GetProperties())
             {
@@ -130,8 +132,8 @@ namespace EfCore.Shaman.ModelScanner
             UsedDbContextModel = model != null;
             Log(nameof(Prepare),
                 UsedDbContextModel
-                ? "Use dbContext model"
-                : "Don't use dbContext model");
+                    ? "Use dbContext model"
+                    : "Don't use dbContext model");
             var tableNames = GetTableNamesFromModel(model, _logger);
             DefaultSchema = DefaultSchemaUpdater.GetDefaultSchema(_dbContextType, model, _logger);
             foreach (var property in _dbContextType.GetProperties())
@@ -149,11 +151,14 @@ namespace EfCore.Shaman.ModelScanner
 
         #region Properties
 
+        [NotNull]
+        public ShamanOptions UsedShamanOptions { get; }
+
         public string DefaultSchema { get; set; }
 
         public IEnumerable<DbSetInfo> DbSets => _dbSets.Values;
 
-        public IList<IShamanService> UsedServices { get; private set; }
+        // public IList<IShamanService> UsedServices { get; private set; }
 
         /// <summary>
         ///     IModel from DbContext has been used in modelinfo building
