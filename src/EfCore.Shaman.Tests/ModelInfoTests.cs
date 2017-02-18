@@ -1,7 +1,6 @@
 ﻿#region using
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,6 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore.Storage.Internal;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using Xunit;
 
 #endregion
@@ -28,7 +28,7 @@ namespace EfCore.Shaman.Tests
                 .UseInMemoryDatabase(nameof(T02_ShouldHaveUniqueIndex))
                 .Options;
             var count = 0;
-            using (var context = InstanceCreator.CreateInstance<T>(EmptyShamanLogger.Instance, options))
+            using(var context = InstanceCreator.CreateInstance<T>(EmptyShamanLogger.Instance, options))
             {
                 context.ExternalCheckModel = b =>
                 {
@@ -52,7 +52,8 @@ namespace EfCore.Shaman.Tests
 
         private static string SerializeToTest(object data)
         {
-            return data == null ? "null" : JsonConvert.SerializeObject(data).Replace("\"", "'");
+            JsonConverter[] converters = {new StringEnumConverter()};
+            return data == null ? "null" : JsonConvert.SerializeObject(data, converters).Replace("\"", "'");
         }
 
         #endregion
@@ -84,7 +85,7 @@ namespace EfCore.Shaman.Tests
                 Assert.NotNull(dbSet);
                 var idxs = SerializeToTest(dbSet.Indexes);
                 Assert.Equal(
-                    "[{'IndexName':'','Fields':[{'FieldName':'Name','IsDescending':false}],'IsUnique':true}]",
+                    "[{'IndexName':'','Fields':[{'FieldName':'Name','IsDescending':false}],'IndexType':'UniqueIndex'}]",
                     idxs);
             });
         }
@@ -184,8 +185,23 @@ namespace EfCore.Shaman.Tests
             });
         }
 
-        #endregion
+        [Fact]
+        public void T09_ShouldHaveFullTextIndex()
+        {
+            // todo: xunit tests (each test in separate appdomain). DbContext creates Model only once  
+            DoTestOnModelBuilder<TestDbContext>(mb =>
+            {
+                var modelInfo = GetModelInfo<TestDbContext>();
+                var dbSet = modelInfo.DbSet<MyEntityWithFullTextIndex>();
+                Assert.NotNull(dbSet);
+                var idxs = SerializeToTest(dbSet.Indexes);
+                Assert.Equal(
+                    "[{'IndexName':'','Fields':[{'FieldName':'Name','IsDescending':false}],'IndexType':'FullTextIndex'}]",
+                    idxs);
+            });
+        }
 
+        #endregion
     }
 
 

@@ -54,6 +54,7 @@ namespace EfCore.Shaman.Tests.Model
         #region Properties
 
         public DbSet<MyEntityWithUniqueIndex> EntityWithUniqueIndex { get; set; }
+        public DbSet<MyEntityWithFullTextIndex> EntityWithFullTextIndex { get; set; }
         public DbSet<MyEntityWithDifferentTableName> EntityWithDifferentTableName { get; set; }
 
         #endregion

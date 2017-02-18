@@ -62,8 +62,7 @@ namespace EfCore.Shaman.SqlServer
             foreach (var i in migrationBuilder.Operations.OfType<CreateTableOperation>())
                 createTableOperations[i.Name] = i;
             foreach (var dbSetInfo in info.DbSets)
-            {
-               
+            {               
                 // looking for create operation
                 CreateTableOperation createTableOperation;
                 if (!createTableOperations.TryGetValue(dbSetInfo.TableName, out createTableOperation))

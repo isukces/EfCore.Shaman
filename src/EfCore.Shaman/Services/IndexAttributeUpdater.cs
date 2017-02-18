@@ -30,9 +30,12 @@ namespace EfCore.Shaman.Services
                 }
                 indexInfo.Order = indexAttribute.Order;
                 indexInfo.IsDescending = indexAttribute.IsDescending;
-                indexInfo.IsUnique = indexAttribute is UniqueIndexAttribute;
+                if (indexAttribute is UniqueIndexAttribute)
+                    indexInfo.IndexType = IndexType.UniqueIndex;
+                else if (indexAttribute is FullTextIndexAttribute)
+                    indexInfo.IndexType = IndexType.FullTextIndex;
                 logger.Log(typeof(IndexAttributeUpdater), nameof(UpdateColumnInfo),
-                    $"Set indexInfo: Order={indexInfo.Order}, IsDescending={indexInfo.IsDescending}, IsUnique={indexInfo.IsUnique}");
+                    $"Set indexInfo: Order={indexInfo.Order}, IsDescending={indexInfo.IsDescending}, IndexType={indexInfo.IndexType}");
             }
         }
 

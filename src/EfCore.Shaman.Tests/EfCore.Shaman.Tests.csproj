@@ -139,6 +139,7 @@
     <Compile Include="ModelInfoTests.cs" />
     <Compile Include="Model\EmptyService.cs" />
     <Compile Include="Model\MyEntityWithDifferentTableName.cs" />
+    <Compile Include="Model\MyEntityWithFullTextIndex.cs" />
     <Compile Include="Model\MyEntityWithUniqueIndex.cs" />
     <Compile Include="Model\MySettingsEntity.cs" />
     <Compile Include="Model\User.cs" />

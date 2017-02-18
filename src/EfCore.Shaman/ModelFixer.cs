@@ -124,10 +124,12 @@ namespace EfCore.Shaman
                 ChangeTableName(entity, dbSet);
                 foreach (var idx in dbSet.Indexes)
                 {
+                    if (!idx.IndexType.IsNormalIndex())
+                        continue;
                     var fields = idx.Fields.Select(a => a.FieldName).ToArray();
                     var indexBuilder = entity.HasIndex(fields);
                     TrySetIndexName(indexBuilder, idx.IndexName);
-                    indexBuilder.IsUnique(idx.IsUnique);
+                    indexBuilder.IsUnique(idx.IndexType == IndexType.UniqueIndex);
                 }
                 foreach (var info in dbSet.Properites)
                 {

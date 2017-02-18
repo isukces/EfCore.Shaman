@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using EfCore.Shaman.ModelScanner;
 
 namespace EfCore.Shaman
 {
@@ -9,7 +10,7 @@ namespace EfCore.Shaman
         string IndexName { get; }
 
         IReadOnlyList<ITableIndexFieldInfo> Fields { get; }
-        bool IsUnique { get; }
+        IndexType IndexType { get; }
 
         #endregion
     }

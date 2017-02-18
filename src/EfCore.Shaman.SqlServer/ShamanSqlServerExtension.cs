@@ -19,7 +19,8 @@ namespace EfCore.Shaman
             return options
                 .With<SqlServerReflectionService>()
                 .With<SqlServerDirectSaverFactoryService>()
-                .With<SqlServerFixerService>();
+                .With<SqlServerFixerService>()
+                .With<SqlServerFullTextIndexService>();
         }
 
         #endregion
