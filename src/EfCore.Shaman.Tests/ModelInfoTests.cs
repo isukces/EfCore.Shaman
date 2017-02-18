@@ -10,15 +10,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore.Storage.Internal;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 using Xunit;
 
 #endregion
 
 namespace EfCore.Shaman.Tests
 {
-    public class ModelInfoTests
+    public partial class ModelInfoTests
     {
         #region Static Methods
 
@@ -28,7 +26,7 @@ namespace EfCore.Shaman.Tests
                 .UseInMemoryDatabase(nameof(T02_ShouldHaveUniqueIndex))
                 .Options;
             var count = 0;
-            using(var context = InstanceCreator.CreateInstance<T>(EmptyShamanLogger.Instance, options))
+            using (var context = InstanceCreator.CreateInstance<T>(EmptyShamanLogger.Instance, options))
             {
                 context.ExternalCheckModel = b =>
                 {
@@ -48,12 +46,6 @@ namespace EfCore.Shaman.Tests
         {
             var aa = new ModelInfo(typeof(T), options);
             return aa;
-        }
-
-        private static string SerializeToTest(object data)
-        {
-            JsonConverter[] converters = {new StringEnumConverter()};
-            return data == null ? "null" : JsonConvert.SerializeObject(data, converters).Replace("\"", "'");
         }
 
         #endregion
@@ -83,10 +75,9 @@ namespace EfCore.Shaman.Tests
                 var modelInfo = GetModelInfo<TestDbContext>();
                 var dbSet = modelInfo.DbSet<MyEntityWithUniqueIndex>();
                 Assert.NotNull(dbSet);
-                var idxs = SerializeToTest(dbSet.Indexes);
-                Assert.Equal(
-                    "[{'IndexName':'','Fields':[{'FieldName':'Name','IsDescending':false}],'IndexType':'UniqueIndex'}]",
-                    idxs);
+                var idxs = JsonHelper.SerializeToTest(dbSet.Indexes);
+                const string expected = "[{'IndexName':'','Fields':[{'FieldName':'Name'}],'IndexType':'UniqueIndex'}]";
+                Assert.Equal(expected, idxs);
             });
         }
 
@@ -194,10 +185,10 @@ namespace EfCore.Shaman.Tests
                 var modelInfo = GetModelInfo<TestDbContext>();
                 var dbSet = modelInfo.DbSet<MyEntityWithFullTextIndex>();
                 Assert.NotNull(dbSet);
-                var idxs = SerializeToTest(dbSet.Indexes);
-                Assert.Equal(
-                    "[{'IndexName':'','Fields':[{'FieldName':'Name','IsDescending':false}],'IndexType':'FullTextIndex'}]",
-                    idxs);
+                var idxs = JsonHelper.SerializeToTest(dbSet.Indexes);
+                const string expected =
+                    "[{'IndexName':'','Fields':[{'FieldName':'Name'}],'IndexType':'FullTextIndex','FullTextCatalogName':'my catalog'}]";
+                Assert.Equal(expected, idxs);
             });
         }
 

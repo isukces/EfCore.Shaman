@@ -14,10 +14,9 @@ namespace EfCore.Shaman.ModelScanner
         public int Order { get; set; }
         public bool IsDescending { get; set; }
 
-        [Obsolete]
-        public bool IsUnique => IndexType == ModelScanner.IndexType.UniqueIndex;
 
         public IndexType IndexType { get; set; }
+        public string FullTextCatalogName { get; set; }
 
         #endregion
     }

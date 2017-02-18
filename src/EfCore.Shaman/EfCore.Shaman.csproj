@@ -125,6 +125,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ModelScanner\DbSetInfoIndexHelper.cs" />
     <Compile Include="ModelScanner\IndexType.cs" />
     <Compile Include="Services\LogToConsoleWhileMigrationService.cs" />
     <Compile Include="ShamanCallstackSpy.cs" />

@@ -6,7 +6,7 @@ namespace EfCore.Shaman.Tests.Model
 
         public int Id { get; set; }
 
-        [FullTextIndex()]
+        [FullTextIndex(FullTextCatalogName = "my catalog")]
         public string Name { get; set; }
 
         #endregion

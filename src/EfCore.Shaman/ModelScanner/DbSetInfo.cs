@@ -21,41 +21,6 @@ namespace EfCore.Shaman.ModelScanner
 
         #endregion
 
-        #region Static Methods
-
-        private static IndexType AggregateIndexType(IEnumerable<ColumnAndIndex> list)
-        {
-            var configuration = IndexTypeConfiguration.None;
-            foreach (var columnAndIndex in list)
-            {
-                switch (columnAndIndex.IndexInfo.IndexType)
-                {
-                    case IndexType.FullTextIndex:
-                        configuration |= IndexTypeConfiguration.FullTextIndex;
-                        break;
-                    case IndexType.UniqueIndex:
-                        configuration |= IndexTypeConfiguration.UniqueIndex;
-                        break;
-                }
-                if (configuration == IndexTypeConfiguration.Forbidden)
-                    throw new Exception("Forbidden index type combination for index " + columnAndIndex.IndexInfo.IndexName);
-            }
-
-            switch (configuration)
-            {
-                case IndexTypeConfiguration.None:
-                    return IndexType.Index;
-                case IndexTypeConfiguration.FullTextIndex:
-                    return IndexType.FullTextIndex;
-                case IndexTypeConfiguration.UniqueIndex:
-                    return IndexType.UniqueIndex;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-        }
-
-        #endregion
-
         #region Instance Methods
 
         public override string ToString() => $"DbSet: {EntityType?.Name} => {Schema}.{TableName}";
@@ -77,40 +42,18 @@ namespace EfCore.Shaman.ModelScanner
             get
             {
                 var query = from column in Properites
-                            from indexInfo in column.ColumnIndexes
-                            group new ColumnAndIndex(column, indexInfo)
-                            by indexInfo.IndexName
+                    from indexInfo in column.ColumnIndexes
+                    group new ColumnAndIndex(column, indexInfo)
+                    by indexInfo.IndexName
                     into g
-                            let ii = new TableIndexInfo
-                            {
-                                IndexName = g.Key,
-                                Fields = g.OrderBy(q => q.IndexInfo.Order)
-                                    .Select(q => new TableIndexFieldInfo
-                                    {
-                                        FieldName = q.Column.ColumnName,
-                                        IsDescending = q.IndexInfo.IsDescending
-                                    }).ToArray(),
-                                IndexType = AggregateIndexType(g)
-                            }
-                            select (ITableIndexInfo)ii;
+                    select DbSetInfoIndexHelper.CreateTableIndexInfo(g, TableName);
                 return query.ToList();
             }
         }
 
         #endregion
 
-        #region Enums
-
-        [Flags]
-        private enum IndexTypeConfiguration
-        {
-            None = 0,
-            FullTextIndex = 1,
-            UniqueIndex = 2,
-            Forbidden = 3
-        }
-
-        #endregion
+       
 
         #region Nested
 

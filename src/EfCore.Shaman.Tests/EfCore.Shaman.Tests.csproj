@@ -139,6 +139,7 @@
     <Compile Include="EfCore.Shaman.SqlServer\SqlServerFixerServiceTest.cs" />
     <Compile Include="EfCore.Shaman.SqlServer\SqlServerFullTextIndexServiceTest.cs" />
     <Compile Include="ModelInfoTests.cs" />
+    <Compile Include="JsonHelper.cs" />
     <Compile Include="Model\EmptyService.cs" />
     <Compile Include="Model\MyEntityWithDifferentTableName.cs" />
     <Compile Include="Model\MyEntityWithFullTextIndex.cs" />

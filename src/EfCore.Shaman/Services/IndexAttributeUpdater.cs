@@ -24,7 +24,8 @@ namespace EfCore.Shaman.Services
                 {
                     indexInfo = new ColumnIndexInfo
                     {
-                        IndexName = indexName
+                        IndexName = indexName,
+                        FullTextCatalogName = indexAttribute.FullTextCatalogName
                     };
                     columnInfo.ColumnIndexes.Add(indexInfo);
                 }

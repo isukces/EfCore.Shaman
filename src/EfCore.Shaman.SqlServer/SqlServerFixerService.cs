@@ -91,9 +91,9 @@ namespace EfCore.Shaman.SqlServer
                     // looking for column for operation
                     AddColumnOperation addColumnOperation;
                     if (!columns.TryGetValue(columnInfo.ColumnName, out addColumnOperation)) continue;
-                    var qu = CreateChangeCollationSql(escapedTableName, escapedColumnName, columnCollation,
+                    var sql = CreateChangeCollationSql(escapedTableName, escapedColumnName, columnCollation,
                         addColumnOperation.IsUnicode, addColumnOperation.MaxLength, addColumnOperation.IsNullable);
-                    migrationBuilder.Sql(qu);
+                    migrationBuilder.Sql(sql);
                     MoveSqlBeforeIndexCreation(migrationBuilder, createTableOperation, columnInfo.ColumnName);
                 }
             }

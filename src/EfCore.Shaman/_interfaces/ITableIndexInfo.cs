@@ -11,6 +11,7 @@ namespace EfCore.Shaman
 
         IReadOnlyList<ITableIndexFieldInfo> Fields { get; }
         IndexType IndexType { get; }
+        string FullTextCatalogName { get;  }
 
         #endregion
     }
