@@ -10,5 +10,11 @@
         }
 
         #endregion
+
+        #region Properties
+
+        public string FullTextCatalogName { get; set; }
+
+        #endregion
     }
 }

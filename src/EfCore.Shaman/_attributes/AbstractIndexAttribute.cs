@@ -24,7 +24,7 @@ namespace EfCore.Shaman
         public string Name { get; set; }
         public int Order { get; set; }
         public bool IsDescending { get; set; }
-        public string FullTextCatalogName { get; set; }
+      
 
         #endregion
 
