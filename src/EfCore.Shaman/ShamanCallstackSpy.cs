@@ -1,5 +1,6 @@
 ﻿#region using
 
+using System;
 using System.Diagnostics;
 using System.Reflection;
 
@@ -31,6 +32,7 @@ namespace EfCore.Shaman
         {
             get
             {
+#if net45
                 var st = new StackTrace(true);
                 for (var i = 0; i < st.FrameCount; i++)
                 {
@@ -47,11 +49,14 @@ namespace EfCore.Shaman
                             return CallerInfoType.AddMigration;
                     }
                 }
+#else
+#warning CallerInfo is not supported :(
+#endif
                 return CallerInfoType.Other;
             }
         }
 
-        #endregion
+#endregion
     }
 
     public enum CallerInfoType
