@@ -96,7 +96,7 @@ namespace EfCore.Shaman.ModelScanner
             {
                 if (dbSetInfoUpdateServices != null)
                     foreach (var i in dbSetInfoUpdateServices)
-                        i.UpdateDbSetInfo(dbSetInfo, entityType, _dbContextType);
+                        i.UpdateDbSetInfo(dbSetInfo, entityType, _dbContextType, _logger);
             }
             var columnInfoUpdateServices = UsedShamanOptions.Services?.OfType<IColumnInfoUpdateService>().ToArray();
             var useDirectSaverForType = entityType.GetTypeInfo().GetCustomAttribute<NoDirectSaverAttribute>() == null;
@@ -114,7 +114,7 @@ namespace EfCore.Shaman.ModelScanner
                 }
                 if (columnInfoUpdateServices != null)
                     foreach (var service in columnInfoUpdateServices)
-                        service.UpdateColumnInfo(columnInfo, propertyInfo);
+                        service.UpdateColumnInfo(columnInfo, propertyInfo, _logger);
                 dbSetInfo.Properites.Add(columnInfo);
             }
             return dbSetInfo;

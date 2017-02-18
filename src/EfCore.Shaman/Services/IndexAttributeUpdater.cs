@@ -12,7 +12,7 @@ namespace EfCore.Shaman.Services
     {
         #region Instance Methods
 
-        public void UpdateColumnInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo)
+        public void UpdateColumnInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo, IShamanLogger logger)
         {
             var indexAttributes = propertyInfo.GetCustomAttributes<AbstractIndexAttribute>()?.ToArray();
             if ((indexAttributes == null) || !indexAttributes.Any()) return;
@@ -31,6 +31,8 @@ namespace EfCore.Shaman.Services
                 indexInfo.Order = indexAttribute.Order;
                 indexInfo.IsDescending = indexAttribute.IsDescending;
                 indexInfo.IsUnique = indexAttribute is UniqueIndexAttribute;
+                logger.Log(typeof(IndexAttributeUpdater), nameof(UpdateColumnInfo),
+                    $"Set indexInfo: Order={indexInfo.Order}, IsDescending={indexInfo.IsDescending}, IsUnique={indexInfo.IsUnique}");
             }
         }
 

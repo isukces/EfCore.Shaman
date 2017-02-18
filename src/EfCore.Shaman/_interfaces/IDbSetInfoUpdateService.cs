@@ -7,7 +7,7 @@ namespace EfCore.Shaman
     {
         #region Instance Methods
 
-        void UpdateDbSetInfo(DbSetInfo dbSetInfo, Type entityType, Type contextType);
+        void UpdateDbSetInfo(DbSetInfo dbSetInfo, Type entityType, Type contextType, IShamanLogger logger);
 
         #endregion
     }

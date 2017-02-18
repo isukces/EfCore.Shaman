@@ -12,10 +12,11 @@ namespace EfCore.Shaman.Services
     {
         #region Instance Methods
 
-        public void UpdateColumnInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo)
+        public void UpdateColumnInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo, IShamanLogger logger)
         {
             if (propertyInfo.GetCustomAttribute<NotMappedAttribute>() != null)
                 columnInfo.IsNotMapped = true;
+            // todo log NotMappedAttributeUpdater.UpdateColumnInfo
         }
 
         #endregion

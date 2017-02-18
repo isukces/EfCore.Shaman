@@ -12,11 +12,12 @@ namespace EfCore.Shaman.Services
     {
         #region Instance Methods
 
-        public void UpdateColumnInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo)
+        public void UpdateColumnInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo, IShamanLogger logger)
         {
             var attribute = propertyInfo.GetCustomAttribute<DefaultValueAttribute>();
             if (attribute != null)
                 columnInfo.DefaultValue = ValueInfo.FromClrValue(attribute.Value);
+            // todo: log
         }
 
         #endregion

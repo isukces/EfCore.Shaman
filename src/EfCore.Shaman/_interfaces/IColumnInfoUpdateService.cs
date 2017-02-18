@@ -11,7 +11,7 @@ namespace EfCore.Shaman
     {
         #region Instance Methods
 
-        void UpdateColumnInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo);
+        void UpdateColumnInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo, IShamanLogger logger);
 
         #endregion
     }

@@ -42,6 +42,11 @@ namespace EfCore.Shaman
             });
         }
 
+        public static Action<string> CreateMethod(this IShamanLogger logger, Type type, string method)
+        {
+            return txt => logger.Log(type, method, txt);
+        }
+
         public static bool IsNullOrEmpty(this IShamanLogger src)
         {
             return src == null || src is EmptyShamanLogger;

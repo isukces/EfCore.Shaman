@@ -6,11 +6,12 @@ namespace EfCore.Shaman.Services
 {
     class MaxLengthAttributeUpdater : IColumnInfoUpdateService
     {
-        public void UpdateColumnInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo)
+        public void UpdateColumnInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo, IShamanLogger logger)
         {
             var attribute = propertyInfo.GetCustomAttribute<MaxLengthAttribute>();
             if (attribute == null) return;
             columnInfo.MaxLength = attribute.Length;
+            // todo log MaxLengthAttributeUpdater.UpdateColumnInfo
         }
     }
 }

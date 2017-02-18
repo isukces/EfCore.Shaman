@@ -25,11 +25,15 @@ namespace EfCore.Shaman.Services
 
         #region Instance Methods
 
-        public void UpdateDbSetInfo(DbSetInfo dbSetInfo, Type entityType, Type contextType)
+        public void UpdateDbSetInfo(DbSetInfo dbSetInfo, Type entityType, Type contextType, IShamanLogger logger)
         {
             var tableAttribute = entityType.GetTypeInfo().GetCustomAttribute<TableAttribute>();
             if (tableAttribute == null || _ignoreTableAttribute)
+            {
                 dbSetInfo.TableName = _prefix + dbSetInfo.TableName;
+                logger.Log(typeof(PrefixedTableNameService), nameof(UpdateDbSetInfo),
+                    $"Set TableName='{dbSetInfo.TableName}', prefix='{_prefix}')");
+            }
         }
 
         #endregion

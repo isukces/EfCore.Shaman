@@ -6,10 +6,11 @@ namespace EfCore.Shaman.Services
 {
     class KeyAttributeUpdater : IColumnInfoUpdateService
     {
-        public void UpdateColumnInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo)
+        public void UpdateColumnInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo, IShamanLogger logger)
         {
             var notMappedAttribute = propertyInfo.GetCustomAttribute<KeyAttribute>();
             columnInfo.IsInPrimaryKey = notMappedAttribute != null;
+            // todo : log
         }
     }
 }

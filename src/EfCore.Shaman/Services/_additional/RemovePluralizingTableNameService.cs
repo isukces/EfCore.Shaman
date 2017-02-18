@@ -13,11 +13,12 @@ namespace EfCore.Shaman.Services
     {
         #region Instance Methods
 
-        public void UpdateDbSetInfo(DbSetInfo dbSetInfo, Type entityType, Type contextType)
+        public void UpdateDbSetInfo(DbSetInfo dbSetInfo, Type entityType, Type contextType, IShamanLogger logger)
         {
             var tableAttribute = entityType.GetTypeInfo().GetCustomAttribute<TableAttribute>();
             if (tableAttribute == null)
                 dbSetInfo.TableName = entityType.Name;
+            // todo log
         }
 
         #endregion

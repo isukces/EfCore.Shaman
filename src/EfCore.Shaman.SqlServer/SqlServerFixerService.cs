@@ -55,18 +55,20 @@ namespace EfCore.Shaman.SqlServer
         {
             if (!IsSupportedProvider(migrationBuilder.ActiveProvider))
                 return;
-
+            var logger = info.UsedShamanOptions.Logger ?? EmptyShamanLogger.Instance;
+            var log = logger.CreateMethod(typeof(SqlServerFixerService), nameof(FixMigrationUp));
+            log("Begin");
             var createTableOperations = new Dictionary<string, CreateTableOperation>(StringComparer.OrdinalIgnoreCase);
             foreach (var i in migrationBuilder.Operations.OfType<CreateTableOperation>())
                 createTableOperations[i.Name] = i;
-            var logger = info.UsedShamanOptions.Logger ?? EmptyShamanLogger.Instance;
             foreach (var dbSetInfo in info.DbSets)
             {
+               
                 // looking for create operation
                 CreateTableOperation createTableOperation;
                 if (!createTableOperations.TryGetValue(dbSetInfo.TableName, out createTableOperation))
                     continue;
-
+                log($"Fixing create table {dbSetInfo.TableName}");
                 // var tableCollation = GetCollation(dbSetInfo.Annotations);
                 var columns = createTableOperation.Columns.ToDictionary(a => a.Name, a => a,
                     StringComparer.OrdinalIgnoreCase);
@@ -76,8 +78,7 @@ namespace EfCore.Shaman.SqlServer
                     if (string.IsNullOrEmpty(columnCollation)) continue;
                     var escapedTableName = MsSqlUtils.Escape(dbSetInfo.Schema, dbSetInfo.TableName);
                     var escapedColumnName = MsSqlUtils.Escape(columnInfo.ColumnName);
-                    logger.Log(typeof(SqlServerFixerService), nameof(FixMigrationUp),
-                        $"Change collation {escapedTableName}.{escapedColumnName} => {columnCollation}");
+                    log($"Change collation {escapedTableName}.{escapedColumnName} => {columnCollation}");
                     // looking for column for operation
                     AddColumnOperation addColumnOperation;
                     if (!columns.TryGetValue(columnInfo.ColumnName, out addColumnOperation)) continue;
@@ -94,6 +95,7 @@ namespace EfCore.Shaman.SqlServer
                     MoveSqlBeforeIndexCreation(migrationBuilder, createTableOperation, columnInfo.ColumnName);
                 }
             }
+            log("End");
         }
 
         #endregion
