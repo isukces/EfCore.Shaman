@@ -35,7 +35,7 @@ namespace EfCore.Shaman.ModelScanner
         private static string AggregateFullTextCatalogName(List<DbSetInfo.ColumnAndIndex> list, string tableName)
         {
             var distinctNames = list
-                .Select(a => a.IndexInfo.FullTextCatalogName?.Trim())
+                .Select(a => a.IndexInfo.FullTextCatalog?.Name?.Trim())
                 .Where(a => !string.IsNullOrEmpty(a))
                 .Distinct()
                 .ToArray();

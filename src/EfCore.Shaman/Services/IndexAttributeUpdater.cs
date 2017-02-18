@@ -24,8 +24,7 @@ namespace EfCore.Shaman.Services
                 {
                     indexInfo = new ColumnIndexInfo
                     {
-                        IndexName = indexName,
-                        FullTextCatalogName = indexAttribute.FullTextCatalogName
+                        IndexName = indexName
                     };
                     columnInfo.ColumnIndexes.Add(indexInfo);
                 }
@@ -35,6 +34,12 @@ namespace EfCore.Shaman.Services
                     indexInfo.IndexType = IndexType.UniqueIndex;
                 else if (indexAttribute is FullTextIndexAttribute)
                     indexInfo.IndexType = IndexType.FullTextIndex;
+                if (indexInfo.IndexType == IndexType.FullTextIndex)
+                {
+                    var tmp = indexInfo.FullTextCatalog ?? new FullTextCatalogInfo();
+                    tmp.Name = indexAttribute.FullTextCatalogName;
+                    indexInfo.FullTextCatalog = tmp;
+                }
                 logger.Log(typeof(IndexAttributeUpdater), nameof(UpdateColumnInfo),
                     $"Set indexInfo: Order={indexInfo.Order}, IsDescending={indexInfo.IsDescending}, IndexType={indexInfo.IndexType}");
             }

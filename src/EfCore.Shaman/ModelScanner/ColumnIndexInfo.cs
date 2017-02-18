@@ -13,10 +13,8 @@ namespace EfCore.Shaman.ModelScanner
         public string IndexName { get; set; }
         public int Order { get; set; }
         public bool IsDescending { get; set; }
-
-
         public IndexType IndexType { get; set; }
-        public string FullTextCatalogName { get; set; }
+        public FullTextCatalogInfo? FullTextCatalog { get; set; }
 
         #endregion
     }
