@@ -150,6 +150,7 @@
     <Compile Include="Model\VisitableDbContext.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Model\TestDbContext.cs" />
+    <Compile Include="TestInMemoryTransactionManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
