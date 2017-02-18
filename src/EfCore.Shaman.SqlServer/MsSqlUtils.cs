@@ -18,15 +18,19 @@ namespace EfCore.Shaman.SqlServer
 
         public static string Escape(string schema, string tableName)
         {
-            if (String.IsNullOrEmpty(schema))
+            if (string.IsNullOrEmpty(schema))
                 schema = DefaultSchema;
             return Escape(schema) + "." + Escape(tableName);
         }
 
-        public static string GetStringLength(int? maxLength)
-        {
-            return maxLength?.ToString(CultureInfo.InvariantCulture) ?? "max";
-        }
+        public static string GetStringLength(int? maxLength) 
+            => maxLength?.ToString(CultureInfo.InvariantCulture) ?? "max";
+
+        public static bool IsSupportedProvider(string provider)
+            => string.Equals(provider, "Microsoft.EntityFrameworkCore.SqlServer", StringComparison.OrdinalIgnoreCase);
+
+        public static string QuoteText(string name)
+            => name == null ? "NULL" : $"\'{name.Replace("'", "''")}\'";
 
         #endregion
 
@@ -35,10 +39,5 @@ namespace EfCore.Shaman.SqlServer
         public const string DefaultSchema = "dbo";
 
         #endregion
-
-        public static bool IsSupportedProvider(string provider)
-        {
-            return String.Equals(provider, "Microsoft.EntityFrameworkCore.SqlServer", StringComparison.OrdinalIgnoreCase);
-        }
     }
 }

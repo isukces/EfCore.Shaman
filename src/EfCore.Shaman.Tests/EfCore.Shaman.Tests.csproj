@@ -137,6 +137,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="EfCore.Shaman.SqlServer\SqlServerFixerServiceTest.cs" />
+    <Compile Include="EfCore.Shaman.SqlServer\SqlServerFullTextIndexServiceTest.cs" />
     <Compile Include="ModelInfoTests.cs" />
     <Compile Include="Model\EmptyService.cs" />
     <Compile Include="Model\MyEntityWithDifferentTableName.cs" />
