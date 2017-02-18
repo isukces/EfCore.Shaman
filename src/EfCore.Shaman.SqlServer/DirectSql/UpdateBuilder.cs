@@ -36,7 +36,7 @@ namespace EfCore.Shaman.SqlServer.DirectSql
         {
             SqlText.AppendFormat("Update {0} set ", TableName);
             Separator = null;
-            for (var index = 0; index < SqlColumns.Length; index++)
+            for (var index = 0; index < SqlColumns.Count; index++)
             {
                 var columnInfo = SqlColumns[index];
                 if (columnInfo.IsInPrimaryKey || columnInfo.IsDatabaseGenerated)
@@ -67,5 +67,7 @@ namespace EfCore.Shaman.SqlServer.DirectSql
         }
 
         #endregion
+
+     
     }
 }

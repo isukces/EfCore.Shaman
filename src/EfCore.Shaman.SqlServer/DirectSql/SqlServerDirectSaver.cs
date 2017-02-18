@@ -1,6 +1,7 @@
 ﻿#region using
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using EfCore.Shaman.ModelScanner;
 using Microsoft.EntityFrameworkCore;
@@ -48,6 +49,16 @@ namespace EfCore.Shaman.SqlServer.DirectSql
         public void Update(DbContext context, T entity)
         {
             UpdateBuilder.DoUpdate(_info, context, _sqlColumns, _identityColumn, entity);
+        }
+
+        public void Delete(DbContext context, IReadOnlyDictionary<string, object> keys)
+        {
+            DeleteBuilder.DoDelete(_info, context, keys);
+        }
+
+        public void DeleteByPrimaryKey(DbContext context, params object[] keyValues)
+        {
+            DeleteBuilder.DeleteByPrimaryKey(_info, context, _sqlColumns, _identityColumn, keyValues);
         }
 
         #endregion

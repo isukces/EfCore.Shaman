@@ -48,7 +48,7 @@ namespace EfCore.Shaman.SqlServer.DirectSql
 
         private void Insert(DbContext context)
         {
-            _parameters = new string[SqlColumns.Length];
+            _parameters = new string[SqlColumns.Count];
             // var ts = DateTime.UtcNow;
             SqlText.AppendLine("SET NOCOUNT ON;");
             PrepareInsertSql();
@@ -87,7 +87,7 @@ namespace EfCore.Shaman.SqlServer.DirectSql
         {
             SqlText.AppendFormat("INSERT INTO {0} (", TableName);
             Separator = null;
-            for (var index = 0; index < SqlColumns.Length; index++)
+            for (var index = 0; index < SqlColumns.Count; index++)
             {
                 var col = SqlColumns[index];
                 if (col.IsIdentity) continue;
@@ -120,7 +120,7 @@ namespace EfCore.Shaman.SqlServer.DirectSql
             }
             else
             {
-                for (var index = 0; index < SqlColumns.Length; index++)
+                for (var index = 0; index < SqlColumns.Count; index++)
                 {
                     var col = SqlColumns[index];
                     if (!col.IsInPrimaryKey) continue;

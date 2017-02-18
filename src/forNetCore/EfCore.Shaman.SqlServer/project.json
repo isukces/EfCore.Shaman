@@ -10,6 +10,7 @@
       "imports": "dnxcore50",
       "dependencies": {
         "Microsoft.EntityFrameworkCore": "1.1.0",
+        "JetBrains.Annotations": "10.2.1",
         "Microsoft.EntityFrameworkCore.Design": "1.1.0",
         "Microsoft.EntityFrameworkCore.InMemory": "1.1.0",
         "Microsoft.EntityFrameworkCore.SqlServer": "1.1.0",
@@ -19,6 +20,7 @@
     },
     "net451": {
       "dependencies": {
+        "JetBrains.Annotations": "10.2.1",
         "Microsoft.EntityFrameworkCore": "1.1.0",
         "Microsoft.EntityFrameworkCore.Design": "1.1.0",
         "Microsoft.EntityFrameworkCore.InMemory": "1.1.0",
