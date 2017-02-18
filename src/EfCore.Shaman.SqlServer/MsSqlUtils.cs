@@ -1,5 +1,6 @@
 ﻿#region using
 
+using System;
 using System.Globalization;
 
 #endregion
@@ -17,7 +18,7 @@ namespace EfCore.Shaman.SqlServer
 
         public static string Escape(string schema, string tableName)
         {
-            if (string.IsNullOrEmpty(schema))
+            if (String.IsNullOrEmpty(schema))
                 schema = DefaultSchema;
             return Escape(schema) + "." + Escape(tableName);
         }
@@ -34,5 +35,10 @@ namespace EfCore.Shaman.SqlServer
         public const string DefaultSchema = "dbo";
 
         #endregion
+
+        public static bool IsSupportedProvider(string provider)
+        {
+            return String.Equals(provider, "Microsoft.EntityFrameworkCore.SqlServer", StringComparison.OrdinalIgnoreCase);
+        }
     }
 }

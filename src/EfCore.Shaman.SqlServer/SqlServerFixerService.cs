@@ -12,20 +12,30 @@ using Microsoft.EntityFrameworkCore.Migrations.Operations;
 
 namespace EfCore.Shaman.SqlServer
 {
-    internal class SqlServerFixerService : IFixMigrationUpService
+    public sealed class SqlServerFixerService : IFixMigrationUpService
     {
         #region Static Methods
+
+        public static string CreateChangeCollationSql(string escapedTableName, string escapedColumnName,
+            string columnCollation, bool? isUnicode, int? maxLength, bool isNullable)
+        {
+            var qu = new StringBuilder();
+            qu.Append("ALTER TABLE ");
+            qu.Append(escapedTableName);
+            qu.Append(" ALTER COLUMN ");
+            qu.Append(escapedColumnName);
+            qu.Append(isUnicode == true ? " nvarchar" : " varchar");
+            qu.Append($"({MsSqlUtils.GetStringLength(maxLength)})");
+            qu.Append(" COLLATE " + columnCollation);
+            qu.Append(isNullable ? " NULL" : " NOT NULL");
+            return qu.ToString();
+        }
 
         private static string GetCollation(IDictionary<string, object> iAnnotations)
         {
             object value;
             iAnnotations.TryGetValue(SqlServerReflectionService.Ck, out value);
             return value as string;
-        }
-
-        private static bool IsSupportedProvider(string provider)
-        {
-            return string.Equals(provider, "Microsoft.EntityFrameworkCore.SqlServer", StringComparison.OrdinalIgnoreCase);
         }
 
         private static void MoveSqlBeforeIndexCreation(MigrationBuilder migrationBuilder,
@@ -53,7 +63,7 @@ namespace EfCore.Shaman.SqlServer
 
         public void FixMigrationUp(MigrationBuilder migrationBuilder, ModelInfo info)
         {
-            if (!IsSupportedProvider(migrationBuilder.ActiveProvider))
+            if (!MsSqlUtils.IsSupportedProvider(migrationBuilder.ActiveProvider))
                 return;
             var logger = info.UsedShamanOptions.Logger ?? EmptyShamanLogger.Instance;
             var log = logger.CreateMethod(typeof(SqlServerFixerService), nameof(FixMigrationUp));
@@ -62,7 +72,7 @@ namespace EfCore.Shaman.SqlServer
             foreach (var i in migrationBuilder.Operations.OfType<CreateTableOperation>())
                 createTableOperations[i.Name] = i;
             foreach (var dbSetInfo in info.DbSets)
-            {               
+            {
                 // looking for create operation
                 CreateTableOperation createTableOperation;
                 if (!createTableOperations.TryGetValue(dbSetInfo.TableName, out createTableOperation))
@@ -81,16 +91,9 @@ namespace EfCore.Shaman.SqlServer
                     // looking for column for operation
                     AddColumnOperation addColumnOperation;
                     if (!columns.TryGetValue(columnInfo.ColumnName, out addColumnOperation)) continue;
-                    var qu = new StringBuilder();
-                    qu.Append("ALTER TABLE ");
-                    qu.Append(escapedTableName);
-                    qu.Append(" ALTER COLUMN ");
-                    qu.Append(escapedColumnName);
-                    qu.Append(addColumnOperation.IsUnicode == true ? " nvarchar" : " varchar");
-                    qu.Append($"({MsSqlUtils.GetStringLength(addColumnOperation.MaxLength)})");
-                    qu.Append(" COLLATE " + columnCollation);
-                    qu.Append(addColumnOperation.IsNullable ? " NULL" : " NOT NULL");
-                    migrationBuilder.Sql(qu.ToString());
+                    var qu = CreateChangeCollationSql(escapedTableName, escapedColumnName, columnCollation,
+                        addColumnOperation.IsUnicode, addColumnOperation.MaxLength, addColumnOperation.IsNullable);
+                    migrationBuilder.Sql(qu);
                     MoveSqlBeforeIndexCreation(migrationBuilder, createTableOperation, columnInfo.ColumnName);
                 }
             }

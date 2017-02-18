@@ -136,6 +136,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EfCore.Shaman.SqlServer\SqlServerFixerServiceTest.cs" />
     <Compile Include="ModelInfoTests.cs" />
     <Compile Include="Model\EmptyService.cs" />
     <Compile Include="Model\MyEntityWithDifferentTableName.cs" />
@@ -155,6 +156,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\EfCore.Shaman.SqlServer\EfCore.Shaman.SqlServer.csproj">
+      <Project>{4D085DEB-EC4D-4001-8D1B-FC26D2142417}</Project>
+      <Name>EfCore.Shaman.SqlServer</Name>
+    </ProjectReference>
     <ProjectReference Include="..\EfCore.Shaman\EfCore.Shaman.csproj">
       <Project>{D8CECFB3-BAB9-4189-B999-F94A02E0A741}</Project>
       <Name>EfCore.Shaman</Name>
