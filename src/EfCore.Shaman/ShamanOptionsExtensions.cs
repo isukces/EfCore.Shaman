@@ -80,8 +80,7 @@ namespace EfCore.Shaman
             return options
                 .With<ColumnAttributeUpdater>()
                 .With<NotMappedAttributeUpdater>()
-                .With<ForeignKeyAttributeUpdater>()
-                .With<InversePropertyAttributeUpdater>()
+                .With<NavigationPropertyAttributeUpdater>()
                 .With<DatabaseGeneratedAttributeUpdater>()
                 .With<KeyAttributeUpdater>()
                 .With<IndexAttributeUpdater>()
