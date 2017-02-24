@@ -49,30 +49,11 @@ namespace EfCore.Shaman.SqlServer.DirectSql
             DeleteBuilder.DoDelete(_info, context, keys);
         }
 
-        public void Delete(DbContext context, T entity)
+        public IReadOnlyList<ColumnInfo> GetPrimaryKeyColumns()
         {
-            object[] keyValues;
-            if (_identityColumn != null)
-            {
-                keyValues = new object[1];
-                keyValues[0] = _identityColumn.ValueReader.ReadPropertyValue(entity);
-            }
-            else
-            {
-                keyValues = new object[_pkColumns.Length];
-                for (var index = 0; index < _pkColumns.Length; index++)
-                {
-                    var column = _pkColumns[index];
-                    keyValues[index] = column.ValueReader.ReadPropertyValue(entity);
-                }
-            }
-            DeleteByPrimaryKey(context, keyValues);
+            return _pkColumns;
         }
 
-        public void DeleteByPrimaryKey(DbContext context, params object[] keyValues)
-        {
-            DeleteBuilder.DeleteByPrimaryKey(_info, context, _sqlColumns, _pkColumns, keyValues);
-        }
 
         public void Insert(DbContext context, T entity)
         {

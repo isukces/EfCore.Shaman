@@ -131,6 +131,7 @@
     <Compile Include="Services\LogToConsoleWhileMigrationService.cs" />
     <Compile Include="ShamanCallstackSpy.cs" />
     <Compile Include="_attributes\FullTextIndexAttribute.cs" />
+    <Compile Include="EntityWithDirectSaverStatus.cs" />
     <Compile Include="_interfaces\IShamanOptionModificationService.cs" />
     <Compile Include="_interfaces\IValueProviderService.cs" />
     <Compile Include="_loggers\EmptyShamanLogger.cs" />

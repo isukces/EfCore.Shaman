@@ -1,9 +1,6 @@
 ﻿#region using
 
-using System;
 using System.Collections.Generic;
-using EfCore.Shaman.ModelScanner;
-using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 
 #endregion
@@ -32,17 +29,6 @@ namespace EfCore.Shaman.SqlServer.DirectSql
             a.Delete(context, keys);
         }
 
-        public static void DeleteByPrimaryKey(IFullTableName fullTableName, DbContext context, ColumnInfo[] sqlColumns,
-            ColumnInfo[] pkColumns, object[] keyValues)
-        {
-            var a = new DeleteBuilder
-            {
-                FullTableName = fullTableName,
-                SqlColumns = sqlColumns
-            };
-            a.DeleteByPrimaryKey(context, keyValues);
-        }
-
         #endregion
 
         #region Instance Methods
@@ -52,17 +38,6 @@ namespace EfCore.Shaman.SqlServer.DirectSql
             PrepareUpdateSql(keys);
             var sql = SqlText.ToString();
             var tmp = context.Database.ExecuteSqlCommand(sql, ParameterValues.ToArray());
-        }
-
-        private void DeleteByPrimaryKey(DbContext context, [NotNull] object[] keyValues)
-        {
-            if (keyValues == null) throw new ArgumentNullException(nameof(keyValues));
-            if (PkColumns.Count != keyValues.Length)
-                throw new ArgumentNullException($"{nameof(keyValues)} should contain {PkColumns.Count} element(s)");
-            var dict = new Dictionary<string, object>();
-            for (var i = 0; i < PkColumns.Count; i++)
-                dict[PkColumns[i].ColumnName] = keyValues[i];
-            Delete(context, dict);
         }
 
         private void PrepareUpdateSql(IReadOnlyDictionary<string, object> keys)
