@@ -12,6 +12,7 @@ namespace EfCore.Shaman
 
         void Insert(DbContext context, T entity);
         void Update(DbContext context, T entity);
+        void Delete(DbContext context, T entity);
 
         #endregion
     }

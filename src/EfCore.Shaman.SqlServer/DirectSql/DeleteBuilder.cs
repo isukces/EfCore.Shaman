@@ -33,7 +33,7 @@ namespace EfCore.Shaman.SqlServer.DirectSql
         }
 
         public static void DeleteByPrimaryKey(IFullTableName fullTableName, DbContext context, ColumnInfo[] sqlColumns,
-            ColumnInfo identityColumn, object[] keyValues)
+            ColumnInfo[] pkColumns, object[] keyValues)
         {
             var a = new DeleteBuilder
             {
