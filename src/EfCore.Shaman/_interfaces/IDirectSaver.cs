@@ -65,6 +65,20 @@ namespace EfCore.Shaman
             saver.Save(context, entityWithStatus.Item, entityWithStatus.Status);
         }
 
+        public static void DirectDelete<T>(this ShamanDbContext context, T item)
+        {
+            var ds = context.GetDirectSaver<T>();
+            ds.Delete(context, item);
+        }
+
+        public static void DirectSave<T>(this ShamanDbContext context, EntityWithDirectSaverStatus<T> item)
+        {
+            if (item.Status == DirectSaverEntityStatus.Clean)
+                return;
+            var ds = context.GetDirectSaver<T>();
+            ds.Save(context, item);
+        }
+
         #endregion
     }
 }
