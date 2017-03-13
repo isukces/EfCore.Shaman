@@ -1,22 +1,20 @@
-﻿using EfCore.Shaman.ModelScanner;
+﻿using System.Collections.Generic;
+using System.Linq;
+using EfCore.Shaman.ModelScanner;
+using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 
 namespace EfCore.Shaman.SqlServer.DirectSql
 {
     internal class UpdateBuilder : DirectSqlBase
     {
-        #region Constructors
-
         private UpdateBuilder()
         {
         }
 
-        #endregion
-
-        #region Static Methods
 
         public static void DoUpdate(IFullTableName fullTableName, DbContext context, ColumnInfo[] sqlColumns,
-            ColumnInfo identityColumn, object entity)
+            ColumnInfo identityColumn, object entity, bool skipSelect = false)
         {
             var a = new UpdateBuilder
             {
@@ -25,15 +23,13 @@ namespace EfCore.Shaman.SqlServer.DirectSql
                 Entity = entity,
                 IdentityColumn = identityColumn
             };
-            a.Update(context);
+            a.Update(context, skipSelect);
         }
 
-        #endregion
-
-        #region Instance Methods
-
-        private void PrepareUpdateSql()
+        [NotNull]
+        private IReadOnlyList<ColumnInfo> PrepareUpdateSql(bool skipSelect)
         {
+            var whereSql = PrepareWhereSql();
             SqlText.AppendFormat("Update {0} set ", TableName);
             Separator = null;
             for (var index = 0; index < SqlColumns.Count; index++)
@@ -45,6 +41,19 @@ namespace EfCore.Shaman.SqlServer.DirectSql
                 SqlText.Append(Encode(columnInfo.ColumnName) + "=@p" + ParameterValues.Count);
                 ParameterValues.Add(columnInfo.ValueReader.ReadPropertyValue(Entity));
             }
+            SqlText.Append(whereSql);
+            if (skipSelect)
+                return new ColumnInfo[0];
+            var returned = SqlColumns.Where(a => a.IsDatabaseGenerated && !a.IsInPrimaryKey).ToList();
+            if (!returned.Any()) return returned;
+            SqlText.Append("; select " + string.Join(",", returned.Select(q => Encode(q.ColumnName))));
+            SqlText.Append(" from " + TableName);
+            SqlText.Append(whereSql);
+            return returned;
+        }
+
+        private string PrepareWhereSql()
+        {
             SqlText.Append(" where ");
             Separator = null;
             foreach (var i in SqlColumns)
@@ -55,19 +64,18 @@ namespace EfCore.Shaman.SqlServer.DirectSql
                 SqlText.Append(Encode(i.ColumnName) + "=@p" + ParameterValues.Count);
                 ParameterValues.Add(i.ValueReader.ReadPropertyValue(Entity));
             }
+            var whereSql = SqlText.ToString();
+            SqlText.Clear();
+            return whereSql;
         }
 
 
-        private void Update(DbContext context)
+        private void Update(DbContext context, bool skipSelect)
         {
-            // _sb.AppendLine("SET NOCOUNT ON;");
-            PrepareUpdateSql();
+            var returned = PrepareUpdateSql(skipSelect);
             var sql = SqlText.ToString();
-            var tmp = context.Database.ExecuteSqlCommand(sql, ParameterValues.ToArray());
+            ExecSqlAndUpdateBack(sql, context, Entity, returned, ParameterValues.ToArray());
+           
         }
-
-        #endregion
-
-     
     }
 }

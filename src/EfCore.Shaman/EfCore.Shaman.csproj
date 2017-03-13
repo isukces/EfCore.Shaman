@@ -130,6 +130,7 @@
     <Compile Include="ModelScanner\IndexType.cs" />
     <Compile Include="Services\LogToConsoleWhileMigrationService.cs" />
     <Compile Include="Services\NavigationPropertyAttributeUpdater.cs" />
+    <Compile Include="Services\TimestampAttributeUpdater.cs" />
     <Compile Include="ShamanCallstackSpy.cs" />
     <Compile Include="_attributes\FullTextIndexAttribute.cs" />
     <Compile Include="EntityWithDirectSaverStatus.cs" />

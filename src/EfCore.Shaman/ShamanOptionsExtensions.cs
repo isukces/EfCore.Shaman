@@ -81,6 +81,7 @@ namespace EfCore.Shaman
                 .With<ColumnAttributeUpdater>()
                 .With<NotMappedAttributeUpdater>()
                 .With<NavigationPropertyAttributeUpdater>()
+                .With<TimestampAttributeUpdater>()
                 .With<DatabaseGeneratedAttributeUpdater>()
                 .With<KeyAttributeUpdater>()
                 .With<IndexAttributeUpdater>()

@@ -15,7 +15,7 @@ namespace EfCore.Shaman.Tests
     {
         #region Static Methods
 
-        private static void DoTestOnModelBuilder<T>(Action<ModelBuilder> checkMethod) where T : VisitableDbContext
+        internal static void DoTestOnModelBuilder<T>(Action<ModelBuilder> checkMethod, Action<T> checkContext = null) where T : VisitableDbContext
         {
             var options = new DbContextOptionsBuilder<T>()
                 .UseInMemoryDatabase(nameof(T02_ShouldHaveUniqueIndex))
@@ -32,12 +32,14 @@ namespace EfCore.Shaman.Tests
                 var model = context.Model;
                 if (model == null) // enforce to create model
                     throw new NullReferenceException();
+                if (checkContext != null)
+                    checkContext(context);
             }
             if (count == 0)
                 throw new Exception("checkMethod has not been invoked");
         }
 
-        private static ModelInfo GetModelInfo<T>(ShamanOptions options = null)
+        internal static ModelInfo GetModelInfo<T>(ShamanOptions options = null)
         {
             var aa = new ModelInfo(typeof(T), options);
             return aa;

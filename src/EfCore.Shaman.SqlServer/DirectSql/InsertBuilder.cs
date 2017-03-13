@@ -1,26 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using EfCore.Shaman.ModelScanner;
+using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 
 namespace EfCore.Shaman.SqlServer.DirectSql
 {
     internal class InsertBuilder : DirectSqlBase
     {
-        #region Constructors
-
         private InsertBuilder()
         {
         }
 
-        #endregion
-
-        #region Static Methods
-
         public static void DoInsert(IFullTableName tableName, DbContext context, ColumnInfo[] sqlColumns,
-            ColumnInfo identityColumn, object entity)
+            ColumnInfo identityColumn, object entity, bool skipSelect = false)
         {
             var builder = new InsertBuilder
             {
@@ -29,12 +22,8 @@ namespace EfCore.Shaman.SqlServer.DirectSql
                 SqlColumns = sqlColumns,
                 IdentityColumn = identityColumn
             };
-            builder.Insert(context);
+            builder.Insert(context, skipSelect);
         }
-
-        #endregion
-
-        #region Instance Methods
 
         private string AddPropertyValue(int idx)
         {
@@ -46,31 +35,14 @@ namespace EfCore.Shaman.SqlServer.DirectSql
             return _parameters[idx];
         }
 
-        private void Insert(DbContext context)
+        private void Insert(DbContext context, bool skipSelect)
         {
             _parameters = new string[SqlColumns.Count];
             // var ts = DateTime.UtcNow;
             SqlText.AppendLine("SET NOCOUNT ON;");
             PrepareInsertSql();
-            var returned = PrepareSelectSql();
-            if (returned != null)
-            {
-                using (var reader = context.Database.ExecuteReader(SqlText.ToString(), ParameterValues.ToArray()))
-                {
-                    while (reader.DbDataReader.Read())
-                    {
-                        var v = new object[reader.DbDataReader.FieldCount];
-                        reader.DbDataReader.GetValues(v);
-                        for (var index = 0; index < returned.Count; index++)
-                            returned[index].ValueWriter.WritePropertyValue(Entity, v[index]);
-                        break;
-                    }
-                }
-            }
-            else
-            {
-                var tmp = context.Database.ExecuteSqlCommand(SqlText.ToString(), ParameterValues.ToArray());
-            }
+            var returned = PrepareSelectSql(skipSelect);
+            ExecSqlAndUpdateBack(SqlText.ToString(), context, Entity, returned, ParameterValues.ToArray());
             //Debug.WriteLine("  sql elapsed " + (DateTime.UtcNow - ts).TotalMilliseconds);
             /*
 
@@ -83,6 +55,7 @@ namespace EfCore.Shaman.SqlServer.DirectSql
     */
         }
 
+
         private void PrepareInsertSql()
         {
             SqlText.AppendFormat("INSERT INTO {0} (", TableName);
@@ -90,7 +63,7 @@ namespace EfCore.Shaman.SqlServer.DirectSql
             for (var index = 0; index < SqlColumns.Count; index++)
             {
                 var col = SqlColumns[index];
-                if (col.IsIdentity) continue;
+                if (col.IsIdentity || col.IsDatabaseGenerated) continue;
                 AddSeparator(", ");
                 SqlText.Append(Encode(col.ColumnName));
                 AddPropertyValue(index);
@@ -105,11 +78,14 @@ namespace EfCore.Shaman.SqlServer.DirectSql
             SqlText.AppendLine(");");
         }
 
-        private List<ColumnInfo> PrepareSelectSql()
+        [NotNull]
+        private IReadOnlyList<ColumnInfo> PrepareSelectSql(bool skipSelect)
         {
+            if (skipSelect)
+                return new ColumnInfo[0];
             var returned = SqlColumns.Where(a => a.IsDatabaseGenerated).ToList();
             if (!returned.Any())
-                return null;
+                return new ColumnInfo[0];
             Separator = " AND ";
             SqlText.Append("select " + string.Join(",", returned.Select(q => Encode(q.ColumnName))));
             SqlText.Append(" from " + TableName + " WHERE @@ROWCOUNT=1");
@@ -132,12 +108,6 @@ namespace EfCore.Shaman.SqlServer.DirectSql
             return returned;
         }
 
-        #endregion
-
-        #region Fields
-
         private string[] _parameters;
-
-        #endregion
     }
 }

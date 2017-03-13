@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EfCore.Shaman.Tests.Model
 {
-    internal abstract class VisitableDbContext : DbContext
+    internal abstract class VisitableDbContext : ShamanDbContext
     {
         #region Constructors
 

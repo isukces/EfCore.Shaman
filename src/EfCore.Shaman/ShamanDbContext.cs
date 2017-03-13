@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using EfCore.Shaman.Services;
 using Microsoft.EntityFrameworkCore;
 
 #endregion
@@ -25,6 +26,7 @@ namespace EfCore.Shaman
 
         #endregion
 
+       
         #region Instance Methods
 
         public IDirectSaver<T> GetDirectSaver<T>(Func<ShamanOptions> optionsFactory = null)

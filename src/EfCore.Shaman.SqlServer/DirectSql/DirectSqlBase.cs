@@ -2,8 +2,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using EfCore.Shaman.ModelScanner;
+using Microsoft.EntityFrameworkCore;
 
 #endregion
 
@@ -11,25 +13,38 @@ namespace EfCore.Shaman.SqlServer.DirectSql
 {
     internal class DirectSqlBase
     {
-        #region Constructors
-
         protected DirectSqlBase()
         {
             _pkColumns = new Lazy<IReadOnlyList<ColumnInfo>>(GetPkColumnsInternal);
         }
-
-        #endregion
-
-        #region Static Methods
 
         public static string Encode(string x)
         {
             return "[" + x + "]";
         }
 
-        #endregion
-
-        #region Instance Methods
+        protected static void ExecSqlAndUpdateBack(string sqlText, DbContext context, object entity,
+            IReadOnlyList<ColumnInfo> returned, object[] parameterValues)
+        {
+            if (returned != null && returned.Any())
+            {
+                using(var reader = context.Database.ExecuteReader(sqlText, parameterValues))
+                {
+                    while (reader.DbDataReader.Read())
+                    {
+                        var v = new object[reader.DbDataReader.FieldCount];
+                        reader.DbDataReader.GetValues(v);
+                        for (var index = 0; index < returned.Count; index++)
+                            returned[index].ValueWriter.WritePropertyValue(entity, v[index]);
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                var tmp = context.Database.ExecuteSqlCommand(sqlText, parameterValues);
+            }
+        }
 
         protected void AddSeparator(string newSeparator)
         {
@@ -38,8 +53,6 @@ namespace EfCore.Shaman.SqlServer.DirectSql
             else
                 SqlText.Append(Separator);
         }
-
-        protected IReadOnlyList<ColumnInfo> PkColumns => _pkColumns.Value;
 
         private IReadOnlyList<ColumnInfo> GetPkColumnsInternal()
         {
@@ -50,19 +63,14 @@ namespace EfCore.Shaman.SqlServer.DirectSql
             return columnInfos.ToArray();
         }
 
-        #endregion
-
-        #region Properties
+        protected IReadOnlyList<ColumnInfo> PkColumns => _pkColumns.Value;
 
         protected string TableName => Encode(FullTableName.Schema) + "." + Encode(FullTableName.TableName);
-
-        #endregion
-
-        #region Fields
 
         protected readonly StringBuilder SqlText = new StringBuilder();
 
         protected readonly List<object> ParameterValues = new List<object>();
+
         protected string Separator;
 
         protected IFullTableName FullTableName;
@@ -74,7 +82,5 @@ namespace EfCore.Shaman.SqlServer.DirectSql
         private readonly Lazy<IReadOnlyList<ColumnInfo>> _pkColumns;
 
         protected object Entity;
-
-        #endregion
     }
 }
