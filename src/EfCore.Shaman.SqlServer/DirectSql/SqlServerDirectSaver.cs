@@ -55,14 +55,14 @@ namespace EfCore.Shaman.SqlServer.DirectSql
         }
 
 
-        public void Insert(DbContext context, T entity)
+        public void Insert(DbContext context, T entity, bool skipSelect = false)
         {
-            InsertBuilder.DoInsert(_info, context, _sqlColumns, _identityColumn, entity);
+            InsertBuilder.DoInsert(_info, context, _sqlColumns, _identityColumn, entity, skipSelect);
         }
 
-        public void Update(DbContext context, T entity)
+        public void Update(DbContext context, T entity, bool skipSelect = false)
         {
-            UpdateBuilder.DoUpdate(_info, context, _sqlColumns, _identityColumn, entity);
+            UpdateBuilder.DoUpdate(_info, context, _sqlColumns, _identityColumn, entity, skipSelect);
         }
 
         #endregion
