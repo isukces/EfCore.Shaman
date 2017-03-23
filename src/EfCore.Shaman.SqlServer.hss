@@ -6,7 +6,7 @@ Microsoft.EntityFrameworkCore.SqlServer
 ";
 
 var builder = new ProjectBuilder(){
-	VisualStudioExe = GlobalVar["VisualStudio 2015"],
+	VisualStudioExe = GlobalVar["VisualStudio 2017"],
 	NugetExe = GlobalVar["Nuget"],
 	NugetRepositoryDir =  GlobalVar["Private Nuget Repository"],
 	SolutionName = "EfCore.Shaman",
