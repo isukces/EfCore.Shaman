@@ -115,6 +115,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ModelScanner\DbSetInfoIndexHelper.cs" />
+    <Compile Include="ModelScanner\FullTableName.cs" />
     <Compile Include="ModelScanner\FullTextCatalogInfo.cs" />
     <Compile Include="ModelScanner\IndexType.cs" />
     <Compile Include="Services\LogToConsoleWhileMigrationService.cs" />

@@ -80,7 +80,7 @@ namespace EfCore.Shaman.ModelScanner
         public DbSetInfo DbSet<T>()
             => _dbSets.Values.SingleOrDefault(a => a.EntityType == typeof(T));
 
-        public DbSetInfo GetByTableName(string tableName)
+        public DbSetInfo GetByTableName(FullTableName tableName)
         {
             DbSetInfo entity;
             _dbSets.TryGetValue(tableName, out entity);
@@ -143,7 +143,8 @@ namespace EfCore.Shaman.ModelScanner
                 if (propertyType.GetGenericTypeDefinition() != typeof(DbSet<>)) continue;
                 var entityType = propertyType.GetGenericArguments()[0];
                 var entity = CreateDbSetWrapper(entityType, property.Name, tableNames);
-                _dbSets[entity.TableName] = entity;
+                var key  = new FullTableName(entity.TableName, entity.Schema);
+                _dbSets[key] = entity;
             }
         }
 
@@ -172,8 +173,8 @@ namespace EfCore.Shaman.ModelScanner
         private readonly Type _dbContextType;
 
 
-        private readonly Dictionary<string, DbSetInfo> _dbSets =
-            new Dictionary<string, DbSetInfo>(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<FullTableName, DbSetInfo> _dbSets =
+            new Dictionary<FullTableName, DbSetInfo>();
 
         private readonly IShamanLogger _logger;
 

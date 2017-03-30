@@ -145,7 +145,7 @@ namespace EfCore.Shaman
                 throw new ArgumentNullException(nameof(table));
             if (_info == null)
                 throw new NullReferenceException(nameof(_info));
-            var entity = _info.GetByTableName(table.Name);
+            var entity = _info.GetByTableName(new FullTableName(table.Name, table.Schema));
             if (entity == null)
                 throw new Exception($"Unable to find table {table.Name}.");
             var colsDic = entity
