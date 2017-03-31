@@ -7,27 +7,19 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EfCore.Shaman.Tests.Model
 {
-    internal class PrefixedTableNamesDbContext : VisitableDbContext
+    internal class SingularTableNamesDbContext : VisitableDbContext
     {
-        #region Constructors
-
-        public PrefixedTableNamesDbContext(DbContextOptions options) : base(options)
+        public SingularTableNamesDbContext(DbContextOptions options) : base(options)
         {
         }
 
-        #endregion
-
-        #region Static Methods
 
         public static ShamanOptions GetShamanOptions()
         {
-            return ShamanOptions.Default.With(new PrefixedTableNameService("myPrefix"))
+            return ShamanOptions.Default.With(new RemovePluralizingTableNameService())
                 .WithLogger(new MethodCallLogger(a => System.Console.WriteLine($"SHAMAN: {a.Message}")));
         }
 
-        #endregion
-
-        #region Instance Methods
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -37,12 +29,7 @@ namespace EfCore.Shaman.Tests.Model
             ExternalCheckModel?.Invoke(modelBuilder);
         }
 
-        #endregion
-
-        #region Properties
 
         public DbSet<User> Users { get; set; }
-
-        #endregion
     }
 }

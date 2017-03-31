@@ -10,7 +10,7 @@ namespace EfCore.Shaman.Tests.EfCore.Shaman.Services
         [Fact]
         public void T01_ShouldMarkColumnAsTimestamp()
         {
-            ModelInfoTests.DoTestOnModelBuilder<TimestampAttributeUpdaterDbContext>(mb =>
+            ModelInfoTests.DoTestOnModelBuilder<TimestampAttributeUpdaterDbContext>(false, mb =>
             {
                 var t = mb.Model.GetEntityTypes().Single(a => a.ClrType == typeof(UserWithTimestamp));
                 Assert.NotNull(t);

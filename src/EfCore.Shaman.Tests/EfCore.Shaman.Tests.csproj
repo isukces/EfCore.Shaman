@@ -48,6 +48,9 @@
     <Reference Include="Microsoft.EntityFrameworkCore.Relational, Version=1.1.1.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.EntityFrameworkCore.Relational.1.1.1\lib\net451\Microsoft.EntityFrameworkCore.Relational.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.EntityFrameworkCore.SqlServer, Version=1.1.1.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.EntityFrameworkCore.SqlServer.1.1.1\lib\net451\Microsoft.EntityFrameworkCore.SqlServer.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Extensions.Caching.Abstractions, Version=1.1.1.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Extensions.Caching.Abstractions.1.1.1\lib\netstandard1.0\Microsoft.Extensions.Caching.Abstractions.dll</HintPath>
     </Reference>
@@ -137,6 +140,7 @@
     <Compile Include="Model\MyEntityWithFullTextIndex.cs" />
     <Compile Include="Model\MyEntityWithUniqueIndex.cs" />
     <Compile Include="Model\MySettingsEntity.cs" />
+    <Compile Include="Model\SingularTableNamesDbContext.cs" />
     <Compile Include="Model\User.cs" />
     <Compile Include="Model\PrefixedTableNamesDbContext.cs" />
     <Compile Include="Model\VisitableDbContext.cs" />

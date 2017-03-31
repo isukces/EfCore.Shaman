@@ -15,11 +15,13 @@ namespace EfCore.Shaman.Tests
     {
         #region Static Methods
 
-        internal static void DoTestOnModelBuilder<T>(Action<ModelBuilder> checkMethod, Action<T> checkContext = null) where T : VisitableDbContext
+        internal static void DoTestOnModelBuilder<T>(bool useSql, Action<ModelBuilder> checkMethod, Action<T> checkContext = null) where T : VisitableDbContext
         {
-            var options = new DbContextOptionsBuilder<T>()
-                .UseInMemoryDatabase(nameof(T02_ShouldHaveUniqueIndex))
-                .Options;
+            var optionsBuilder = new DbContextOptionsBuilder<T>();
+            optionsBuilder = useSql
+                ? optionsBuilder.UseSqlServer("Data Source=.;Initial Catalog=EfCoreShamanTests;Integrated Security=True;")
+                : optionsBuilder.UseInMemoryDatabase(nameof(T02_ShouldHaveUniqueIndex));
+            var options = optionsBuilder.Options;
             var count = 0;
             using (var context = InstanceCreator.CreateInstance<T>(EmptyShamanLogger.Instance, options))
             {
@@ -67,7 +69,7 @@ namespace EfCore.Shaman.Tests
         public void T02_ShouldHaveUniqueIndex()
         {
             // todo: xunit tests (each test in separate appdomain). DbContext creates Model only once  
-            DoTestOnModelBuilder<TestDbContext>(mb =>
+            DoTestOnModelBuilder<TestDbContext>(false, mb =>
             {
                 var modelInfo = GetModelInfo<TestDbContext>();
                 var dbSet = modelInfo.DbSet<MyEntityWithUniqueIndex>();
@@ -81,7 +83,7 @@ namespace EfCore.Shaman.Tests
         [Fact]
         public void T03_ShouldHaveManuallyChangedTableName()
         {
-            DoTestOnModelBuilder<TestDbContext>(mb =>
+            DoTestOnModelBuilder<TestDbContext>(false, mb =>
             {
                 var modelInfo = GetModelInfo<TestDbContext>();
                 var dbSet = modelInfo.DbSet<MyEntityWithDifferentTableName>();
@@ -109,9 +111,9 @@ namespace EfCore.Shaman.Tests
         [Fact]
         public void T06_ShouldHaveTableNameWithPrefix()
         {
-            const string expectedTableName = "myPrefixUser";
+            const string expectedTableName = "myPrefixUsers";
 
-            DoTestOnModelBuilder<PrefixedTableNamesDbContext>(mb =>
+            DoTestOnModelBuilder<PrefixedTableNamesDbContext>(true, mb =>
             {
                 var t = mb.Model.GetEntityTypes().Single(a => a.ClrType == typeof(User));
                 Assert.NotNull(t);
@@ -143,7 +145,7 @@ namespace EfCore.Shaman.Tests
         [Fact]
         public void T07_ShouldHaveDefaultValue()
         {
-            DoTestOnModelBuilder<TestDbContext>(mb =>
+            DoTestOnModelBuilder<TestDbContext>(false, mb =>
             {
                 var modelInfo = GetModelInfo<TestDbContext>();
                 var dbSet = modelInfo.DbSet<MyEntityWithDifferentTableName>();
@@ -160,7 +162,7 @@ namespace EfCore.Shaman.Tests
         [Fact]
         public void T08_ShouldHaveSqlDefaultValue()
         {
-            DoTestOnModelBuilder<TestDbContext>(mb =>
+            DoTestOnModelBuilder<TestDbContext>(false, mb =>
             {
                 var modelInfo = GetModelInfo<TestDbContext>();
                 var dbSet = modelInfo.DbSet<MyEntityWithDifferentTableName>();
@@ -177,7 +179,7 @@ namespace EfCore.Shaman.Tests
         public void T09_ShouldHaveFullTextIndex()
         {
             // todo: xunit tests (each test in separate appdomain). DbContext creates Model only once  
-            DoTestOnModelBuilder<TestDbContext>(mb =>
+            DoTestOnModelBuilder<TestDbContext>(false, mb =>
             {
                 var modelInfo = GetModelInfo<TestDbContext>();
                 var dbSet = modelInfo.DbSet<MyEntityWithFullTextIndex>();
@@ -187,6 +189,39 @@ namespace EfCore.Shaman.Tests
                     "[{'IndexName':'','Fields':[{'FieldName':'Name'}],'IndexType':'FullTextIndex','FullTextCatalogName':'my catalog'}]";
                 Assert.Equal(expected, idxs);
             });
+        }
+
+        [Fact]
+        public void T10_ShouldHaveSingularTableNames()
+        {
+            const string expectedTableName = "User";
+            DoTestOnModelBuilder<SingularTableNamesDbContext>(false, mb =>
+            {
+                var t = mb.Model.GetEntityTypes().Single(a => a.ClrType == typeof(User));
+                Assert.NotNull(t);
+                Assert.Equal(expectedTableName, t.Relational().TableName);
+
+                // without patching - when use 'InMemory' table names are singular
+                {
+                    var modelInfo = GetModelInfo<SingularTableNamesDbContext>(ShamanOptions.Default);
+                    var dbSet = modelInfo.DbSet<User>();
+                    Assert.NotNull(dbSet);
+                    Assert.Equal("User", dbSet.TableName);
+                }
+                // with patching
+                {
+                    var modelInfo = GetModelInfo<SingularTableNamesDbContext>();
+                    var dbSet = modelInfo.DbSet<User>();
+                    Assert.NotNull(dbSet);
+                    Assert.Equal(expectedTableName, dbSet.TableName);
+                }
+            });
+
+            {
+                var mi = ModelInfo.Make<SingularTableNamesDbContext>();
+                var dbSet = mi.DbSets.Single(a => a.EntityType == typeof(User));
+                Assert.Equal(expectedTableName, dbSet.TableName);
+            }
         }
 
         #endregion
