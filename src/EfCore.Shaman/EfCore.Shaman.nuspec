@@ -13,9 +13,9 @@
     <copyright>Copyright by Internet Sukces Piotr Stęclik 2017</copyright>
     <tags>EntityFrameworkCore</tags>
     <dependencies xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
-      <dependency id="Microsoft.EntityFrameworkCore" version="1.1.1" />
-      <dependency id="Microsoft.EntityFrameworkCore.Relational" version="1.1.1" />
-      <dependency id="Microsoft.EntityFrameworkCore.InMemory" version="1.1.1" />
+      <dependency id="Microsoft.EntityFrameworkCore" version="1.1.2" />
+      <dependency id="Microsoft.EntityFrameworkCore.Relational" version="1.1.2" />
+      <dependency id="Microsoft.EntityFrameworkCore.InMemory" version="1.1.2" />
     </dependencies>
   </metadata>
   <files>
