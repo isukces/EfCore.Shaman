@@ -1,20 +1,14 @@
-﻿#region using
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using EfCore.Shaman.Services;
 using Microsoft.EntityFrameworkCore;
 
-#endregion
-
 namespace EfCore.Shaman
 {
-    public class ShamanDbContext : DbContext
+    public class ShamanDbContext : DbContext, IInMemoryDatabaseAwareDbProvider
     {
-        #region Constructors
-
         public ShamanDbContext(DbContextOptions options)
             : base(options)
         {
@@ -24,10 +18,13 @@ namespace EfCore.Shaman
         {
         }
 
-        #endregion
+        /// <summary>
+        /// Current db provider is 'inMemory' so many features doesn't work
+        /// <see cref="http://efcoreshaman.com/inmemory-provider-troubles.html">InMemory db provider</see>
+        /// </summary>
 
-       
-        #region Instance Methods
+        public bool IsUsingInMemoryDatabase { get; protected set; }
+
 
         public IDirectSaver<T> GetDirectSaver<T>(Func<ShamanOptions> optionsFactory = null)
         {
@@ -60,13 +57,7 @@ namespace EfCore.Shaman
         }
 
 
-        #endregion
-
-        #region Fields
-
         private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
         private readonly IDictionary<Type, object> _directSaverCache = new Dictionary<Type, object>();
-
-        #endregion
     }
 }

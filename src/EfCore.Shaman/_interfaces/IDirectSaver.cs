@@ -19,59 +19,96 @@ namespace EfCore.Shaman
 
     public static class DirectSaverExtensions
     {
-        public static void DirectDelete<T>(this IDirectSaver<T> saver, DbContext context, T entity)
+        public static void DirectDelete<T>(this IDirectSaver<T> saver, DbContext context, T entity) where T : class
         {
-            var pk = saver.GetPrimaryKeyColumns();
-            var dict = new Dictionary<string, object>(pk.Count);
-            foreach (var i in pk)
+            if (context is IInMemoryDatabaseAwareDbProvider p && p.IsUsingInMemoryDatabase)
+                context.Remove(entity);
+            else
             {
-                var value = i.ValueReader.ReadPropertyValue(entity);
-                dict[i.ColumnName] = value;
+                var pk = saver.GetPrimaryKeyColumns();
+                var dict = new Dictionary<string, object>(pk.Count);
+                foreach (var i in pk)
+                {
+                    var value = i.ValueReader.ReadPropertyValue(entity);
+                    dict[i.ColumnName] = value;
+                }
+                saver.Delete(context, dict);
             }
-            saver.Delete(context, dict);
         }
 
-        public static void DirectDelete<T>(this ShamanDbContext context, T item)
+        public static void DirectDelete<T>(this ShamanDbContext context, T item) where T : class
         {
             var ds = context.GetDirectSaver<T>();
             ds.DirectDelete(context, item);
         }
 
 
-        public static void DirectInsert<T>(this ShamanDbContext context, T obj, bool skipSelect = false)
+        public static void DirectInsert<T>(this ShamanDbContext context, T obj, bool skipSelect = false) where T : class
         {
-            var ds = context.GetDirectSaver<T>();
-            ds.Insert(context, obj, skipSelect);
-        }
-
-
-        public static void DirectSave<T>(this IDirectSaver<T> saver, DbContext context, T entity, DirectSaverEntityStatus status, bool skipSelect = false)
-        {
-            switch (status)
+            if (context.IsUsingInMemoryDatabase)
             {
-                case DirectSaverEntityStatus.Clean:
-                    return;
-                case DirectSaverEntityStatus.MustBeInserted:
-                    saver.Insert(context, entity, skipSelect);
-                    break;
-                case DirectSaverEntityStatus.MustBeUpdated:
-                    saver.Update(context, entity, skipSelect);
-                    break;
-                case DirectSaverEntityStatus.MustBeRemoved:
-                    saver.DirectDelete(context, entity);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(status), status, null);
+                context.Add(obj);
+                context.SaveChanges();
+            }
+            else
+            {
+                var ds = context.GetDirectSaver<T>();
+                ds.Insert(context, obj, skipSelect);
             }
         }
 
-        public static void DirectSave<T>(this IDirectSaver<T> saver, DbContext context, EntityWithDirectSaverStatus<T> entityWithStatus, bool skipSelect = false)
+
+        public static void DirectSave<T>(this IDirectSaver<T> saver, DbContext context, T entity, DirectSaverEntityStatus status, bool skipSelect = false) where T : class
+        {
+            if (context is IInMemoryDatabaseAwareDbProvider p && p.IsUsingInMemoryDatabase)
+            {
+                switch (status)
+                {
+                    case DirectSaverEntityStatus.Clean:
+                        return;
+                    case DirectSaverEntityStatus.MustBeInserted:
+                        context.Add(entity);
+                        context.SaveChanges();
+                        break;
+                    case DirectSaverEntityStatus.MustBeUpdated:
+                        context.SaveChanges();
+                        break;
+                    case DirectSaverEntityStatus.MustBeRemoved:
+                        context.Remove(entity);
+                        context.SaveChanges();
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(status), status, null);
+                }
+            }
+            else
+            {
+                switch (status)
+                {
+                    case DirectSaverEntityStatus.Clean:
+                        return;
+                    case DirectSaverEntityStatus.MustBeInserted:
+                        saver.Insert(context, entity, skipSelect);
+                        break;
+                    case DirectSaverEntityStatus.MustBeUpdated:
+                        saver.Update(context, entity, skipSelect);
+                        break;
+                    case DirectSaverEntityStatus.MustBeRemoved:
+                        saver.DirectDelete(context, entity);
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(status), status, null);
+                }
+            }
+        }
+
+        public static void DirectSave<T>(this IDirectSaver<T> saver, DbContext context, EntityWithDirectSaverStatus<T> entityWithStatus, bool skipSelect = false) where T : class
         {
             saver.DirectSave(context, entityWithStatus.Item, entityWithStatus.Status, skipSelect);
         }
 
 
-        public static void DirectSave<T>(this ShamanDbContext context, EntityWithDirectSaverStatus<T> item, bool skipSelect = false)
+        public static void DirectSave<T>(this ShamanDbContext context, EntityWithDirectSaverStatus<T> item, bool skipSelect = false) where T : class
         {
             if (item.Status == DirectSaverEntityStatus.Clean)
                 return;
@@ -80,7 +117,7 @@ namespace EfCore.Shaman
         }
 
 
-        public static void DirectSave<T>(this ShamanDbContext context, T obj, DirectSaverEntityStatus status, bool skipSelect = false)
+        public static void DirectSave<T>(this ShamanDbContext context, T obj, DirectSaverEntityStatus status, bool skipSelect = false) where T : class
         {
             var ds = context.GetDirectSaver<T>();
             ds.DirectSave(context, obj, status, skipSelect);

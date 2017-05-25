@@ -118,6 +118,7 @@
     <Compile Include="_attributes\FullTextIndexAttribute.cs" />
     <Compile Include="EntityWithDirectSaverStatus.cs" />
     <Compile Include="_attributes\NavigationPropertyAttribute.cs" />
+    <Compile Include="_interfaces\IInMemoryProviderAwareDbProvider.cs" />
     <Compile Include="_interfaces\IShamanOptionModificationService.cs" />
     <Compile Include="_interfaces\IValueProviderService.cs" />
     <Compile Include="_loggers\EmptyShamanLogger.cs" />
