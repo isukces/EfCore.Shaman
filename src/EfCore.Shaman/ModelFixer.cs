@@ -42,8 +42,17 @@ namespace EfCore.Shaman
                 shamanOptions.Logger.Log(typeof(ModelFixer), nameof(FixOnModelCreating), message);
 
             log("Before SetRawModel");
-            ModelsCachedContainer.SetRawModel(contextType, modelBuilder.Model, shamanOptions.Logger);
-            log("After SetRawModel");
+            try
+            {
+                ModelsCachedContainer.SetRawModel(contextType, modelBuilder.Model, shamanOptions.Logger);
+                log("After SetRawModel");
+            }
+            catch (Exception e)
+            {
+                log("After SetRawModel with exception " + e.Message);
+                throw;
+            }
+
 
             var fix = fixingHolder.TryFix(contextType, () =>
             {

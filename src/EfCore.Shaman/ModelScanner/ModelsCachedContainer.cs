@@ -80,14 +80,16 @@ namespace EfCore.Shaman.ModelScanner
 
         public static void SetRawModel(Type type, IMutableModel model, IShamanLogger logger)
         {
-            Action<string> log = message => logger.Log(typeof(ModelsCachedContainer), nameof(SetRawModel), message);
-            var tables = from i in model.GetEntityTypes()
-                         let r = i.Relational()
-                         select $"{r.Schema}.{r.TableName}";
-            log($"Try set model containing tables: {string.Join(",", tables)}");
+            void Log(string message) => logger.Log(typeof(ModelsCachedContainer), nameof(SetRawModel), message);
+            var tables = (
+                from i in model.GetEntityTypes()
+                let r = i.Relational()
+                select $"{r.Schema}.{r.TableName}"
+                ).ToList();
+            Log($"Try set model containing tables: {string.Join(",", tables)}");
             var value = EfModelWrapper.FromModel(model);
             var result = Cache.TryAdd(type, value);
-            log(result ? "Success" : "Skipped");
+            Log(result ? "Success" : "Skipped");
         }
 
         private static EfModelWrapper GetModel(Type dbContextType, bool raw, IShamanLogger logger)
