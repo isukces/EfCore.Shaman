@@ -22,7 +22,7 @@ namespace EfCore.Shaman.Tests.Model
         public static ShamanOptions GetShamanOptions()
         {
             return ShamanOptions.Default.With(new PrefixedTableNameService("myPrefix"))
-                .WithLogger(new MethodCallLogger(a => System.Console.WriteLine($"SHAMAN: {a.Message}")));
+                .WithLogger(new MethodCallLogger(LogToConsoleWhileMigrationService.LogInfoToConsole));
         }
 
         #endregion

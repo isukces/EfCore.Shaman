@@ -21,7 +21,11 @@ namespace EfCore.Shaman
 
         public void Log(ShamanLogMessage info)
         {
-            _action?.Invoke(info);
+            try
+            {
+                _action?.Invoke(info);
+            }
+            catch { }
         }
 
         #endregion

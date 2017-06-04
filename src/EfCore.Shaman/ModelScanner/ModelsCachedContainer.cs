@@ -4,7 +4,6 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
@@ -14,6 +13,13 @@ namespace EfCore.Shaman.ModelScanner
 {
     public class ModelsCachedContainer
     {
+        #region Static Fields
+
+        private static readonly ConcurrentDictionary<Type, EfModelWrapper> Cache =
+            new ConcurrentDictionary<Type, EfModelWrapper>();
+
+        #endregion
+
         #region Instance Methods
 
         private EfModelWrapper GetModelInternal()
@@ -27,7 +33,7 @@ namespace EfCore.Shaman.ModelScanner
         private DbContext TryCreateInstance(Type contextType)
         {
             Action<string> log = message =>
-                     Logger.Log(typeof(ModelsCachedContainer), nameof(TryCreateInstance), message);
+                Logger.Log(typeof(ModelsCachedContainer), nameof(TryCreateInstance), message);
             if (contextType == null) throw new ArgumentNullException(nameof(contextType));
             var method = contextType.FindStaticMethodWihoutParameters("GetDbContext");
             if (method != null)
@@ -59,13 +65,6 @@ namespace EfCore.Shaman.ModelScanner
 
         #endregion
 
-        #region Static Fields
-
-        private static readonly ConcurrentDictionary<Type, EfModelWrapper> Cache =
-            new ConcurrentDictionary<Type, EfModelWrapper>();
-
-        #endregion
-
         #region Static Methods
 
         public static EfModelWrapper GetRawModel(Type dbContextType, IShamanLogger logger)
@@ -81,12 +80,19 @@ namespace EfCore.Shaman.ModelScanner
         public static void SetRawModel(Type type, IMutableModel model, IShamanLogger logger)
         {
             void Log(string message) => logger.Log(typeof(ModelsCachedContainer), nameof(SetRawModel), message);
-            var tables = (
-                from i in model.GetEntityTypes()
-                let r = i.Relational()
-                select $"{r.Schema}.{r.TableName}"
-                ).ToList();
-            Log($"Try set model containing tables: {string.Join(",", tables)}");
+
+            string MutableEntityTypeToString(IMutableEntityType mutableEntityType)
+            {
+                try
+                {
+                    var r = mutableEntityType.Relational();
+                    return $"{r.Schema}.{r.TableName}";
+                }
+                catch
+                {
+                    return "??";
+                }
+            }
             var value = EfModelWrapper.FromModel(model);
             var result = Cache.TryAdd(type, value);
             Log(result ? "Success" : "Skipped");
@@ -94,7 +100,8 @@ namespace EfCore.Shaman.ModelScanner
 
         private static EfModelWrapper GetModel(Type dbContextType, bool raw, IShamanLogger logger)
         {
-            Action<string> log = message => logger.Log(typeof(ModelsCachedContainer), nameof(GetModelInternal), message);
+            Action<string> log = message => logger.Log(typeof(ModelsCachedContainer), nameof(GetModelInternal),
+                message);
             try
             {
                 var instance = new ModelsCachedContainer

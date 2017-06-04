@@ -1,8 +1,4 @@
-﻿#region using
-
-using System;
-
-#endregion
+﻿using System;
 
 namespace EfCore.Shaman.Services
 {
@@ -11,16 +7,17 @@ namespace EfCore.Shaman.Services
     /// </summary>
     public class LogToConsoleWhileMigrationService : IShamanOptionModificationService
     {
-        #region Static Methods
-
-        private static void LogInfoToConsole(ShamanLogMessage info)
+        public static void LogInfoToConsole(ShamanLogMessage info)
         {
-            Console.WriteLine($"SHAMAN: {info.Source}: {info.Message}");
+            try
+            {
+                Console.WriteLine($"SHAMAN: {info.Source}: {info.Message}");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"SHAMAN LogInfoToConsole exception : {e.Message}");
+            }
         }
-
-        #endregion
-
-        #region Instance Methods
 
         public void ModifyShamanOptions(ShamanOptions options)
         {
@@ -34,7 +31,5 @@ namespace EfCore.Shaman.Services
             consoleLogger.Log(typeof(LogToConsoleWhileMigrationService), nameof(ModifyShamanOptions), message);
             options.WithLogger(options.Logger.Append(consoleLogger));
         }
-
-        #endregion
     }
 }
