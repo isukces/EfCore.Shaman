@@ -37,7 +37,7 @@ var nugetPackageFileName = string.Format(@"{0}\{1}.{2}.symbols.nupkg",
 var nugetOut = builder.NugetRepositoryDir + "\\" + builder.GetNugetName() + "." + version + ".nupkg";
 
 Console.WriteLine("Copy {0} to {1}", nugetPackageFileName, nugetOut);
-File.Copy(nugetPackageFileName, nugetOut);
+File.Copy(nugetPackageFileName, nugetOut, true);
 
 Console.WriteLine("--FINISHED--");
 
