@@ -42,6 +42,10 @@ namespace EfCore.Shaman.ModelScanner
 
         public string TableName { get; }
         public string Schema { get; }
-        private static readonly IEqualityComparer<string> Comparer = StringComparer.InvariantCultureIgnoreCase;
+#if FXCORE
+        public static IEqualityComparer<string> Comparer = StringComparer.OrdinalIgnoreCase;
+#else
+        public static IEqualityComparer<string> Comparer = StringComparer.InvariantCultureIgnoreCase;
+#endif
     }
 }

@@ -124,7 +124,7 @@ namespace EfCore.Shaman.Tests
                     var modelInfo = GetModelInfo<PrefixedTableNamesDbContext>(ShamanOptions.Default);
                     var dbSet = modelInfo.DbSet<User>();
                     Assert.NotNull(dbSet);
-                    Assert.Equal("User", dbSet.TableName);
+                    Assert.Equal("Users", dbSet.TableName);
                 }
                 // with patching
                 {

@@ -1,3 +1,5 @@
+using EfCore.Shaman;
+
 namespace EfCore.Shaman.Tests.Model
 {
     internal class MyEntityWithUniqueIndex
