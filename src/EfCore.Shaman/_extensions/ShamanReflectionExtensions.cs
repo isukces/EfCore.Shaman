@@ -16,7 +16,7 @@ namespace EfCore.Shaman
         {
             const BindingFlags allStatic = BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
             if (dbContextType == null) throw new ArgumentNullException(nameof(dbContextType));
-#if !net45
+#if FXCORE
             var method = dbContextType
                 .GetMethods(allStatic)
                 .FirstOrDefault(a => 

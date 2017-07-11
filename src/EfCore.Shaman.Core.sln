@@ -1,20 +1,17 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26430.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{701139C9-82E5-44F0-8E5D-04401797B138}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{4FBEBDF3-CC9F-4AF3-84C5-6137EC5F9F77}"
-	ProjectSection(SolutionItems) = preProject
-		global.json = global.json
-	EndProjectSection
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "EfCore.Shaman", "EfCore.Shaman\EfCore.Shaman.xproj", "{303B2852-5381-4928-A9B2-1AC98370FAFE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EfCore.Shaman", "EfCore.Shaman\EfCore.Shaman.csproj", "{303B2852-5381-4928-A9B2-1AC98370FAFE}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "EfCore.Shaman.SqlServer", "EfCore.Shaman.SqlServer\EfCore.Shaman.SqlServer.xproj", "{583D52D1-6C12-4D1A-9BBE-A7ED8B1E0DCF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EfCore.Shaman.SqlServer", "EfCore.Shaman.SqlServer\EfCore.Shaman.SqlServer.csproj", "{583D52D1-6C12-4D1A-9BBE-A7ED8B1E0DCF}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "EfCore.Shaman.Tests", "EfCore.Shaman.Tests\EfCore.Shaman.Tests.xproj", "{98E93521-DB76-4121-80F5-A3256C7946EE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EfCore.Shaman.Tests", "EfCore.Shaman.Tests\EfCore.Shaman.Tests.csproj", "{98E93521-DB76-4121-80F5-A3256C7946EE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

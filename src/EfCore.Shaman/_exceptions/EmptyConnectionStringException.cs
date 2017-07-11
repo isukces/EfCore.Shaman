@@ -6,7 +6,7 @@ using System;
 
 namespace EfCore.Shaman
 {
-#if net45
+#if NET451
     [Serializable]
 #endif
     public class EmptyConnectionStringException : Exception

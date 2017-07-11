@@ -7,6 +7,7 @@ using EfCore.Shaman.Tests.EfCore.Shaman.Services;
 
 namespace EfCore.Shaman.Tests
 {
+    /*
     public class Program
     {
         public static void Main()
@@ -14,4 +15,5 @@ namespace EfCore.Shaman.Tests
             new TimestampAttributeUpdaterTest().T01_ShouldMarkColumnAsTimestamp();
         }
     }
+    */
 }

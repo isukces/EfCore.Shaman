@@ -32,7 +32,7 @@ namespace EfCore.Shaman
         {
             get
             {
-#if net45
+#if NET451
                 var st = new StackTrace(true);
                 for (var i = 0; i < st.FrameCount; i++)
                 {
