@@ -156,7 +156,11 @@ namespace EfCore.Shaman
                 throw new NullReferenceException(nameof(_info));
             var entity = _info.GetByTableName(new FullTableName(table.Name, table.Schema));
             if (entity == null)
-                throw new Exception($"Unable to find table {table.Name}.");
+            {
+                _shamanOptions.Logger.Log(typeof(ModelFixer), nameof(FixOnModelCreatingForTable),
+                    $"Table {table.Name} not found. Skipping.");
+                return;
+            }
             var colsDic = entity
                 .Properites
                 .Where(info => !info.IsNotMapped && !info.IsNavigationProperty)
