@@ -31,8 +31,8 @@
     </PackageReference>
     <ProjectReference Include="..\EfCore.Shaman\EfCore.Shaman.csproj" />
     <ProjectReference Include="..\EfCore.Shaman.SqlServer\EfCore.Shaman.SqlServer.csproj" />
-    <PackageReference Include="JetBrains.Annotations" Version="10.4.0" />
-    <PackageReference Include="newtonsoft.json" Version="9.0.1" />
+    <PackageReference Include="JetBrains.Annotations" Version="11.0.0" />
+    <PackageReference Include="newtonsoft.json" Version="10.0.3" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.6' ">
   </ItemGroup>
