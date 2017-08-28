@@ -13,7 +13,7 @@ namespace EfCore.Shaman.Tests
     {
         public static void Main()
         {
-            IEntityType t = null;
+            new ModelInfoTests().T06_ShouldHaveTableNameWithPrefix();
             new TimestampAttributeUpdaterTest().T01_ShouldMarkColumnAsTimestamp();
         }
     }

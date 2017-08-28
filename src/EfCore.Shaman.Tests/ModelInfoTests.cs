@@ -1,7 +1,9 @@
 ﻿#region using
 
 using System;
+using System.Data.SqlClient;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using EfCore.Shaman.ModelScanner;
 using EfCore.Shaman.Tests.Model;
 using Microsoft.EntityFrameworkCore;
@@ -15,11 +17,28 @@ namespace EfCore.Shaman.Tests
     {
         #region Static Methods
 
-        internal static void DoTestOnModelBuilder<T>(bool useSql, Action<ModelBuilder> checkMethod, Action<T> checkContext = null) where T : VisitableDbContext
+        static string GetSqlConnectionString(string memberName)
+        {
+            var cfg = TestsConfig.Load();
+            var csb = new SqlConnectionStringBuilder(cfg.ConnectionStringTemplate);
+            csb.InitialCatalog += memberName;
+            var result = csb.ConnectionString;
+            var dbName = csb.InitialCatalog;
+            {
+                if (SqlUtils.DbExists(result))
+                {
+                    SqlUtils.DropDb(result);
+                }
+                SqlUtils.CreateDb(result);
+            }
+            return result;
+        }
+
+        internal static void DoTestOnModelBuilder<T>(bool useSql, Action<ModelBuilder> checkMethod, Action<T> checkContext = null, [CallerMemberName]string memberName = null) where T : VisitableDbContext
         {
             var optionsBuilder = new DbContextOptionsBuilder<T>();
             optionsBuilder = useSql
-                ? optionsBuilder.UseSqlServer("Data Source=.;Initial Catalog=EfCoreShamanTests;Integrated Security=True;")
+                ? optionsBuilder.UseSqlServer(GetSqlConnectionString(memberName))
                 : optionsBuilder.UseInMemoryDatabase(nameof(T02_ShouldHaveUniqueIndex));
             var options = optionsBuilder.Options;
             var count = 0;
@@ -30,10 +49,16 @@ namespace EfCore.Shaman.Tests
                     count++;
                     checkMethod?.Invoke(b);
                 };
-                var tmp = context.Settings.ToArray(); // enforce to create model
+                if (useSql)
+                {
+                    Console.WriteLine("Migration");
+                    context.Database.Migrate();
+                }
+                // var tmp = context.Settings.ToArray(); // enforce to create model
                 var model = context.Model;
                 if (model == null) // enforce to create model
                     throw new NullReferenceException();
+  
                 if (checkContext != null)
                     checkContext(context);
             }
@@ -119,15 +144,15 @@ namespace EfCore.Shaman.Tests
                 Assert.NotNull(t);
                 Assert.Equal(expectedTableName, t.Relational().TableName);
 
-                // without patching
-                {
+            // without patching
+            {
                     var modelInfo = GetModelInfo<PrefixedTableNamesDbContext>(ShamanOptions.Default);
                     var dbSet = modelInfo.DbSet<User>();
                     Assert.NotNull(dbSet);
                     Assert.Equal("Users", dbSet.TableName);
                 }
-                // with patching
-                {
+            // with patching
+            {
                     var modelInfo = GetModelInfo<PrefixedTableNamesDbContext>();
                     var dbSet = modelInfo.DbSet<User>();
                     Assert.NotNull(dbSet);
@@ -201,15 +226,15 @@ namespace EfCore.Shaman.Tests
                 Assert.NotNull(t);
                 Assert.Equal(expectedTableName, t.Relational().TableName);
 
-                // without patching - when use 'InMemory' table names are singular
-                {
+            // without patching - when use 'InMemory' table names are singular
+            {
                     var modelInfo = GetModelInfo<SingularTableNamesDbContext>(ShamanOptions.Default);
                     var dbSet = modelInfo.DbSet<User>();
                     Assert.NotNull(dbSet);
                     Assert.Equal("User", dbSet.TableName);
                 }
-                // with patching
-                {
+            // with patching
+            {
                     var modelInfo = GetModelInfo<SingularTableNamesDbContext>();
                     var dbSet = modelInfo.DbSet<User>();
                     Assert.NotNull(dbSet);
