@@ -80,7 +80,10 @@ namespace EfCore.Shaman.ModelScanner
 
         public static void SetRawModel(Type type, IMutableModel model, IShamanLogger logger)
         {
-            void Log(string message) => logger.Log(typeof(ModelsCachedContainer), nameof(SetRawModel), message);
+            void Log(string message)
+            {
+                logger.Log(typeof(ModelsCachedContainer), nameof(SetRawModel), message);
+            }
 
             string MutableEntityTypeToString(IMutableEntityType mutableEntityType)
             {

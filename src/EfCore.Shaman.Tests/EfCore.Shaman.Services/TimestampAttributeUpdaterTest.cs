@@ -1,6 +1,8 @@
-﻿using System.Linq;
+﻿using System.Diagnostics;
+using System.Linq;
 using EfCore.Shaman.Tests.Model;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Xunit;
 
 namespace EfCore.Shaman.Tests.EfCore.Shaman.Services
@@ -49,6 +51,10 @@ namespace EfCore.Shaman.Tests.EfCore.Shaman.Services
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            IEntityType et = modelBuilder.Model.GetEntityTypes().First();
+            Debug.WriteLine($"ClrType={et.ClrType} from {et.ClrType.Assembly.FullName}");
+            Debug.WriteLine($"GetType()={et.GetType()} from {et.GetType().Assembly.FullName}");
 
             this.FixOnModelCreating(modelBuilder);
             ExternalCheckModel?.Invoke(modelBuilder);

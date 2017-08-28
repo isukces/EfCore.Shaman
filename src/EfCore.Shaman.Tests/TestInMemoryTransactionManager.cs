@@ -1,23 +1,29 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore.Storage.Internal;
-using Microsoft.Extensions.Logging;
 
 namespace EfCore.Shaman.Tests
 {
     public class TestInMemoryTransactionManager : InMemoryTransactionManager
     {
-        #region Constructors
-
-        public TestInMemoryTransactionManager(ILogger<InMemoryTransactionManager> logger)
+#if EF200
+        public TestInMemoryTransactionManager(
+            [CanBeNull] IDiagnosticsLogger<DbLoggerCategory.Database.Transaction> logger)
             : base(logger)
         {
         }
-
-        #endregion
-
-        #region Instance Methods
+#else
+        public TestInMemoryTransactionManager([CanBeNull] ILogger<InMemoryTransactionManager> logger)
+            : base(logger)
+        {
+        }
+       
+#endif
 
         public override IDbContextTransaction BeginTransaction()
         {
@@ -36,34 +42,16 @@ namespace EfCore.Shaman.Tests
 
         public override void RollbackTransaction() => CurrentTransaction.Rollback();
 
-        #endregion
-
-        #region Properties
-
         public override IDbContextTransaction CurrentTransaction => _currentTransaction;
-
-        #endregion
-
-        #region Fields
 
         private IDbContextTransaction _currentTransaction;
 
-        #endregion
-
-        #region Nested
-
         private class TestInMemoryTransaction : IDbContextTransaction
         {
-            #region Constructors
-
             public TestInMemoryTransaction(TestInMemoryTransactionManager transactionManager)
             {
                 TransactionManager = transactionManager;
             }
-
-            #endregion
-
-            #region Instance Methods
 
             public void Commit()
             {
@@ -79,16 +67,12 @@ namespace EfCore.Shaman.Tests
             {
                 TransactionManager._currentTransaction = null;
             }
-
-            #endregion
-
-            #region Properties
+#if EF200
+            public Guid TransactionId
+                => TransactionManager._currentTransaction?.TransactionId ?? Guid.Empty;
+#endif
 
             private TestInMemoryTransactionManager TransactionManager { get; }
-
-            #endregion
         }
-
-        #endregion
     }
 }
