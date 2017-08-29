@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <AssemblyName>EfCore.Shaman.SqlServer</AssemblyName>
+    <AssemblyName>EfCore.Shaman112.SqlServer</AssemblyName>
     <Version>1.0.17241.60</Version>
-    <TargetFrameworks>net461</TargetFrameworks>
+    <TargetFrameworks>netstandard1.6;net451</TargetFrameworks>
     <RuntimeIdentifiers>win</RuntimeIdentifiers>
     <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netstandard2.0' ">$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
     <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard2.0' ">1.6.1</NetStandardImplicitPackageVersion>
@@ -14,7 +14,7 @@
     <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
     <RepositoryUrl>https://github.com/isukces/EfCore.Shaman</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageId>EfCore.Shaman.SqlServer</PackageId>
+    <PackageId>EfCore.Shaman112.SqlServer</PackageId>
     <PackageTags>EntityFrameworkCore</PackageTags>
     <PackageReleaseNotes>Separate set of nugets for 
 EntityFrameworkCore 1.1.2 (EfCore.Shaman112 + EfCore.Shaman112.SqlServer)
@@ -34,6 +34,7 @@ EntityFrameworkCore 2.0.0 (EfCore.Shaman + EfCore.Shaman.SqlServer)</PackageRele
     <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
     <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <RootNamespace>EfCore.Shaman.SqlServer</RootNamespace>
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
     <DefineConstants>CORE_CSPROJ</DefineConstants>
   </PropertyGroup>
@@ -53,7 +54,7 @@ EntityFrameworkCore 2.0.0 (EfCore.Shaman + EfCore.Shaman.SqlServer)</PackageRele
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\EfCore.Shaman\EfCore.Shaman.csproj" />
+    <ProjectReference Include="..\EfCore.Shaman\EfCore.Shaman112.csproj" />
     <PackageReference Include="JetBrains.Annotations" Version="11.0.0" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' Or '$(TargetFramework)' == 'net461' ">

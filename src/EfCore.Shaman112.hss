@@ -1,0 +1,41 @@
+// using System.IO;
+
+var deps = @"
+Microsoft.EntityFrameworkCore
+Microsoft.EntityFrameworkCore.InMemory
+Microsoft.EntityFrameworkCore.Relational
+";
+
+var builder = new ProjectBuilder(){
+	VisualStudioExe = GlobalVar["VisualStudio 2017"],
+	NugetExe = GlobalVar["Nuget"],
+	NugetRepositoryDir =  GlobalVar["Private Nuget Repository"],
+	SolutionName = "EfCore.Shaman.Core112",
+	SolutionDir = ConfigDir,
+	ProjectName = "EfCore.Shaman112",	
+	OnlySelectedPackages = deps.Split('\r', '\n', ','),
+	ProjectDirTemplate = "{SolutionDir}\\EfCore.Shaman"
+};
+
+// task: Clean
+DeleteDir(builder.ProjectDir+"\\bin", builder.ProjectDir+"\\obj");
+
+// task: Update version
+var version = builder.UpdateVersion(builder.ProjectDir + "\\" + builder.ProjectName+".csproj");
+
+// task: Build
+builder.Build("deploy");
+
+var nugetPackageFileName = string.Format(@"{0}\{1}.{2}.symbols.nupkg", 
+	builder.ProjectDir+@"\bin\Release", 
+	builder.GetNugetName(), 
+	version);
+
+// task: Copy nuget
+var nugetOut = builder.NugetRepositoryDir + "\\" + builder.GetNugetName() + "." + version + ".nupkg";
+
+Console.WriteLine("Copy {0} to {1}", nugetPackageFileName, nugetOut);
+File.Copy(nugetPackageFileName, nugetOut, true);
+
+Console.WriteLine("--FINISHED--");
+

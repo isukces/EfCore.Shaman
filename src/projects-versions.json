@@ -1,4 +1,6 @@
 {
-  "EfCore.Shaman": "1.0.17240.66",
-  "EfCore.Shaman.SqlServer": "1.0.17240.59"
+  "EfCore.Shaman": "1.0.17241.67",
+  "EfCore.Shaman.SqlServer": "1.0.17241.60",
+  "EfCore.Shaman112": "1.0.17241.67",
+  "EfCore.Shaman112.SqlServer": "1.0.17241.60"
 }
