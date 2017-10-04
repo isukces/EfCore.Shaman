@@ -1,8 +1,4 @@
-﻿#region using
-
-using System;
-
-#endregion
+﻿using System;
 
 namespace EfCore.Shaman
 {
@@ -12,19 +8,11 @@ namespace EfCore.Shaman
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
     public class DefaultValueSqlAttribute : Attribute
     {
-        #region Constructors
-
         public DefaultValueSqlAttribute(string defaultValueSql)
         {
             DefaultValueSql = defaultValueSql;
         }
 
-        #endregion
-
-        #region Properties
-
         public string DefaultValueSql { get; set; }
-
-        #endregion
     }
 }
