@@ -1,40 +1,36 @@
-﻿#region using
-
-using System;
-
-#endregion
+﻿using System;
+using JetBrains.Annotations;
 
 namespace EfCore.Shaman
 {
     public class MethodCallLogger : IShamanLogger
     {
-        #region Constructors
-
-        public MethodCallLogger(Action<ShamanLogMessage> action)
+        public MethodCallLogger([CanBeNull] Action<ShamanLogMessage> logAction, [CanBeNull] Action<Guid, Exception > exceptionAction)
         {
-            _action = action;
+            _logAction = logAction;
+            _exceptionAction = exceptionAction;
         }
-
-        #endregion
-
-        #region Instance Methods
 
         public void Log(ShamanLogMessage info)
         {
             try
             {
-                _action?.Invoke(info);
+                _logAction?.Invoke(info);
             }
-            catch { }
+            catch { } // no exception logginng
         }
 
-        #endregion
+        public void LogException(Guid locationId, Exception exception)
+        {
+            try
+            {
+                _exceptionAction?.Invoke(locationId, exception);
+            }
+            catch { } // no exception logginng
+        }
 
-        #region Fields
-
-        private readonly Action<ShamanLogMessage> _action;
-
-        #endregion
+        private readonly Action<ShamanLogMessage> _logAction;
+        private readonly Action<Guid, Exception> _exceptionAction;
     }
     
 }

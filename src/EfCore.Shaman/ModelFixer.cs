@@ -49,6 +49,7 @@ namespace EfCore.Shaman
             }
             catch (Exception e)
             {
+                shamanOptions.Logger.LogException(Guid.Parse("{8E4EA170-3B75-4491-8074-177E5DC8F671}"), e);
                 log("After SetRawModel with exception " + e.Message);
                 throw;
             }

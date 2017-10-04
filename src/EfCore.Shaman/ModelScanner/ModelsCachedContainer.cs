@@ -92,8 +92,9 @@ namespace EfCore.Shaman.ModelScanner
                     var r = mutableEntityType.Relational();
                     return $"{r.Schema}.{r.TableName}";
                 }
-                catch
+                catch (Exception e)
                 {
+                    logger.LogException(Guid.Parse("{22CC8890-B871-45BF-890E-9341B41183F6}"), e);
                     return "??";
                 }
             }
@@ -118,6 +119,7 @@ namespace EfCore.Shaman.ModelScanner
             }
             catch (Exception e)
             {
+                logger.LogException(Guid.Parse("{F0BA1A53-86D9-430D-99A7-4D5792C593EF}"), e);
                 log("Exception " + e.Message);
                 throw;
             }

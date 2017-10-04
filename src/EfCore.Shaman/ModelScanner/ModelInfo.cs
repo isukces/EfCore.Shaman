@@ -1,6 +1,4 @@
-﻿#region using
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
@@ -10,14 +8,10 @@ using EfCore.Shaman.Services;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 
-#endregion
-
 namespace EfCore.Shaman.ModelScanner
 {
     public class ModelInfo
     {
-        #region Constructors
-
         public ModelInfo(Type dbContextType, ShamanOptions options = null)
         {
             _dbContextType = dbContextType;
@@ -26,10 +20,6 @@ namespace EfCore.Shaman.ModelScanner
             _logger = options.Logger ?? EmptyShamanLogger.Instance;
             Prepare();
         }
-
-        #endregion
-
-        #region Static Methods
 
         public static ModelInfo Make<T>(ShamanOptions options = null)
         {
@@ -73,10 +63,6 @@ namespace EfCore.Shaman.ModelScanner
             return result;
         }
 
-        #endregion
-
-        #region Instance Methods
-
         public DbSetInfo DbSet<T>()
             => _dbSets.Values.SingleOrDefault(a => a.EntityType == typeof(T));
 
@@ -108,7 +94,7 @@ namespace EfCore.Shaman.ModelScanner
                 };
                 if (useDirectSaverForType)
                 {
-                    var readerWriter = new SimplePropertyReaderWriter(entityType, propertyInfo);
+                    var readerWriter = new SimplePropertyReaderWriter(entityType, propertyInfo, _logger);
                     columnInfo.ValueReader = readerWriter;
                     columnInfo.ValueWriter = readerWriter;
                 }
@@ -148,10 +134,6 @@ namespace EfCore.Shaman.ModelScanner
             }
         }
 
-        #endregion
-
-        #region Properties
-
         [NotNull]
         public ShamanOptions UsedShamanOptions { get; }
 
@@ -166,10 +148,6 @@ namespace EfCore.Shaman.ModelScanner
         /// </summary>
         public bool UsedDbContextModel { get; private set; }
 
-        #endregion
-
-        #region Fields
-
         private readonly Type _dbContextType;
 
 
@@ -177,7 +155,5 @@ namespace EfCore.Shaman.ModelScanner
             new Dictionary<FullTableName, DbSetInfo>();
 
         private readonly IShamanLogger _logger;
-
-        #endregion
     }
 }

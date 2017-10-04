@@ -5,6 +5,7 @@ namespace EfCore.Shaman
     public interface IShamanLogger
     {
         void Log(ShamanLogMessage logInfo);
+        void LogException(Guid locationId, Exception exception);
     }
 
     public struct ShamanLogMessage
@@ -25,6 +26,10 @@ namespace EfCore.Shaman
             {
                 src.Log(info);
                 another.Log(info);
+            }, (locationId, exception) =>
+            {
+                src.LogException(locationId, exception);
+                another.LogException(locationId, exception);
             });
         }
 

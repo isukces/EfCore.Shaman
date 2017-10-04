@@ -1,18 +1,11 @@
-﻿#region using
-
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
-using EfCore.Shaman.Reflection;
-
-#endregion
+using JetBrains.Annotations;
 
 namespace EfCore.Shaman
 {
     public sealed class ShamanOptions
     {
-        #region Static Methods
-
         public static ShamanOptions CreateShamanOptions(Type dbContextType)
         {
             if (dbContextType == null) throw new ArgumentNullException(nameof(dbContextType));
@@ -22,21 +15,26 @@ namespace EfCore.Shaman
             return (ShamanOptions)method.Invoke(null, null);
         }
 
-        #endregion
-
-        #region Static Properties
+        [CanBeNull]
+        public static IShamanLogger TryGetExceptionLogger(Type dbContextType)
+        {
+            try
+            {
+                return CreateShamanOptions(dbContextType)?.Logger;
+            }
+            catch
+            {
+                return null;
+            }
+        }
 
         public static ShamanOptions Default
-            => new ShamanOptions().WithDefaultServices();
-
-        #endregion
-
-        #region Properties
+        {
+            get { return new ShamanOptions().WithDefaultServices(); }
+        }
 
         public IList<IShamanService> Services { get; } = new List<IShamanService>();
 
         public IShamanLogger Logger { get; set; } = EmptyShamanLogger.Instance;
-
-        #endregion
     }
 }

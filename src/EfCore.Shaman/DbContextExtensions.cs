@@ -47,6 +47,8 @@ namespace EfCore.Shaman
                 }
                 catch (Exception e)
                 {
+                    ShamanOptions.TryGetExceptionLogger(typeof(T))?
+                        .LogException(Guid.Parse("{A84D312F-AD7D-4A80-B514-5E4714FD9A9E}"), e);
                     transaction.Rollback();
                     transactionFinalize = TransactionAction.None;
                     throw;

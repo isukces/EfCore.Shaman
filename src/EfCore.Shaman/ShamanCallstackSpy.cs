@@ -1,62 +1,48 @@
-﻿#region using
-
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Reflection;
-
-#endregion
 
 namespace EfCore.Shaman
 {
     public static class ShamanCallstackSpy
     {
-        #region Static Methods
-
-        private static string GetDeclaringTypeFullName(MethodBase method)
+        private static string GetDeclaringTypeFullName(MethodBase method, IShamanLogger logger)
         {
             try
             {
                 return method.DeclaringType?.FullName;
             }
-            catch
+            catch (Exception e)
             {
+                logger?.LogException(Guid.Parse("{CE9439CA-5A1C-4ABC-9587-926F91B3AD22}"), e);
                 return null;
             }
         }
 
-        #endregion
-
-        #region Static Properties
-
-        public static CallerInfoType CallerInfo
+        public static CallerInfoType GetCallerInfo(IShamanLogger logger)
         {
-            get
-            {
 #if NET451
-                var st = new StackTrace(true);
-                for (var i = 0; i < st.FrameCount; i++)
+            var st = new StackTrace(true);
+            for (var i = 0; i < st.FrameCount; i++)
+            {
+                var frame = st.GetFrame(i);
+                var method = frame.GetMethod();
+                var declaringTypeFullName = GetDeclaringTypeFullName(method, logger);
+                if (declaringTypeFullName != "Microsoft.EntityFrameworkCore.Design.Internal.MigrationsOperations")
+                    continue;
+                switch (method.Name)
                 {
-                    var frame = st.GetFrame(i);
-                    var method = frame.GetMethod();
-                    var declaringTypeFullName = GetDeclaringTypeFullName(method);
-                    if (declaringTypeFullName != "Microsoft.EntityFrameworkCore.Design.Internal.MigrationsOperations")
-                        continue;
-                    switch (method.Name)
-                    {
-                        case "RemoveMigration":
-                            return CallerInfoType.RemoveMigration;
-                        case "AddMigration":
-                            return CallerInfoType.AddMigration;
-                    }
+                    case "RemoveMigration":
+                        return CallerInfoType.RemoveMigration;
+                    case "AddMigration":
+                        return CallerInfoType.AddMigration;
                 }
+            }
 #else
 #warning CallerInfo is not supported :(
 #endif
-                return CallerInfoType.Other;
-            }
+            return CallerInfoType.Other;
         }
-
-#endregion
     }
 
     public enum CallerInfoType

@@ -1,19 +1,14 @@
-﻿#region using
-
-using System;
+﻿using System;
 using System.Linq.Expressions;
 using System.Reflection;
-
-#endregion
 
 namespace EfCore.Shaman.Reflection
 {
     public class SimplePropertyReaderWriter : IPropertyValueReader, IPropertyValueWriter
     {
-        #region Constructors
-
-        public SimplePropertyReaderWriter(Type type, PropertyInfo propertyInfo)
+        public SimplePropertyReaderWriter(Type type, PropertyInfo propertyInfo, IShamanLogger logger)
         {
+            _logger = logger ?? EmptyShamanLogger.Instance;
             _propertyInfo = propertyInfo;
             try
             {
@@ -24,9 +19,9 @@ namespace EfCore.Shaman.Reflection
                     _reader = Expression.Lambda<Func<object, object>>(convertedToObject, instance).Compile();
                 }
             }
-            catch 
+            catch (Exception e) 
             {
-                // use reflection
+                _logger.LogException(Guid.Parse("{D8AFA7E9-DC66-407C-BB61-B19B6BFF6351}"), e);
             }
             try
             {
@@ -49,15 +44,12 @@ namespace EfCore.Shaman.Reflection
                     _writer = expr.Compile();
                 }
             }
-            catch 
+            catch (Exception e) 
             {
-                // use reflection
+                _logger.LogException(Guid.Parse("{81F76FA3-8CAF-4E56-AE2E-58BC006F5F18}"), e);
+
             }
         }
-
-        #endregion
-
-        #region Instance Methods
 
         public object ReadPropertyValue(object obj)
         {
@@ -73,17 +65,10 @@ namespace EfCore.Shaman.Reflection
             _propertyInfo.SetValue(obj, value);
         }
 
-        #endregion
-
-        #region Fields
-
         private readonly Func<object, object> _reader;
         private readonly PropertyInfo _propertyInfo;
+        private readonly IShamanLogger _logger;
         private readonly ByRefStructAction _writer;
-
-        #endregion
-
-        #region Delegates
 
         /// <summary>
         ///     Inspired by
@@ -92,7 +77,5 @@ namespace EfCore.Shaman.Reflection
         /// <param name="instance"></param>
         /// <param name="value"></param>
         private delegate void ByRefStructAction(ref object instance, object value);
-
-        #endregion
     }
 }
