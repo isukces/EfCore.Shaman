@@ -2,7 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <AssemblyName>EfCore.Shaman112.SqlServer</AssemblyName>
-    <Version>1.0.17241.60</Version>
+    <Version>1.0.17277.61</Version>
     <TargetFrameworks>netstandard1.6;net451</TargetFrameworks>
     <RuntimeIdentifiers>win</RuntimeIdentifiers>
     <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netstandard2.0' ">$(PackageTargetFallback);dnxcore50</PackageTargetFallback>

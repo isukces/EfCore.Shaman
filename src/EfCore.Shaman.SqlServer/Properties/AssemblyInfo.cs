@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 #else
 [assembly: Guid("979BE359-90FF-4E4A-A856-A70FC202DDDC")]
 #endif
-[assembly: AssemblyVersion("1.0.17241.60")]
-[assembly: AssemblyFileVersion("1.0.17241.60")]
+[assembly: AssemblyVersion("1.0.17277.61")]
+[assembly: AssemblyFileVersion("1.0.17277.61")]
 
     
