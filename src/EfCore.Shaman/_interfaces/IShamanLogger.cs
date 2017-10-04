@@ -1,34 +1,20 @@
-﻿#region using
-
-using System;
-
-#endregion
+﻿using System;
 
 namespace EfCore.Shaman
 {
     public interface IShamanLogger
     {
-        #region Instance Methods
-
         void Log(ShamanLogMessage logInfo);
-
-        #endregion
     }
 
     public struct ShamanLogMessage
     {
-        #region Properties
-
         public string Source { get; set; }
         public string Message { get; set; }
-
-        #endregion
     }
 
     public static class ShamanLoggerExtension
     {
-        #region Static Methods
-
         public static IShamanLogger Append(this IShamanLogger src, IShamanLogger another)
         {
             if (src.IsNullOrEmpty())
@@ -63,7 +49,5 @@ namespace EfCore.Shaman
             };
             src.Log(info);
         }
-
-        #endregion
     }
 }

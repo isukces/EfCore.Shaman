@@ -5,10 +5,6 @@
     /// </summary>
     public interface IShamanOptionModificationService : IShamanService
     {
-        #region Instance Methods
-
         void ModifyShamanOptions(ShamanOptions options);
-
-        #endregion
     }
 }

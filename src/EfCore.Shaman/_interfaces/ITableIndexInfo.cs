@@ -5,14 +5,10 @@ namespace EfCore.Shaman
 {
     public interface ITableIndexInfo
     {
-        #region Properties
-
         string IndexName { get; }
 
         IReadOnlyList<ITableIndexFieldInfo> Fields { get; }
         IndexType IndexType { get; }
         string FullTextCatalogName { get;  }
-
-        #endregion
     }
 }

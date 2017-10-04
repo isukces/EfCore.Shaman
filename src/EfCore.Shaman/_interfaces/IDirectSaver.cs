@@ -1,11 +1,7 @@
-﻿#region using
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using EfCore.Shaman.ModelScanner;
 using Microsoft.EntityFrameworkCore;
-
-#endregion
 
 namespace EfCore.Shaman
 {

@@ -45,7 +45,7 @@ namespace EfCore.Shaman
                     action(tmp);
                     transactionFinalize = tmp.EndAction;
                 }
-                catch (Exception e) // rabbit
+                catch (Exception e)
                 {
                     transaction.Rollback();
                     transactionFinalize = TransactionAction.None;
