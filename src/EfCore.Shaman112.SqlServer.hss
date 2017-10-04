@@ -12,16 +12,19 @@ var builder = new ProjectBuilder(){
 	VisualStudioExe = GlobalVar["VisualStudio 2017"],
 	NugetExe = GlobalVar["Nuget"],
 	NugetRepositoryDir =  GlobalVar["Private Nuget Repository"],
-	SolutionName = "EfCore.Shaman.Core",
+	SolutionName = "EfCore.Shaman.Core112",
 	SolutionDir = ConfigDir,
 	ProjectName = "EfCore.Shaman112.SqlServer",	
 	OnlySelectedPackages = deps.Split('\r', '\n', ','),
 	ProjectDirTemplate = "{SolutionDir}\\EfCore.Shaman.SqlServer"
 };
-
+ 
 
 // task: Clean
 DeleteDir(builder.ProjectDir+"\\bin", builder.ProjectDir+"\\obj");
+
+// task: Nuget restore
+Execute(builder.NugetExe , "restore "+builder.SolutionName +".sln");
 
 // task: Update version
 var version = builder.UpdateVersion(builder.ProjectDir + "\\" + builder.ProjectName+".csproj");

@@ -20,6 +20,9 @@ var builder = new ProjectBuilder(){
 // task: Clean
 DeleteDir(builder.ProjectDir+"\\bin", builder.ProjectDir+"\\obj");
 
+// task: Nuget restore
+Execute(builder.NugetExe , "restore "+builder.SolutionName +".sln");
+
 // task: Update version
 var version = builder.UpdateVersion(builder.ProjectDir + "\\" + builder.ProjectName+".csproj");
 
