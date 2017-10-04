@@ -20,7 +20,7 @@ namespace EfCore.Shaman.Services
             }
         }
 
-        private static void LogExceptionToConsole(Guid locationId, Exception exception)
+        public static void LogExceptionToConsole(Guid locationId, Exception exception)
         {
             try
             {

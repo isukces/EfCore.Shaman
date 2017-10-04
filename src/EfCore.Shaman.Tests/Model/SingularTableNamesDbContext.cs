@@ -1,9 +1,5 @@
-﻿#region using
-
-using EfCore.Shaman.Services;
+﻿using EfCore.Shaman.Services;
 using Microsoft.EntityFrameworkCore;
-
-#endregion
 
 namespace EfCore.Shaman.Tests.Model
 {
@@ -17,7 +13,10 @@ namespace EfCore.Shaman.Tests.Model
         public static ShamanOptions GetShamanOptions()
         {
             return ShamanOptions.Default.With(new RemovePluralizingTableNameService())
-                .WithLogger(new MethodCallLogger(LogToConsoleWhileMigrationService.LogInfoToConsole));
+                .WithLogger(new MethodCallLogger(
+                    LogToConsoleWhileMigrationService.LogInfoToConsole,
+                    LogToConsoleWhileMigrationService.LogExceptionToConsole
+                    ));
         }
 
 
