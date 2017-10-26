@@ -14,8 +14,9 @@ namespace EfCore.Shaman
         public string Name { get; set; }
         public int Order { get; set; }
         public bool IsDescending { get; set; }
-
-
+#if EF200
+        public string Filter { get; set; }
+#endif
         public const string OneFieldIndexWithAutoName = null;
     }
 }

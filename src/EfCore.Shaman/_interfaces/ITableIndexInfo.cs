@@ -10,5 +10,8 @@ namespace EfCore.Shaman
         IReadOnlyList<ITableIndexFieldInfo> Fields { get; }
         IndexType IndexType { get; }
         string FullTextCatalogName { get;  }
+#if EF200
+        string Filter { get; }
+#endif
     }
 }

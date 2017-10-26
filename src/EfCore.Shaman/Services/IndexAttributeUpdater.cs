@@ -19,9 +19,11 @@ namespace EfCore.Shaman.Services
             var indexInfo = columnInfo.ColumnIndexes.SingleOrDefault(a => a.IndexName == indexName);
             if (indexInfo != null)
                 return indexInfo;
-            indexInfo = new ColumnIndexInfo
+            indexInfo = new ColumnIndexInfo(indexName)
             {
-                IndexName = indexName
+#if EF200
+                Filter = indexAttribute.Filter
+#endif
             };
             columnInfo.ColumnIndexes.Add(indexInfo);
             return indexInfo;

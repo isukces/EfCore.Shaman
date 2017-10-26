@@ -16,19 +16,31 @@ namespace EfCore.Shaman.ModelScanner
             string tableName)
         {
             var list = grouping.ToList();
-            var indexInfo = new TableIndexInfo
+            var indexInfo = new TableIndexInfo(grouping.Key)
             {
-                IndexName = grouping.Key,
                 Fields = list.OrderBy(q => q.IndexInfo.Order)
                     .Select(q => new TableIndexFieldInfo
                     {
                         FieldName = q.Column.ColumnName,
                         IsDescending = q.IndexInfo.IsDescending
                     }).ToArray(),
-                IndexType = AggregateIndexType(list)
+                IndexType = AggregateIndexType(list),
             };
             if (indexInfo.IndexType == IndexType.FullTextIndex)
                 indexInfo.FullTextCatalogName = AggregateFullTextCatalogName(list, tableName);
+#if EF200
+            var filters = list
+                .Select(a => a.IndexInfo.Filter)
+                .Where(a => !string.IsNullOrEmpty(a))
+                .Distinct()
+                .ToArray();
+            if (filters.Length > 1)
+                throw new InvalidIndexFilterException(
+                    $"Two or more different filters for single index i.e. '{filters[0]}' and '{filters[1]}'",
+                    (ITableIndexInfo)indexInfo);
+            indexInfo.Filter = filters.FirstOrDefault();
+#endif
+
             return indexInfo;
         }
 

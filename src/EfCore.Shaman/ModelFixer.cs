@@ -132,7 +132,7 @@ namespace EfCore.Shaman
             {
                 var entity = modelBuilder.Entity(dbSet.EntityType);
                 ChangeTableName(entity, dbSet);
-                foreach (var idx in dbSet.Indexes)
+                foreach (ITableIndexInfo idx in dbSet.Indexes)
                 {
                     if (!idx.IndexType.IsNormalIndex())
                         continue;
@@ -140,6 +140,10 @@ namespace EfCore.Shaman
                     var indexBuilder = entity.HasIndex(fields);
                     TrySetIndexName(indexBuilder, idx.IndexName);
                     indexBuilder.IsUnique(idx.IndexType == IndexType.UniqueIndex);
+#if EF200
+                    if (!string.IsNullOrEmpty(idx.Filter))
+                        indexBuilder.HasFilter(idx.Filter);
+#endif
                 }
                 foreach (var info in dbSet.Properites)
                 {
