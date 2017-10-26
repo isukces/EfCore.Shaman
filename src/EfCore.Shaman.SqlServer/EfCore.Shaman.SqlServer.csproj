@@ -54,7 +54,6 @@ EntityFrameworkCore 2.0.0 (EfCore.Shaman + EfCore.Shaman.SqlServer)</PackageRele
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\EfCore.Shaman\EfCore.Shaman.csproj" />
-    <PackageReference Include="JetBrains.Annotations" Version="11.0.0" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' Or '$(TargetFramework)' == 'net461' ">
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.0.0" />
@@ -71,5 +70,8 @@ EntityFrameworkCore 2.0.0 (EfCore.Shaman + EfCore.Shaman.SqlServer)</PackageRele
   <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="JetBrains.Annotations" Version="11.1.0" />
   </ItemGroup>
 </Project>
