@@ -22,11 +22,13 @@ var builder = new ProjectBuilder(){
 // task: Clean
 DeleteDir(builder.ProjectDir+"\\bin", builder.ProjectDir+"\\obj");
 
+// task: Update version
+var version = builder.UpdateVersionCore();
+
 // task: Nuget restore
 Execute(builder.NugetExe , "restore "+builder.SolutionName +".sln");
 
-// task: Update version
-var version = builder.UpdateVersion(builder.ProjectDir + "\\" + builder.ProjectName+".csproj");
+
 
 // task: Build
 builder.Build("deploy");

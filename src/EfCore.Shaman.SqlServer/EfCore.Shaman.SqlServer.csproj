@@ -2,11 +2,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <AssemblyName>EfCore.Shaman.SqlServer</AssemblyName>
-    <Version>1.0.17277.61</Version>
-    <TargetFrameworks>net461</TargetFrameworks>
+    <AssemblyVersion>1.0.17299.70</AssemblyVersion>
+    <Version>1.0.17299.70</Version>
+    <FileVersion>1.0.17299.70</FileVersion>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <RuntimeIdentifiers>win</RuntimeIdentifiers>
     <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netstandard2.0' ">$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
-    <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard2.0' ">1.6.1</NetStandardImplicitPackageVersion>
     <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'net461' ">1.6.1</NetStandardImplicitPackageVersion>
     <IncludeSource>false</IncludeSource>
     <IncludeSymbols>true</IncludeSymbols>
@@ -16,10 +17,7 @@
     <RepositoryType>git</RepositoryType>
     <PackageId>EfCore.Shaman.SqlServer</PackageId>
     <PackageTags>EntityFrameworkCore</PackageTags>
-    <PackageReleaseNotes>Separate set of nugets for 
-EntityFrameworkCore 1.1.2 (EfCore.Shaman112 + EfCore.Shaman112.SqlServer)
- and 
-EntityFrameworkCore 2.0.0 (EfCore.Shaman + EfCore.Shaman.SqlServer)</PackageReleaseNotes>
+    <PackageReleaseNotes>Index with filter</PackageReleaseNotes>
     <PackageProjectUrl>http://efcoreshaman.com/</PackageProjectUrl>
     <Description>Fixes for EntityFrameworkCore</Description>
     <Authors>Internet Sukces Piotr Stęclik</Authors>
@@ -31,8 +29,8 @@ EntityFrameworkCore 2.0.0 (EfCore.Shaman + EfCore.Shaman.SqlServer)</PackageRele
     <GenerateAssemblyCompanyAttribute>true</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>true</GenerateAssemblyProductAttribute>
     <GenerateAssemblyCopyrightAttribute>true</GenerateAssemblyCopyrightAttribute>
-    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
-    <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
+    <GenerateAssemblyVersionAttribute>true</GenerateAssemblyVersionAttribute>
+    <GenerateAssemblyFileVersionAttribute>true</GenerateAssemblyFileVersionAttribute>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
     <DefineConstants>CORE_CSPROJ</DefineConstants>

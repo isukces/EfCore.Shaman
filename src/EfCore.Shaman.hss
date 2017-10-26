@@ -12,18 +12,20 @@ var builder = new ProjectBuilder(){
 	NugetRepositoryDir =  GlobalVar["Private Nuget Repository"],
 	SolutionName = "EfCore.Shaman.Core",
 	SolutionDir = ConfigDir,
-	ProjectName = "EfCore.Shaman",	
-	OnlySelectedPackages = deps.Split('\r', '\n', ',')
+	ProjectName = "EfCore.Shaman"
+	// OnlySelectedPackages = deps.Split('\r', '\n', ',')
 };
 
 // task: Clean
 DeleteDir(builder.ProjectDir+"\\bin", builder.ProjectDir+"\\obj");
 
+
+// task: Update version
+var version = builder.UpdateVersionCore();
+
 // task: Nuget restore
 Execute(builder.NugetExe , "restore "+builder.SolutionName +".sln");
 
-// task: Update version
-var version = builder.UpdateVersion(builder.ProjectDir + "\\" + builder.ProjectName+".csproj");
 
 // task: Build
 builder.Build("deploy");

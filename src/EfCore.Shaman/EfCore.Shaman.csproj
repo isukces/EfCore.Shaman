@@ -2,8 +2,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <AssemblyName>EfCore.Shaman</AssemblyName>
-    <Version>1.0.17277.68</Version>
-    <TargetFramework>net461</TargetFramework>
+    <AssemblyVersion>1.0.17299.70</AssemblyVersion>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <RuntimeIdentifiers>win</RuntimeIdentifiers>
     <IncludeSource>false</IncludeSource>
     <IncludeSymbols>true</IncludeSymbols>
@@ -14,10 +14,7 @@
     <PackageId>EfCore.Shaman</PackageId>
     <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netstandard2.0' ">$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
     <PackageTags>EntityFrameworkCore</PackageTags>
-    <PackageReleaseNotes>Separate set of nugets for 
-EntityFrameworkCore 1.1.2 (EfCore.Shaman112 + EfCore.Shaman112.SqlServer)
- and 
-EntityFrameworkCore 2.0.0 (EfCore.Shaman + EfCore.Shaman.SqlServer)</PackageReleaseNotes>
+    <PackageReleaseNotes></PackageReleaseNotes>
     <PackageProjectUrl>http://efcoreshaman.com/</PackageProjectUrl>
     <Description>Fixes for EntityFrameworkCore</Description>
     <Authors>Internet Sukces Piotr Stęclik</Authors>
@@ -29,12 +26,14 @@ EntityFrameworkCore 2.0.0 (EfCore.Shaman + EfCore.Shaman.SqlServer)</PackageRele
     <GenerateAssemblyCompanyAttribute>true</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>true</GenerateAssemblyProductAttribute>
     <GenerateAssemblyCopyrightAttribute>true</GenerateAssemblyCopyrightAttribute>
-    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
-    <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
+    <GenerateAssemblyVersionAttribute>true</GenerateAssemblyVersionAttribute>
+    <GenerateAssemblyFileVersionAttribute>true</GenerateAssemblyFileVersionAttribute>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Description>Fixes for EntityFrameworkCore</Description>
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
     <DefineConstants>CORE_CSPROJ</DefineConstants>
+    <Version>1.0.17299.70</Version>
+    <FileVersion>1.0.17299.70</FileVersion>
   </PropertyGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -46,7 +45,7 @@ EntityFrameworkCore 2.0.0 (EfCore.Shaman + EfCore.Shaman.SqlServer)</PackageRele
     <DefineConstants>$(DefineConstants);net461;EF200</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.6' ">
-    <DefineConstants>$(DefineConstants);FXCORE;EF112</DefineConstants>
+    <DefineConstants>$(DefineConstants);FXCORE;EF200</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
     <DefineConstants>$(DefineConstants);FXCORE;EF200</DefineConstants>
