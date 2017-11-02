@@ -5,8 +5,6 @@ namespace EfCore.Shaman.Services
 {
     internal class DecimalTypeAttributeUpdater : IColumnInfoUpdateService
     {
-        #region Instance Methods
-
         public void UpdateColumnInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo, IShamanLogger logger)
         {
             var indexAttribute = propertyInfo.GetCustomAttribute<DecimalTypeAttribute>();
@@ -16,7 +14,5 @@ namespace EfCore.Shaman.Services
             columnInfo.MaxLength = indexAttribute.Length;
             columnInfo.DecimalPlaces = indexAttribute.DecimalPlaces;
         }
-
-        #endregion
     }
 }

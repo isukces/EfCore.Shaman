@@ -249,6 +249,28 @@ namespace EfCore.Shaman.Tests
             }
         }
 
+        
+        [Fact]
+        public void T11_ShouldCreateUnicodeColumns()
+        {
+            // todo: xunit tests (each test in separate appdomain). DbContext creates Model only once  
+            DoTestOnModelBuilder<UnicodeTestDbContext>(true, mb =>
+            {
+                var modelInfo = GetModelInfo<UnicodeTestDbContext>();
+                var dbSet = modelInfo.DbSet<UnicodeTestDbContext.SomeEntity>();
+                Assert.NotNull(dbSet);
+
+                var prop = dbSet.Properites.Single(a => a.PropertyName == nameof(UnicodeTestDbContext.SomeEntity.Unicode));
+                Assert.True(prop.IsUnicode);
+                
+                prop = dbSet.Properites.Single(a => a.PropertyName == nameof(UnicodeTestDbContext.SomeEntity.NoUnicode));
+                Assert.False(prop.IsUnicode);
+                
+                prop = dbSet.Properites.Single(a => a.PropertyName == nameof(UnicodeTestDbContext.SomeEntity.Default));
+                Assert.Null(prop.IsUnicode);
+            });
+        }
+        
         #endregion
     }
 }

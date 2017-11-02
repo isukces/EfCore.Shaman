@@ -9,13 +9,13 @@ namespace EfCore.Shaman.Tests.Model
 {
     internal abstract class VisitableDbContext : ShamanDbContext
     {
-        #region Constructors
-
         protected VisitableDbContext(DbContextOptions options) : base(options)
         {
         }
 
-        #endregion
+        protected VisitableDbContext()
+        {
+        }
 
         #region Properties
 

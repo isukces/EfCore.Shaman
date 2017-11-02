@@ -5,7 +5,7 @@ namespace EfCore.Shaman
 {
     public class MethodCallLogger : IShamanLogger
     {
-        public MethodCallLogger([CanBeNull] Action<ShamanLogMessage> logAction, [CanBeNull] Action<Guid, Exception > exceptionAction)
+        public MethodCallLogger([CanBeNull] Action<ShamanLogMessage> logAction, [CanBeNull] Action<Guid, Exception> exceptionAction)
         {
             _logAction = logAction;
             _exceptionAction = exceptionAction;

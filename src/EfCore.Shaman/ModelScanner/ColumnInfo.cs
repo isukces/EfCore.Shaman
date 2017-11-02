@@ -63,6 +63,7 @@ namespace EfCore.Shaman.ModelScanner
 
         public bool NotNull { get; set; }
         public int? MaxLength { get; set; }
+        public bool? IsUnicode { get; set; }
         public int? DecimalPlaces { get; set; }
         public bool IsInPrimaryKey { get; set; }
         public bool IsTimestamp { get; set; }
@@ -76,8 +77,7 @@ namespace EfCore.Shaman.ModelScanner
         public IPropertyValueReader ValueReader { get; set; }
         public IPropertyValueWriter ValueWriter { get; set; }
         public ValueInfo DefaultValue { get; set; }
-       
-
+        
         #endregion
     }
 }

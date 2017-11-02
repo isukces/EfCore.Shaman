@@ -83,16 +83,20 @@ namespace EfCore.Shaman.SqlServer
                     StringComparer.OrdinalIgnoreCase);
                 foreach (var columnInfo in dbSetInfo.Properites.Where(q => !q.IsNotMapped && !q.IsNavigationProperty))
                 {
+                    if (!columns.TryGetValue(columnInfo.ColumnName, out var addColumnOperation)) continue;
+                    var usedIsUnicode = addColumnOperation.ColumnType.ToLower().StartsWith("nvarchar");
+                    var expectedUnicode = addColumnOperation.IsUnicode ?? usedIsUnicode;
+
                     var columnCollation = GetCollation(columnInfo.Annotations);
-                    if (string.IsNullOrEmpty(columnCollation)) continue;
+                    if (string.IsNullOrEmpty(columnCollation) && usedIsUnicode == expectedUnicode) continue;
                     var escapedTableName = MsSqlUtils.Escape(dbSetInfo.Schema, dbSetInfo.TableName);
                     var escapedColumnName = MsSqlUtils.Escape(columnInfo.ColumnName);
-                    log($"Change collation {escapedTableName}.{escapedColumnName} => {columnCollation}");
-                    // looking for column for operation
-                    AddColumnOperation addColumnOperation;
-                    if (!columns.TryGetValue(columnInfo.ColumnName, out addColumnOperation)) continue;
+                    if (!string.IsNullOrEmpty(columnCollation))
+                        log($"Change collation {escapedTableName}.{escapedColumnName} => {columnCollation}");
+                    if (usedIsUnicode!=expectedUnicode)
+                        log($"Change unicode {escapedTableName}.{escapedColumnName} => {expectedUnicode}");
                     var sql = CreateChangeCollationSql(escapedTableName, escapedColumnName, columnCollation,
-                        addColumnOperation.IsUnicode, addColumnOperation.MaxLength, addColumnOperation.IsNullable);
+                        expectedUnicode, addColumnOperation.MaxLength, addColumnOperation.IsNullable);
                     migrationBuilder.Sql(sql);
                     MoveSqlBeforeIndexCreation(migrationBuilder, createTableOperation, columnInfo.ColumnName);
                 }

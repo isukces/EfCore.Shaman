@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using EfCore.Shaman.ModelScanner;
 using Microsoft.EntityFrameworkCore;
@@ -149,9 +150,12 @@ namespace EfCore.Shaman
                 {
                     UpdateDecimalPlaces(info, entity, dbSet.EntityType);
                     UpdateDefaultValue(info, entity, dbSet.EntityType);
+                    UpdateIsUnicode(info, entity, dbSet.EntityType);
                 }
             }
         }
+
+       
 
         private void FixOnModelCreatingForTable(CreateTableOperation table)
         {
@@ -205,9 +209,18 @@ namespace EfCore.Shaman
             if (info.MaxLength == null || info.DecimalPlaces == null)
                 return;
             var type = $"decimal({info.MaxLength},{info.DecimalPlaces})";
-            string action = $"HasColumnType(\"{type}\")";
+            var action = $"HasColumnType(\"{type}\")";
             LogFix(nameof(UpdateDecimalPlaces), info, entityType, action);
             entity.Property(info.PropertyName).HasColumnType(type);
+        }
+        
+        private void UpdateIsUnicode(ColumnInfo info, EntityTypeBuilder entity, Type entityType)
+        {
+            if (info.IsUnicode == null )
+                return;
+            var action = $"IsUnicode({info.IsUnicode})";
+            LogFix(nameof(UpdateIsUnicode), info, entityType, action);
+            entity.Property(info.PropertyName).IsUnicode(info.IsUnicode.Value);
         }
 
         private void UpdateDefaultValue(ColumnInfo columnInfo, EntityTypeBuilder entity, Type entityType)
