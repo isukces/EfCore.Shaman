@@ -84,7 +84,7 @@ namespace EfCore.Shaman.SqlServer
                 foreach (var columnInfo in dbSetInfo.Properites.Where(q => !q.IsNotMapped && !q.IsNavigationProperty))
                 {
                     if (!columns.TryGetValue(columnInfo.ColumnName, out var addColumnOperation)) continue;
-                    var usedIsUnicode = addColumnOperation.ColumnType.ToLower().StartsWith("nvarchar");
+                    var usedIsUnicode = addColumnOperation.ColumnType?.ToLower().StartsWith("nvarchar") ?? false;
                     var expectedUnicode = addColumnOperation.IsUnicode ?? usedIsUnicode;
 
                     var columnCollation = GetCollation(columnInfo.Annotations);
