@@ -68,8 +68,7 @@ namespace EfCore.Shaman.ModelScanner
 
         public DbSetInfo GetByTableName(FullTableName tableName)
         {
-            DbSetInfo entity;
-            _dbSets.TryGetValue(tableName, out entity);
+            _dbSets.TryGetValue(tableName, out var entity);
             return entity;
         }
 
@@ -88,6 +87,8 @@ namespace EfCore.Shaman.ModelScanner
             var useDirectSaverForType = entityType.GetTypeInfo().GetCustomAttribute<NoDirectSaverAttribute>() == null;
             foreach (var propertyInfo in entityType.GetProperties())
             {
+                if (propertyInfo.NotMappedByEntityFramework())
+                    continue;
                 var columnInfo = new ColumnInfo(dbSetInfo.Properites.Count, propertyInfo.Name)
                 {
                     NotNull = NotNullFromPropertyType(propertyInfo.PropertyType)

@@ -31,8 +31,7 @@ namespace EfCore.Shaman
             _lock.EnterUpgradeableReadLock();
             try
             {
-                object value;
-                if (_directSaverCache.TryGetValue(typeof(T), out value))
+                if (_directSaverCache.TryGetValue(typeof(T), out var value))
                     return (IDirectSaver<T>)value;
                 _lock.EnterWriteLock();
                 try
