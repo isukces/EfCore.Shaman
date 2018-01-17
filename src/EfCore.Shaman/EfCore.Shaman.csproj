@@ -12,7 +12,6 @@
     <RepositoryUrl>https://github.com/isukces/EfCore.Shaman</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageId>EfCore.Shaman</PackageId>
-    <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netstandard2.0' ">$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
     <PackageTags>EntityFrameworkCore</PackageTags>
     <PackageReleaseNotes>.</PackageReleaseNotes>
     <PackageProjectUrl>http://efcoreshaman.com/</PackageProjectUrl>
