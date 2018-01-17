@@ -85,7 +85,7 @@ namespace EfCore.Shaman.ModelScanner
             }
             var columnInfoUpdateServices = UsedShamanOptions.Services?.OfType<IColumnInfoUpdateService>().ToArray();
             var useDirectSaverForType = entityType.GetTypeInfo().GetCustomAttribute<NoDirectSaverAttribute>() == null;
-            foreach (var propertyInfo in entityType.GetProperties())
+            foreach (var propertyInfo in entityType.GetProperties(BindingFlags.Instance | BindingFlags.Public))
             {
                 if (propertyInfo.NotMappedByEntityFramework())
                     continue;
