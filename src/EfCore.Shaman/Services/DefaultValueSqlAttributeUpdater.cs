@@ -1,7 +1,9 @@
 #region using
 
+using System;
 using System.Reflection;
 using EfCore.Shaman.ModelScanner;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 #endregion
 
@@ -9,9 +11,8 @@ namespace EfCore.Shaman.Services
 {
     internal class DefaultValueSqlAttributeUpdater : IColumnInfoUpdateService
     {
-        #region Instance Methods
 
-        public void UpdateColumnInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo, IShamanLogger logger)
+        public void ModelInfoUpdateColumnInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo, IShamanLogger logger)
         {
             var attribute = propertyInfo.GetCustomAttribute<DefaultValueSqlAttribute>();
             if (!string.IsNullOrEmpty(attribute?.DefaultValueSql))
@@ -19,6 +20,9 @@ namespace EfCore.Shaman.Services
             // todo: log
         }
 
-        #endregion
+        public void ModelFixerUpdateColumnInfo(ColumnInfo columnInfo, EntityTypeBuilder entityBuilder, Type entityType,
+            IShamanLogger logger)
+        {            
+        }
     }
 }

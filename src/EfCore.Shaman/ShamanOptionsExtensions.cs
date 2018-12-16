@@ -91,7 +91,10 @@ namespace EfCore.Shaman
                 .With<UnicodeTextAttributeUpdater>()
                 .With<TableAttributeUpdater>()
                 .With<DefaultValueAttributeUpdater>()
-                .With<DefaultValueSqlAttributeUpdater>();
+                .With<DefaultValueSqlAttributeUpdater>()
+                .With<DecimalPlacesColumnInfoUpdateService>()
+                .With<DefaultValueColumnInfoUpdateService>()
+                .With<UnicodeColumnInfoUpdateService>();
         }
 
 

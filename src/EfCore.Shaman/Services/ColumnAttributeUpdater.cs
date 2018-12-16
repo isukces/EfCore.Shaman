@@ -1,12 +1,14 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Reflection;
 using EfCore.Shaman.ModelScanner;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace EfCore.Shaman.Services
 {
     class ColumnAttributeUpdater : IColumnInfoUpdateService
     {
-        public void UpdateColumnInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo, IShamanLogger logger)
+        public void ModelInfoUpdateColumnInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo, IShamanLogger logger)
         {
             var attribute = propertyInfo.GetCustomAttribute<ColumnAttribute>();
             if (attribute == null) return;
@@ -22,6 +24,11 @@ namespace EfCore.Shaman.Services
                 logger.Log(typeof(ColumnAttributeUpdater), "UpdateColumnInfo",
                     $"Set ForceFieldOrder={columnInfo.ForceFieldOrder}");
             }
+        }
+
+        public void ModelFixerUpdateColumnInfo(ColumnInfo columnInfo, EntityTypeBuilder entityBuilder, Type entityType,
+            IShamanLogger logger)
+        {
         }
     }
 }

@@ -3,6 +3,7 @@
 using System;
 using System.Reflection;
 using EfCore.Shaman.ModelScanner;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 #endregion
 
@@ -12,12 +13,12 @@ namespace EfCore.Shaman.Services
     {
         #region Instance Methods
 
-        public void UpdateColumnInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo, IShamanLogger logger)
+        public void ModelInfoUpdateColumnInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo, IShamanLogger logger)
         {
             var attribute = propertyInfo.GetCustomAttribute<NavigationPropertyAttribute>();
             if (attribute == null) return;
             Action<string> log =
-                txt => logger.Log(typeof(NavigationPropertyAttributeUpdater), nameof(UpdateColumnInfo), txt);
+                txt => logger.Log(typeof(NavigationPropertyAttributeUpdater), nameof(ModelFixerUpdateColumnInfo), txt);
             var targetType = attribute.ForceNavigation ? "navigation" : "non-navigation";
             if (columnInfo.IsNavigationProperty == attribute.ForceNavigation)
                 log(
@@ -27,6 +28,11 @@ namespace EfCore.Shaman.Services
                 columnInfo.IsNavigationProperty = attribute.ForceNavigation;
                 log($"column {columnInfo.ColumnName} is {targetType} property because of NavigationPropertyAttribute");
             }
+        }
+
+        public void ModelFixerUpdateColumnInfo(ColumnInfo columnInfo, EntityTypeBuilder entityBuilder, Type entityType,
+            IShamanLogger logger)
+        {            
         }
 
         #endregion

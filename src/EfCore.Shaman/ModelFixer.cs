@@ -128,6 +128,7 @@ namespace EfCore.Shaman
                 Log(nameof(FixOnModelCreating), $"calling modelBuilder.HasDefaultSchema(\"{_info.DefaultSchema}\")");
                 modelBuilder = modelBuilder.HasDefaultSchema(_info.DefaultSchema);
             }
+            var plugins = _shamanOptions.Services.OfType<IColumnInfoUpdateService>().ToArray();
 
             foreach (var dbSet in _info.DbSets)
             {
@@ -146,11 +147,11 @@ namespace EfCore.Shaman
                         indexBuilder.HasFilter(idx.Filter);
 #endif
                 }
+
                 foreach (var info in dbSet.Properites)
                 {
-                    UpdateDecimalPlaces(info, entity, dbSet.EntityType);
-                    UpdateDefaultValue(info, entity, dbSet.EntityType);
-                    UpdateIsUnicode(info, entity, dbSet.EntityType);
+                    foreach(var i in plugins)
+                        i.ModelFixerUpdateColumnInfo(info, entity, dbSet.EntityType, _shamanOptions.Logger);
                 }
             }
         }
@@ -204,46 +205,8 @@ namespace EfCore.Shaman
             Log(methodName, logMessage);
         }
 
-        private void UpdateDecimalPlaces(ColumnInfo info, EntityTypeBuilder entity, Type entityType)
-        {
-            if (info.MaxLength == null || info.DecimalPlaces == null)
-                return;
-            var type = $"decimal({info.MaxLength},{info.DecimalPlaces})";
-            var action = $"HasColumnType(\"{type}\")";
-            LogFix(nameof(UpdateDecimalPlaces), info, entityType, action);
-            entity.Property(info.PropertyName).HasColumnType(type);
-        }
         
-        private void UpdateIsUnicode(ColumnInfo info, EntityTypeBuilder entity, Type entityType)
-        {
-            if (info.IsUnicode == null )
-                return;
-            var action = $"IsUnicode({info.IsUnicode})";
-            LogFix(nameof(UpdateIsUnicode), info, entityType, action);
-            entity.Property(info.PropertyName).IsUnicode(info.IsUnicode.Value);
-        }
-
-        private void UpdateDefaultValue(ColumnInfo columnInfo, EntityTypeBuilder entity, Type entityType)
-        {
-            var dv = columnInfo.DefaultValue;
-            if (columnInfo.DefaultValue == null) return;
-            string action;
-            switch (dv.Kind)
-            {
-                case ValueInfoKind.Clr:
-                    action = $"HasDefaultValue(\"{columnInfo.DefaultValue.ClrValue}\")";
-                    LogFix(nameof(UpdateDefaultValue), columnInfo, entityType, action);
-                    entity.Property(columnInfo.PropertyName).HasDefaultValue(columnInfo.DefaultValue.ClrValue);
-                    break;
-                case ValueInfoKind.Sql:
-                    action = $"HasDefaultValueSql(\"{columnInfo.DefaultValue.SqlValue}\")";
-                    LogFix(nameof(UpdateDefaultValue), columnInfo, entityType, action);
-                    entity.Property(columnInfo.PropertyName).HasDefaultValueSql(columnInfo.DefaultValue.SqlValue);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-        }
+        
 
         #endregion
 
@@ -299,4 +262,5 @@ namespace EfCore.Shaman
 
         #endregion
     }
+ 
 }

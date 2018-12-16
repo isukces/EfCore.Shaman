@@ -101,7 +101,7 @@ namespace EfCore.Shaman.ModelScanner
                 }
                 if (columnInfoUpdateServices != null)
                     foreach (var service in columnInfoUpdateServices)
-                        service.UpdateColumnInfo(columnInfo, propertyInfo, _logger);
+                        service.ModelInfoUpdateColumnInfo(columnInfo, propertyInfo, _logger);
                 dbSetInfo.Properites.Add(columnInfo);
             }
             return dbSetInfo;

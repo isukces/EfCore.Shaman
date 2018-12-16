@@ -2,9 +2,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <AssemblyName>EfCore.Shaman.SqlServer</AssemblyName>
-    <AssemblyVersion>1.0.17309.72</AssemblyVersion>
-    <Version>1.0.17309.72</Version>
-    <FileVersion>1.0.17309.72</FileVersion>
+    <AssemblyVersion>1.0.18017.73</AssemblyVersion>
+    <Version>1.0.18017.73</Version>
+    <FileVersion>1.0.18017.73</FileVersion>
     <TargetFrameworks>net461;netstandard2.0</TargetFrameworks>
     <RuntimeIdentifiers>win</RuntimeIdentifiers>
     <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'net461' ">1.6.1</NetStandardImplicitPackageVersion>
@@ -21,7 +21,7 @@
     <Description>Fixes for EntityFrameworkCore</Description>
     <Authors>Internet Sukces Piotr Stęclik</Authors>
     <Company>Internet Sukces Piotr Stęclik</Company>
-    <Copyright>Copyright by Internet Sukces Piotr Stęclik 2016-2017</Copyright>
+    <Copyright>Copyright by Internet Sukces Piotr Stęclik 2016-2018</Copyright>
     <GenerateAssemblyTitleAttribute>true</GenerateAssemblyTitleAttribute>
     <GenerateAssemblyDescriptionAttribute>true</GenerateAssemblyDescriptionAttribute>
     <GenerateAssemblyConfigurationAttribute>true</GenerateAssemblyConfigurationAttribute>

@@ -1,8 +1,10 @@
 ﻿#region using
 
+using System;
 using System.Linq;
 using System.Reflection;
 using EfCore.Shaman.ModelScanner;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 #endregion
 
@@ -33,7 +35,7 @@ namespace EfCore.Shaman.Services
 
         #region Instance Methods
 
-        public void UpdateColumnInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo, IShamanLogger logger)
+        public void ModelInfoUpdateColumnInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo, IShamanLogger logger)
         {
             var indexAttributes = propertyInfo.GetCustomAttributes<AbstractIndexAttribute>()?.ToArray();
             if (indexAttributes == null || !indexAttributes.Any()) return;
@@ -43,9 +45,15 @@ namespace EfCore.Shaman.Services
                     .WithInfoFromAbstractIndexAttribute(indexAttribute)
                     .WithInfoFromUniqueIndexAttribute(indexAttribute as UniqueIndexAttribute)
                     .WithInfoFromFullTextIndexAttribute(indexAttribute as FullTextIndexAttribute);
-                logger.Log(typeof(IndexAttributeUpdater), nameof(UpdateColumnInfo),
+                logger.Log(typeof(IndexAttributeUpdater), nameof(ModelFixerUpdateColumnInfo),
                     $"Set indexInfo: Order={indexInfo.Order}, IsDescending={indexInfo.IsDescending}, IndexType={indexInfo.IndexType}");
             }
+        }
+
+        public void ModelFixerUpdateColumnInfo(ColumnInfo columnInfo, EntityTypeBuilder entityBuilder, Type entityType,
+            IShamanLogger logger)
+        {
+            
         }
 
         #endregion

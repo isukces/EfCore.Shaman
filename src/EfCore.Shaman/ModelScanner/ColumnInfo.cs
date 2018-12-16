@@ -1,16 +1,10 @@
-﻿#region using
-
-using System;
+﻿using System;
 using System.Collections.Generic;
-
-#endregion
 
 namespace EfCore.Shaman.ModelScanner
 {
     public class ColumnInfo
     {
-        #region Constructors
-
         public ColumnInfo(int reflectionIndex, string propertyName)
         {
             ReflectionIndex = reflectionIndex;
@@ -19,16 +13,8 @@ namespace EfCore.Shaman.ModelScanner
             ForceFieldOrder = int.MaxValue;
         }
 
-        #endregion
-
-        #region Instance Methods
-
         public override string ToString() =>
             $"Property {PropertyName} => {ColumnName}";
-
-        #endregion
-
-        #region Properties
 
         /// <summary>
         ///     Index of property scanned with GetProperties() method
@@ -77,7 +63,5 @@ namespace EfCore.Shaman.ModelScanner
         public IPropertyValueReader ValueReader { get; set; }
         public IPropertyValueWriter ValueWriter { get; set; }
         public ValueInfo DefaultValue { get; set; }
-        
-        #endregion
     }
 }
