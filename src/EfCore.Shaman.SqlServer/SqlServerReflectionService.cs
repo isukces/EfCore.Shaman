@@ -57,7 +57,7 @@ namespace EfCore.Shaman.SqlServer
                 return;
             var isUnicode   = columnInfo.IsUnicode ?? modelInfo.DefaultIsUnicodeText;
             var sqlDataType = SqlServerFixerService.MkStringType(isUnicode, columnInfo.MaxLength, collation);
-            var action      = $"HasColumnType(\"{sqlDataType}\")";
+            var action      = $"{columnInfo.PropertyName}.HasColumnType(\"{sqlDataType}\")";
             logger.LogFix(source, dbSetInfo.EntityType, action);
             entityBuilder.Property(columnInfo.PropertyName).HasColumnType(sqlDataType);
         }

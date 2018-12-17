@@ -21,7 +21,7 @@ namespace EfCore.Shaman
             if (columnInfo.MaxLength == null || columnInfo.DecimalPlaces == null)
                 return;
             var type   = $"decimal({columnInfo.MaxLength},{columnInfo.DecimalPlaces})";
-            var action = $"HasColumnType(\"{type}\")";
+            var action = $"{columnInfo.PropertyName}.HasColumnType(\"{type}\")";
             logger.LogFix(name, dbSetInfo.EntityType, action);
             entityBuilder.Property(columnInfo.PropertyName).HasColumnType(type);
         }

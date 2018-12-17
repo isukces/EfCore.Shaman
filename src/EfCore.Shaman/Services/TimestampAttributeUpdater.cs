@@ -13,12 +13,14 @@ namespace EfCore.Shaman.Services
             IDbSetInfo dbSetInfo, IShamanLogger logger)
         {
             if (propertyInfo.GetCustomAttribute<TimestampAttribute>() == null) return;
+            var logPrefix = $"Set {dbSetInfo.TableName}.{columnInfo.ColumnName}";
+            const string logSource =
+                nameof(TimestampAttributeUpdater) + "." + nameof(UpdateColumnInfoForMigrationFixer);
+
             columnInfo.IsTimestamp = true;
-            logger.Log(typeof(TimestampAttributeUpdater), nameof(UpdateColumnInfoForMigrationFixer),
-                $"{columnInfo.ColumnName}.IsTimestamp=true");
+            logger.Log(logSource, $"{logPrefix}.IsTimestamp=true");
             columnInfo.IsDatabaseGenerated = true;
-            logger.Log(typeof(TimestampAttributeUpdater), nameof(UpdateColumnInfoForMigrationFixer),
-                $"{columnInfo.ColumnName}.IsDatabaseGenerated=true");
+            logger.Log(logSource, $"{logPrefix}.IsDatabaseGenerated=true");
         }
 
         public void UpdateColumnInfoForMigrationFixer(ISimpleModelInfo modelInfo, IDbSetInfo dbSetInfo, ColumnInfo columnInfo,
