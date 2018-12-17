@@ -28,7 +28,7 @@ namespace EfCore.Shaman.Tests.Model
         private static ShamanOptions GetShamanOptions()
         {
             return ShamanOptions
-                .Default
+                .GetDefault(typeof(TestDbContext ))
                 .With<EmptyService>();
         }
 

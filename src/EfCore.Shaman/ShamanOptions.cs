@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
+using Microsoft.EntityFrameworkCore;
 
 namespace EfCore.Shaman
 {
@@ -11,7 +12,7 @@ namespace EfCore.Shaman
             if (dbContextType == null) throw new ArgumentNullException(nameof(dbContextType));
             var method = dbContextType.FindStaticMethodWihoutParameters("GetShamanOptions");
             if (method == null || method.ReturnType != typeof(ShamanOptions))
-                return Default;
+                return GetDefault(dbContextType);
             return (ShamanOptions)method.Invoke(null, null);
         }
 
@@ -28,9 +29,15 @@ namespace EfCore.Shaman
             }
         }
 
-        public static ShamanOptions Default
+        public static ShamanOptions GetDefault(Type dbContextType)
         {
-            get { return new ShamanOptions().WithDefaultServices(); }
+            return new ShamanOptions().WithDefaultServices(dbContextType);
+        }
+
+        public static ShamanOptions GetDefault<T>()
+            where T:DbContext
+        {
+            return GetDefault(typeof(T));
         }
 
         public IList<IShamanService> Services { get; } = new List<IShamanService>();

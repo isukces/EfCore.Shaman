@@ -21,6 +21,18 @@ namespace EfCore.Shaman.ModelScanner
             Prepare();
         }
 
+        public static IEnumerable<A123> GetEntityTypes(Type dbContextType)
+        {
+            foreach (var property in dbContextType.GetProperties())
+            {
+                var propertyType = property.PropertyType;
+                if (!propertyType.GetTypeInfo().IsGenericType) continue;
+                if (propertyType.GetGenericTypeDefinition() != typeof(DbSet<>)) continue;
+                var entityType = propertyType.GetGenericArguments()[0];
+                yield return new A123(property, entityType);
+            }
+        }
+
         public static ModelInfo Make<T>(ShamanOptions options = null)
         {
             return new ModelInfo(typeof(T), options);
@@ -73,7 +85,7 @@ namespace EfCore.Shaman.ModelScanner
             _dbSets.TryGetValue(tableName, out var entity);
             return entity;
         }
-        
+
         private DbSetInfo CreateDbSetWrapper(Type entityType, string propertyName,
             IReadOnlyDictionary<Type, string> tableNames)
         {
@@ -86,12 +98,12 @@ namespace EfCore.Shaman.ModelScanner
                         i.UpdateDbSetInfo(dbSetInfo, entityType, _dbContextType, _logger);
             }
             var columnInfoUpdateServices = UsedShamanOptions.Services?.OfType<IColumnInfoUpdateService>().ToArray();
-            var ignorePropertyServices = UsedShamanOptions.Services?.OfType<IToColumnMappingService>().ToArray() ?? new IToColumnMappingService[0];
+            var ignorePropertyServices = UsedShamanOptions.Services?.OfType<IToColumnMappingService>().ToArray() ??
+                                         new IToColumnMappingService[0];
             var useDirectSaverForType =
                 entityType.GetTypeInfo().GetCustomAttribute<NoDirectSaverAttribute>() == null;
             foreach (var propertyInfo in entityType.GetProperties(BindingFlags.Instance | BindingFlags.Public))
             {
-
                 var ignore = ignorePropertyServices.Any(service => service.IsMappedToTableColumn(propertyInfo));
                 if (ignore)
                     continue;
@@ -144,6 +156,13 @@ namespace EfCore.Shaman.ModelScanner
                 var key        = new FullTableName(entity.TableName, entity.Schema);
                 _dbSets[key] = entity;
             }
+
+            foreach (var aa in GetEntityTypes(_dbContextType))
+            {
+                var entity = CreateDbSetWrapper(aa.EntityType, aa.Property.Name, tableNames);
+                var key    = new FullTableName(entity.TableName, entity.Schema);
+                _dbSets[key] = entity;
+            }
         }
 
         [NotNull]
@@ -171,5 +190,17 @@ namespace EfCore.Shaman.ModelScanner
             new Dictionary<FullTableName, DbSetInfo>();
 
         private readonly IShamanLogger _logger;
+
+        public struct A123
+        {
+            public A123(PropertyInfo property, Type entityType)
+            {
+                Property   = property;
+                EntityType = entityType;
+            }
+
+            public PropertyInfo Property   { get; }
+            public Type         EntityType { get; }
+        }
     }
 }

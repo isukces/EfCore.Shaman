@@ -12,7 +12,8 @@ namespace EfCore.Shaman.Tests.Model
 
         public static ShamanOptions GetShamanOptions()
         {
-            return ShamanOptions.Default.With(new RemovePluralizingTableNameService())
+            return ShamanOptions.GetDefault(typeof(SingularTableNamesDbContext))
+                .With(new RemovePluralizingTableNameService())
                 .WithLogger(new MethodCallLogger(
                     LogToConsoleWhileMigrationService.LogInfoToConsole,
                     LogToConsoleWhileMigrationService.LogExceptionToConsole

@@ -31,7 +31,7 @@ namespace EfCore.Shaman.SqlServer.DirectSql
         public static SqlServerDirectSaver<T> FromContext(Type dbContextType, Func<ShamanOptions> optionsFactory = null)
         {
             if (optionsFactory == null)
-                optionsFactory = () => new ShamanOptions().WithDefaultServices().WithSqlServer();
+                optionsFactory = () => new ShamanOptions().WithDefaultServices(dbContextType).WithSqlServer();
             var options = optionsFactory();
             var info = new ModelInfo(dbContextType, options);
             var dbSetInfo = info.DbSets.FirstOrDefault(a => a.EntityType == typeof(T));

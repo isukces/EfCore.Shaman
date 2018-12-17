@@ -17,7 +17,7 @@ namespace EfCore.Shaman.Tests.Model
 
         public static ShamanOptions GetShamanOptions()
         {
-            return ShamanOptions.Default
+            return ShamanOptions.GetDefault<UnicodeTestDbContext>()
                 .With(new RemovePluralizingTableNameService())
                 .WithSqlServer()
                 .WithLogger(new MethodCallLogger(

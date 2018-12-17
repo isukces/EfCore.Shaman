@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using EfCore.Shaman.Tests.Model;
@@ -37,9 +38,9 @@ namespace EfCore.Shaman.Tests.EfCore.Shaman.Services
         {
         }
 
-        public static ShamanOptions GetShamanOptions()
+        public static ShamanOptions GetShamanOptions(Type dbContextType)
         {
-            var options = ShamanOptions.Default
+            var options = ShamanOptions.GetDefault(dbContextType)
                 // .WithLogger(new MethodCallLogger(WriteDebugInfo))
                 .WithSqlServer();
             //.With<LogToConsoleWhileMigrationService>()

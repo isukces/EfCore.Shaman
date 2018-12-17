@@ -146,7 +146,7 @@ namespace EfCore.Shaman.Tests
 
             // without patching
             {
-                    var modelInfo = GetModelInfo<PrefixedTableNamesDbContext>(ShamanOptions.Default);
+                    var modelInfo = GetModelInfo<PrefixedTableNamesDbContext>(ShamanOptions.GetDefault<PrefixedTableNamesDbContext>());
                     var dbSet = modelInfo.DbSet<User>();
                     Assert.NotNull(dbSet);
                     Assert.Equal("Users", dbSet.TableName);
@@ -228,7 +228,7 @@ namespace EfCore.Shaman.Tests
 
             // without patching - when use 'InMemory' table names are singular
             {
-                    var modelInfo = GetModelInfo<SingularTableNamesDbContext>(ShamanOptions.Default);
+                    var modelInfo = GetModelInfo<SingularTableNamesDbContext>(ShamanOptions.GetDefault<SingularTableNamesDbContext>());
                     var dbSet = modelInfo.DbSet<User>();
                     Assert.NotNull(dbSet);
                     Assert.Equal("User", dbSet.TableName);

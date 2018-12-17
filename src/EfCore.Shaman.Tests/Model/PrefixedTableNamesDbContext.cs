@@ -11,7 +11,7 @@ namespace EfCore.Shaman.Tests.Model
 
         public static ShamanOptions GetShamanOptions()
         {
-            return ShamanOptions.Default
+            return ShamanOptions.GetDefault(typeof(PrefixedTableNamesDbContext))
                 .With(new PrefixedTableNameService("myPrefix"))
                 .WithLogger(new MethodCallLogger(
                     LogToConsoleWhileMigrationService.LogInfoToConsole, 

@@ -77,10 +77,10 @@ namespace EfCore.Shaman
         /// </summary>
         /// <param name="options"></param>
         /// <returns></returns>
-        public static ShamanOptions WithDefaultServices(this ShamanOptions options)
+        public static ShamanOptions WithDefaultServices(this ShamanOptions options, Type dbContextType)
         {
             return options
-                .With<DefaultToColumnMappingService>()
+                .With(new DefaultToColumnMappingService{ DbContextType = dbContextType})
                 .With<ColumnInfoColumnAttributeUpdater>()
                 .With<NotMappedAttributeUpdater>()
                 .With<NavigationPropertyAttributeUpdater>()
