@@ -1,7 +1,9 @@
 ﻿#region using
 
 using System;
+using System.Linq;
 using EfCore.Shaman.Services;
+using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -31,7 +33,7 @@ namespace EfCore.Shaman
 
             var concurrencyDetector = databaseFacade.GetService<IConcurrencyDetector>();
 
-            using (concurrencyDetector.EnterCriticalSection())
+            using(concurrencyDetector.EnterCriticalSection())
             {
                 var rawSqlCommand = databaseFacade
                     .GetService<IRawSqlCommandBuilder>()
@@ -97,6 +99,28 @@ namespace EfCore.Shaman
                 .With<UnicodeColumnInfoUpdateService>();
         }
 
+        public static ShamanOptions ConfigureService<T>([NotNull] this ShamanOptions options, Action<T> configureAction)
+            where T : IShamanService
+        {
+            if (options == null) throw new ArgumentNullException(nameof(options));
+            foreach (var service in options.Services.OfType<T>())
+            {
+                configureAction(service);
+            }
+
+            return options;
+        }
+
+        public static ShamanOptions Without<T>([NotNull] this ShamanOptions options)
+            where T : IShamanService
+        {
+            if (options == null) throw new ArgumentNullException(nameof(options));
+            var list = options.Services;
+            for (var index = list.Count - 1; index >= 0; index--)
+                if (list[index].GetType() == typeof(T))
+                    list.RemoveAt(index);
+            return options;
+        }
 
         /// <summary>
         ///     Copy of private static method
