@@ -1,6 +1,7 @@
 ﻿#region using
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
@@ -44,15 +45,6 @@ namespace EfCore.Shaman
             if (modelBuilder == null) throw new ArgumentNullException(nameof(modelBuilder));
             MigrationFixer.FixOnModelCreating(modelBuilder, typeof(T), shamanOptions);
         }
-
-        public static bool NotMappedByEntityFramework(this PropertyInfo propertyInfo)
-        {
-            if (propertyInfo.GetCustomAttribute<NotMappedAttribute>() != null)
-                return true;
-            if (propertyInfo.GetCustomAttribute<NavigationPropertyAttribute>() != null)
-                return true;
-
-            return false;
-        }
+       
     }
 }

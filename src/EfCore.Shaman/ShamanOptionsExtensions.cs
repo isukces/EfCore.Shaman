@@ -80,6 +80,7 @@ namespace EfCore.Shaman
         public static ShamanOptions WithDefaultServices(this ShamanOptions options)
         {
             return options
+                .With<DefaultToColumnMappingService>()
                 .With<ColumnInfoColumnAttributeUpdater>()
                 .With<NotMappedAttributeUpdater>()
                 .With<NavigationPropertyAttributeUpdater>()

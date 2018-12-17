@@ -73,8 +73,7 @@ namespace EfCore.Shaman.ModelScanner
             _dbSets.TryGetValue(tableName, out var entity);
             return entity;
         }
-
-
+        
         private DbSetInfo CreateDbSetWrapper(Type entityType, string propertyName,
             IReadOnlyDictionary<Type, string> tableNames)
         {
@@ -87,11 +86,14 @@ namespace EfCore.Shaman.ModelScanner
                         i.UpdateDbSetInfo(dbSetInfo, entityType, _dbContextType, _logger);
             }
             var columnInfoUpdateServices = UsedShamanOptions.Services?.OfType<IColumnInfoUpdateService>().ToArray();
+            var ignorePropertyServices = UsedShamanOptions.Services?.OfType<IToColumnMappingService>().ToArray() ?? new IToColumnMappingService[0];
             var useDirectSaverForType =
                 entityType.GetTypeInfo().GetCustomAttribute<NoDirectSaverAttribute>() == null;
             foreach (var propertyInfo in entityType.GetProperties(BindingFlags.Instance | BindingFlags.Public))
             {
-                if (propertyInfo.NotMappedByEntityFramework())
+
+                var ignore = ignorePropertyServices.Any(service => service.IsMappedToTableColumn(propertyInfo));
+                if (ignore)
                     continue;
                 var columnInfo = new ColumnInfo(dbSetInfo.Properites.Count, propertyInfo.Name)
                 {

@@ -22,7 +22,7 @@ namespace EfCore.Shaman.Services
 
             var logPrefix = $"Set {dbSetInfo.TableName}.{columnInfo.ColumnName}";
             const string logSource =
-            nameof(RequiredAttributeUpdater) + "." + nameof(UpdateColumnInfoInModelInfo);
+                nameof(RequiredAttributeUpdater) + "." + nameof(UpdateColumnInfoInModelInfo);
 
             columnInfo.NotNull = true;
             logger.Log(logSource, $"{logPrefix}.NotNull=true");
