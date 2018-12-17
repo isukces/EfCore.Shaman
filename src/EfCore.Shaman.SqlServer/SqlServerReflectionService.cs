@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace EfCore.Shaman.SqlServer
 {
-    internal class SqlServerReflectionService : IColumnInfoUpdateService,
+    public sealed class SqlServerReflectionService : IColumnInfoUpdateService,
         IDbSetInfoUpdateService,
         IModelPrepareService
     {
