@@ -13,15 +13,13 @@ namespace EfCore.Shaman.Services
         public NavigationPropertyByPropertyTypeUpdater(Type dbContextType)
         {
             DbContextType = dbContextType;
+            CollectionsGenericTypes = new HashSet<Type>
+            {
+                typeof(IList<>), typeof(List<>), typeof(ICollection<>), typeof(IEnumerable<>)
+            };
         }
 
-        private static bool CheckGenerticTypeIsCollection(Type gtt)
-        {
-            return gtt == typeof(IList<>)
-                   || gtt == typeof(List<>)
-                   || gtt == typeof(ICollection<>)
-                   || gtt == typeof(IEnumerable<>);
-        }
+        public HashSet<Type> CollectionsGenericTypes { get;  }
 
         public void UpdateColumnInfoForMigrationFixer(ISimpleModelInfo modelInfo, IDbSetInfo dbSetInfo,
             ColumnInfo columnInfo,
@@ -40,6 +38,9 @@ namespace EfCore.Shaman.Services
             var attribute = propertyInfo.GetCustomAttribute<NavigationPropertyAttribute>();
             if (attribute != null)
                 return;
+            if (propertyInfo.PropertyType == typeof(string) || propertyInfo.PropertyType.IsEnum ||
+                propertyInfo.PropertyType.IsPrimitive)
+                return;
             if (IsEntityType(propertyInfo.PropertyType))
                 columnInfo.IsNavigationProperty = true;
             else if (IsListOfEntityType(propertyInfo.PropertyType))
@@ -54,14 +55,12 @@ namespace EfCore.Shaman.Services
         private bool IsListOfEntityType(Type type)
         {
             if (!type.IsGenericType) return false;
-            var gtt = type.GetGenericTypeDefinition();
-            if (DoNotMapCollections) return false;
-            if (!CheckGenerticTypeIsCollection(gtt)) return false;
+            var gtt = type.GetGenericTypeDefinition();            
+            if (!CollectionsGenericTypes.Contains(gtt)) return false;
             var arg = type.GetGenericArguments()[0];
             return IsEntityType(arg);
         }
-
-        public bool DoNotMapCollections { get; set; } = true;
+        
 
         public Type DbContextType
         {
