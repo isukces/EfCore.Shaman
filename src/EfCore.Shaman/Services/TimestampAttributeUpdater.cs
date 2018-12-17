@@ -7,20 +7,21 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace EfCore.Shaman.Services
 {
-    internal class TimestampAttributeUpdater : IColumnInfoUpdateService
+    public  class TimestampAttributeUpdater : IColumnInfoUpdateService
     {
-        public void ModelInfoUpdateColumnInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo, IShamanLogger logger)
+        public void UpdateColumnInfoInModelInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo, IShamanLogger logger)
         {
             if (propertyInfo.GetCustomAttribute<TimestampAttribute>() == null) return;
             columnInfo.IsTimestamp = true;
-            logger.Log(typeof(TimestampAttributeUpdater), nameof(ModelFixerUpdateColumnInfo),
+            logger.Log(typeof(TimestampAttributeUpdater), nameof(UpdateColumnInfoForMigrationFixer),
                 $"{columnInfo.ColumnName}.IsTimestamp=true");
             columnInfo.IsDatabaseGenerated = true;
-            logger.Log(typeof(TimestampAttributeUpdater), nameof(ModelFixerUpdateColumnInfo),
+            logger.Log(typeof(TimestampAttributeUpdater), nameof(UpdateColumnInfoForMigrationFixer),
                 $"{columnInfo.ColumnName}.IsDatabaseGenerated=true");
         }
 
-        public void ModelFixerUpdateColumnInfo(ColumnInfo columnInfo, EntityTypeBuilder entityBuilder, Type entityType,
+        public void UpdateColumnInfoForMigrationFixer(ISimpleModelInfo modelInfo, IDbSetInfo dbSetInfo, ColumnInfo columnInfo,
+            EntityTypeBuilder entityBuilder,
             IShamanLogger logger)
         {
         }

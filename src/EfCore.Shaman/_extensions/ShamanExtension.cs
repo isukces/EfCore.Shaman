@@ -16,7 +16,7 @@ namespace EfCore.Shaman
             where T : DbContext
         {
             if (migrationBuilder == null) throw new ArgumentNullException(nameof(migrationBuilder));
-            ModelFixer.FixMigrationUp<T>(migrationBuilder, shamanOptions);
+            MigrationFixer.FixMigrationUp<T>(migrationBuilder, shamanOptions);
         }
 
         /// <summary>
@@ -29,7 +29,7 @@ namespace EfCore.Shaman
             ShamanOptions shamanOptions = null)
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
-            ModelFixer.FixOnModelCreating(modelBuilder, context.GetType(), shamanOptions);
+            MigrationFixer.FixOnModelCreating(modelBuilder, context.GetType(), shamanOptions);
         }
 
         /// <summary>
@@ -42,7 +42,7 @@ namespace EfCore.Shaman
             where T : DbContext
         {
             if (modelBuilder == null) throw new ArgumentNullException(nameof(modelBuilder));
-            ModelFixer.FixOnModelCreating(modelBuilder, typeof(T), shamanOptions);
+            MigrationFixer.FixOnModelCreating(modelBuilder, typeof(T), shamanOptions);
         }
 
         public static bool NotMappedByEntityFramework(this PropertyInfo propertyInfo)

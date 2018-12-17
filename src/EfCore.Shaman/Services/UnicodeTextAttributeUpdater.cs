@@ -7,16 +7,17 @@ namespace EfCore.Shaman.Services
 {
     internal class UnicodeTextAttributeUpdater : IColumnInfoUpdateService
     {
-        public void ModelInfoUpdateColumnInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo, IShamanLogger logger)
+        public void UpdateColumnInfoInModelInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo, IShamanLogger logger)
         {
             var indexAttribute = propertyInfo.GetCustomAttribute<UnicodeTextAttribute>();
             if (indexAttribute == null) return;
-            logger.Log(typeof(UnicodeTextAttribute), nameof(ModelFixerUpdateColumnInfo),
+            logger.Log(typeof(UnicodeTextAttribute), nameof(UpdateColumnInfoForMigrationFixer),
                 $"Set IsUnicode={indexAttribute.IsUnicode}");
             columnInfo.IsUnicode = indexAttribute.IsUnicode;
         }
 
-        public void ModelFixerUpdateColumnInfo(ColumnInfo columnInfo, EntityTypeBuilder entityBuilder, Type entityType,
+        public void UpdateColumnInfoForMigrationFixer(ISimpleModelInfo modelInfo, IDbSetInfo dbSetInfo, ColumnInfo columnInfo,
+            EntityTypeBuilder entityBuilder,
             IShamanLogger logger)
         {
         }

@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EfCore.Shaman.ModelScanner
 {
-    public class ModelInfo
+    public class ModelInfo: ISimpleModelInfo
     {
         public ModelInfo(Type dbContextType, ShamanOptions options = null)
         {
@@ -101,7 +101,7 @@ namespace EfCore.Shaman.ModelScanner
                 }
                 if (columnInfoUpdateServices != null)
                     foreach (var service in columnInfoUpdateServices)
-                        service.ModelInfoUpdateColumnInfo(columnInfo, propertyInfo, _logger);
+                        service.UpdateColumnInfoInModelInfo(columnInfo, propertyInfo, _logger);
                 dbSetInfo.Properites.Add(columnInfo);
             }
             return dbSetInfo;
@@ -123,6 +123,7 @@ namespace EfCore.Shaman.ModelScanner
                     : "Don't use dbContext model");
             var tableNames = GetTableNamesFromModel(model, _logger);
             DefaultSchema = DefaultSchemaUpdater.GetDefaultSchema(_dbContextType, model, _logger);
+            DefaultIsUnicodeText= DefaultSchemaUpdater.GetDefaultIsUnicodeText(_dbContextType, _logger);
             foreach (var property in _dbContextType.GetProperties())
             {
                 var propertyType = property.PropertyType;
@@ -139,6 +140,8 @@ namespace EfCore.Shaman.ModelScanner
         public ShamanOptions UsedShamanOptions { get; }
 
         public string DefaultSchema { get; set; }
+
+        public bool DefaultIsUnicodeText { get; set; } = true;
 
         public IEnumerable<DbSetInfo> DbSets => _dbSets.Values;
 

@@ -10,16 +10,17 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace EfCore.Shaman.Services
 {
-    internal class NotMappedAttributeUpdater : IColumnInfoUpdateService
+    public  class NotMappedAttributeUpdater : IColumnInfoUpdateService
     {
-        public void ModelInfoUpdateColumnInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo, IShamanLogger logger)
+        public void UpdateColumnInfoInModelInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo, IShamanLogger logger)
         {
             if (propertyInfo.GetCustomAttribute<NotMappedAttribute>() != null)
                 columnInfo.IsNotMapped = true;
             // todo log NotMappedAttributeUpdater.UpdateColumnInfo
         }
 
-        public void ModelFixerUpdateColumnInfo(ColumnInfo columnInfo, EntityTypeBuilder entityBuilder, Type entityType,
+        public void UpdateColumnInfoForMigrationFixer(ISimpleModelInfo modelInfo, IDbSetInfo dbSetInfo, ColumnInfo columnInfo,
+            EntityTypeBuilder entityBuilder,
             IShamanLogger logger)
         {
         }

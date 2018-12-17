@@ -6,27 +6,28 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace EfCore.Shaman.Services
 {
-    class ColumnAttributeUpdater : IColumnInfoUpdateService
+    public class ColumnInfoColumnAttributeUpdater : IColumnInfoUpdateService
     {
-        public void ModelInfoUpdateColumnInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo, IShamanLogger logger)
+        public void UpdateColumnInfoInModelInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo, IShamanLogger logger)
         {
             var attribute = propertyInfo.GetCustomAttribute<ColumnAttribute>();
             if (attribute == null) return;
             if (!string.IsNullOrEmpty(attribute.Name))
             {
                 columnInfo.ColumnName = attribute.Name;
-                logger.Log(typeof(ColumnAttributeUpdater), "UpdateColumnInfo",
+                logger.Log(typeof(ColumnInfoColumnAttributeUpdater), "UpdateColumnInfo",
                     $"Set ColumnName='{columnInfo.ColumnName}'");
             }
             if (attribute.Order >= 0)
             {
                 columnInfo.ForceFieldOrder = attribute.Order;
-                logger.Log(typeof(ColumnAttributeUpdater), "UpdateColumnInfo",
+                logger.Log(typeof(ColumnInfoColumnAttributeUpdater), "UpdateColumnInfo",
                     $"Set ForceFieldOrder={columnInfo.ForceFieldOrder}");
             }
         }
-
-        public void ModelFixerUpdateColumnInfo(ColumnInfo columnInfo, EntityTypeBuilder entityBuilder, Type entityType,
+ 
+        public void UpdateColumnInfoForMigrationFixer(ISimpleModelInfo modelInfo, IDbSetInfo dbSetInfo, ColumnInfo columnInfo,
+            EntityTypeBuilder entityBuilder,
             IShamanLogger logger)
         {
         }

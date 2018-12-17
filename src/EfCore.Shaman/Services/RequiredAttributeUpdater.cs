@@ -6,18 +6,19 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace EfCore.Shaman.Services
 {
-    class RequiredAttributeUpdater : IColumnInfoUpdateService
+    public class RequiredAttributeUpdater : IColumnInfoUpdateService
     {
-        public void ModelInfoUpdateColumnInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo, IShamanLogger logger)
+        public void UpdateColumnInfoInModelInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo, IShamanLogger logger)
         {
             var attribute = propertyInfo.GetCustomAttribute<RequiredAttribute>();
             if (attribute == null) return;
             columnInfo.NotNull = true;
-            logger.Log(typeof(RequiredAttributeUpdater), nameof(ModelFixerUpdateColumnInfo),
+            logger.Log(typeof(RequiredAttributeUpdater), nameof(UpdateColumnInfoForMigrationFixer),
                 $"Set NotNull=true for column '{columnInfo.ColumnName}'");
         }
 
-        public void ModelFixerUpdateColumnInfo(ColumnInfo columnInfo, EntityTypeBuilder entityBuilder, Type entityType,
+        public void UpdateColumnInfoForMigrationFixer(ISimpleModelInfo modelInfo, IDbSetInfo dbSetInfo, ColumnInfo columnInfo,
+            EntityTypeBuilder entityBuilder,
             IShamanLogger logger)
         {            
         }

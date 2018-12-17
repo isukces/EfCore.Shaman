@@ -8,27 +8,28 @@ namespace EfCore.Shaman
 {
     public class DefaultValueColumnInfoUpdateService:IColumnInfoUpdateService
     {
-        public void ModelInfoUpdateColumnInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo, IShamanLogger logger)
+        public void UpdateColumnInfoInModelInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo, IShamanLogger logger)
         {
         }
       
-        public void ModelFixerUpdateColumnInfo(ColumnInfo columnInfo, EntityTypeBuilder entityBuilder, Type entityType,
+        public void UpdateColumnInfoForMigrationFixer(ISimpleModelInfo modelInfo, IDbSetInfo dbSetInfo, ColumnInfo columnInfo,
+            EntityTypeBuilder entityBuilder,
             IShamanLogger logger)
         {
-            const string name = nameof(DefaultValueColumnInfoUpdateService) + "." + nameof(ModelFixerUpdateColumnInfo);
+            const string source = nameof(DefaultValueColumnInfoUpdateService) + "." + nameof(UpdateColumnInfoForMigrationFixer);
             var dv = columnInfo.DefaultValue;
             if (columnInfo.DefaultValue == null) return;
             string action;
             switch (dv.Kind)
             {
                 case ValueInfoKind.Clr:
-                    action = $"HasDefaultValue(\"{columnInfo.DefaultValue.ClrValue}\")";
-                    logger.LogFix(name, entityType, action);
+                    action = $"{columnInfo.PropertyName}.HasDefaultValue(\"{columnInfo.DefaultValue.ClrValue}\")";
+                    logger.LogFix(source, dbSetInfo.EntityType, action);
                     entityBuilder.Property(columnInfo.PropertyName).HasDefaultValue(columnInfo.DefaultValue.ClrValue);
                     break;
                 case ValueInfoKind.Sql:
-                    action = $"HasDefaultValueSql(\"{columnInfo.DefaultValue.SqlValue}\")";
-                    logger.LogFix(name, entityType, action);
+                    action = $"{columnInfo.PropertyName}.HasDefaultValueSql(\"{columnInfo.DefaultValue.SqlValue}\")";
+                    logger.LogFix(source, dbSetInfo.EntityType, action);
                     entityBuilder.Property(columnInfo.PropertyName).HasDefaultValueSql(columnInfo.DefaultValue.SqlValue);
                     break;
                 default:

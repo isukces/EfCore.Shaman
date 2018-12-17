@@ -10,6 +10,12 @@ namespace EfCore.Shaman
 
     public struct ShamanLogMessage
     {
+        public ShamanLogMessage(string source, string message)
+        {
+            Source = source;
+            Message = message;
+        }
+
         public string Source  { get; set; }
         public string Message { get; set; }
     }
@@ -46,25 +52,19 @@ namespace EfCore.Shaman
 
         public static void Log(this IShamanLogger src, Type t, string method, string message)
         {
-            if (src.IsNullOrEmpty())
-                return;
-            var info = new ShamanLogMessage
-            {
-                Source  = $"{t.Name}.{method}",
-                Message = message
-            };
-            src.Log(info);
+            src.Log($"{t.Name}.{method}", message);
+        }
+        
+        public static void Log(this IShamanLogger src, string source, string message)
+        {
+            if (!src.IsNullOrEmpty()) 
+                src.Log(new ShamanLogMessage(source, message));
         }
 
         public static void LogFix(this IShamanLogger logger, string source, Type entityType, string action)
         {
             var logMessage = $"calling {action} for {entityType.Name}";
-            var info = new ShamanLogMessage
-            {
-                Source  = source,
-                Message = logMessage
-            };
-            logger.Log(info);
+            logger.Log(source, logMessage);
         }
     }
 }

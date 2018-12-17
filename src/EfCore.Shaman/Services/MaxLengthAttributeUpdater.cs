@@ -6,9 +6,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace EfCore.Shaman.Services
 {
-    class MaxLengthAttributeUpdater : IColumnInfoUpdateService
+    public class MaxLengthAttributeUpdater : IColumnInfoUpdateService
     {
-        public void ModelInfoUpdateColumnInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo, IShamanLogger logger)
+        public void UpdateColumnInfoInModelInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo, IShamanLogger logger)
         {
             var attribute = propertyInfo.GetCustomAttribute<MaxLengthAttribute>();
             if (attribute == null) return;
@@ -16,7 +16,8 @@ namespace EfCore.Shaman.Services
             // todo log MaxLengthAttributeUpdater.UpdateColumnInfo
         }
 
-        public void ModelFixerUpdateColumnInfo(ColumnInfo columnInfo, EntityTypeBuilder entityBuilder, Type entityType,
+        public void UpdateColumnInfoForMigrationFixer(ISimpleModelInfo modelInfo, IDbSetInfo dbSetInfo, ColumnInfo columnInfo,
+            EntityTypeBuilder entityBuilder,
             IShamanLogger logger)
         {
         }

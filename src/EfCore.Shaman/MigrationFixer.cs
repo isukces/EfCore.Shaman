@@ -1,8 +1,5 @@
-﻿#region using
-
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using EfCore.Shaman.ModelScanner;
 using Microsoft.EntityFrameworkCore;
@@ -10,28 +7,20 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
 
-#endregion
-
 namespace EfCore.Shaman
 {
-    public class ModelFixer
+    public class MigrationFixer
     {
-        #region Constructors
-
-        public ModelFixer(Type dbContextType, ShamanOptions shamanOptions, ModelInfo modelInfo = null)
+        public MigrationFixer(Type dbContextType, ShamanOptions shamanOptions, ModelInfo modelInfo = null)
         {
             _shamanOptions = shamanOptions ?? ShamanOptions.CreateShamanOptions(dbContextType);
-            _info = modelInfo ?? new ModelInfo(dbContextType, _shamanOptions);
+            _info          = modelInfo ?? new ModelInfo(dbContextType, _shamanOptions);
         }
-
-        #endregion
-
-        #region Static Methods
 
         public static void FixMigrationUp<T>(MigrationBuilder migrationBuilder, ShamanOptions shamanOptions = null)
             where T : DbContext
         {
-            var tmp = new ModelFixer(typeof(T), shamanOptions);
+            var tmp = new MigrationFixer(typeof(T), shamanOptions);
             tmp.FixMigrationUp(migrationBuilder);
         }
 
@@ -39,8 +28,10 @@ namespace EfCore.Shaman
             ShamanOptions shamanOptions = null)
         {
             shamanOptions = shamanOptions ?? ShamanOptions.CreateShamanOptions(contextType);
-            Action<string> log = message =>
-                shamanOptions.Logger.Log(typeof(ModelFixer), nameof(FixOnModelCreating), message);
+            Action<string> log = delegate(string message)
+            {
+                shamanOptions.Logger.Log(typeof(MigrationFixer), nameof(FixOnModelCreating), message);
+            };
 
             log("Before SetRawModel");
             try
@@ -55,30 +46,14 @@ namespace EfCore.Shaman
                 throw;
             }
 
-
             var fix = fixingHolder.TryFix(contextType, () =>
             {
                 log("Fixing...");
-                var modelFixer = new ModelFixer(contextType, shamanOptions);
+                var modelFixer = new MigrationFixer(contextType, shamanOptions);
                 modelFixer.FixOnModelCreating(modelBuilder);
             });
             if (!fix)
                 log("Skip");
-        }
-
-        private void ChangeTableName(EntityTypeBuilder entity, DbSetInfo dbSet)
-        {
-            if (string.IsNullOrEmpty(dbSet.TableName)) return;
-            if (string.IsNullOrEmpty(dbSet.Schema))
-            {
-                LogFix(nameof(ChangeTableName), dbSet.EntityType, $"ToTable(\"{dbSet.TableName}\")");
-                entity.ToTable(dbSet.TableName);
-            }
-            else
-            {
-                LogFix(nameof(ChangeTableName), dbSet.EntityType, $"ToTable(\"{dbSet.TableName}\", \"{dbSet.Schema}\")");
-                entity.ToTable(dbSet.TableName, dbSet.Schema);
-            }
         }
 
 
@@ -103,10 +78,6 @@ namespace EfCore.Shaman
             indexBuilder.HasName(indexName);
         }
 
-        #endregion
-
-        #region Instance Methods
-
         public void FixMigrationUp(MigrationBuilder migrationBuilder)
         {
             var services = _shamanOptions?.Services.OfType<IFixMigrationUpService>().ToArray();
@@ -128,7 +99,8 @@ namespace EfCore.Shaman
                 Log(nameof(FixOnModelCreating), $"calling modelBuilder.HasDefaultSchema(\"{_info.DefaultSchema}\")");
                 modelBuilder = modelBuilder.HasDefaultSchema(_info.DefaultSchema);
             }
-            var plugins = _shamanOptions.Services.OfType<IColumnInfoUpdateService>().ToArray();
+
+            var updateServices = _shamanOptions.Services.OfType<IColumnInfoUpdateService>().ToArray();
 
             foreach (var dbSet in _info.DbSets)
             {
@@ -138,7 +110,7 @@ namespace EfCore.Shaman
                 {
                     if (!idx.IndexType.IsNormalIndex())
                         continue;
-                    var fields = idx.Fields.Select(a => a.FieldName).ToArray();
+                    var fields       = idx.Fields.Select(a => a.FieldName).ToArray();
                     var indexBuilder = entity.HasIndex(fields);
                     TrySetIndexName(indexBuilder, idx.IndexName);
                     indexBuilder.IsUnique(idx.IndexType == IndexType.UniqueIndex);
@@ -148,15 +120,33 @@ namespace EfCore.Shaman
 #endif
                 }
 
-                foreach (var info in dbSet.Properites)
+                foreach (var columnInfo in dbSet.Properites)
                 {
-                    foreach(var i in plugins)
-                        i.ModelFixerUpdateColumnInfo(info, entity, dbSet.EntityType, _shamanOptions.Logger);
+                    for (var index = 0; index < updateServices.Length; index++)
+                    {
+                        var service = updateServices[index];
+                        service.UpdateColumnInfoForMigrationFixer(_info, dbSet, columnInfo, entity, _shamanOptions.Logger);
+                    }
                 }
             }
         }
 
-       
+        private void ChangeTableName(EntityTypeBuilder entity, DbSetInfo dbSet)
+        {
+            if (string.IsNullOrEmpty(dbSet.TableName)) return;
+            if (string.IsNullOrEmpty(dbSet.Schema))
+            {
+                LogFix(nameof(ChangeTableName), dbSet.EntityType, $"ToTable(\"{dbSet.TableName}\")");
+                entity.ToTable(dbSet.TableName);
+            }
+            else
+            {
+                LogFix(nameof(ChangeTableName), dbSet.EntityType,
+                    $"ToTable(\"{dbSet.TableName}\", \"{dbSet.Schema}\")");
+                entity.ToTable(dbSet.TableName, dbSet.Schema);
+            }
+        }
+
 
         private void FixOnModelCreatingForTable(CreateTableOperation table)
         {
@@ -167,10 +157,11 @@ namespace EfCore.Shaman
             var entity = _info.GetByTableName(new FullTableName(table.Name, table.Schema));
             if (entity == null)
             {
-                _shamanOptions.Logger.Log(typeof(ModelFixer), nameof(FixOnModelCreatingForTable),
+                _shamanOptions.Logger.Log(typeof(MigrationFixer), nameof(FixOnModelCreatingForTable),
                     $"Table {table.Name} not found. Skipping.");
                 return;
             }
+
             var colsDic = entity
                 .Properites
                 .Where(info => !info.IsNotMapped && !info.IsNavigationProperty)
@@ -190,7 +181,7 @@ namespace EfCore.Shaman
 
         private void Log(string methodName, string message)
         {
-            _shamanOptions.Logger.Log(typeof(ModelFixer), methodName, message);
+            _shamanOptions.Logger.Log(typeof(MigrationFixer), methodName, message);
         }
 
         private void LogFix(string methodName, ColumnInfo columnInfo, Type entityType, string action)
@@ -205,38 +196,23 @@ namespace EfCore.Shaman
             Log(methodName, logMessage);
         }
 
-        
-        
-
-        #endregion
-
-        #region Static Fields
 
         private static readonly FixingHolder fixingHolder = new FixingHolder();
-
-        #endregion
-
-        #region Fields
 
         private readonly ModelInfo _info;
         private readonly ShamanOptions _shamanOptions;
 
-        #endregion
-
-        #region Nested
-
         private class FixingHolder
         {
-            #region Instance Methods
-
             public bool TryFix(Type contextType, Action action)
             {
-                lock (_typesUnderProcessing)
+                lock(_typesUnderProcessing)
                 {
                     if (_typesUnderProcessing.Contains(contextType))
                         return false;
                     _typesUnderProcessing.Add(contextType);
                 }
+
                 try
                 {
                     action();
@@ -244,23 +220,14 @@ namespace EfCore.Shaman
                 }
                 finally
                 {
-                    lock (_typesUnderProcessing)
+                    lock(_typesUnderProcessing)
                     {
                         _typesUnderProcessing.Remove(contextType);
                     }
                 }
             }
 
-            #endregion
-
-            #region Fields
-
             private readonly HashSet<Type> _typesUnderProcessing = new HashSet<Type>();
-
-            #endregion
         }
-
-        #endregion
     }
- 
 }

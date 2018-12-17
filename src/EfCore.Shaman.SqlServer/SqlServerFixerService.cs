@@ -14,8 +14,6 @@ namespace EfCore.Shaman.SqlServer
 {
     public sealed class SqlServerFixerService : IFixMigrationUpService
     {
-        #region Static Methods
-
         public static string CreateChangeCollationSql(string escapedTableName, string escapedColumnName,
             string columnCollation, bool? isUnicode, int? maxLength, bool isNullable)
         {
@@ -24,17 +22,25 @@ namespace EfCore.Shaman.SqlServer
             qu.Append(escapedTableName);
             qu.Append(" ALTER COLUMN ");
             qu.Append(escapedColumnName);
-            qu.Append(isUnicode == true ? " nvarchar" : " varchar");
-            qu.Append($"({MsSqlUtils.GetStringLength(maxLength)})");
-            qu.Append(" COLLATE " + columnCollation);
+            var def = MkStringType(isUnicode == true, maxLength, columnCollation);
+            qu.Append(" " + def);
             qu.Append(isNullable ? " NULL" : " NOT NULL");
+            return qu.ToString();
+        }
+
+        public static string MkStringType(bool isUnicode, int? maxLength, string columnCollation)
+        {
+            var qu = new StringBuilder();
+            qu.Append(isUnicode ? "nvarchar" : " varchar");
+            qu.Append($"({MsSqlUtils.GetStringLength(maxLength)})");
+            if (!string.IsNullOrEmpty(columnCollation))
+                qu.Append(" COLLATE " + columnCollation);
             return qu.ToString();
         }
 
         private static string GetCollation(IDictionary<string, object> iAnnotations)
         {
-            object value;
-            iAnnotations.TryGetValue(SqlServerReflectionService.Ck, out value);
+            iAnnotations.TryGetValue(SqlServerReflectionService.Ck, out var value);
             return value as string;
         }
 
@@ -57,16 +63,12 @@ namespace EfCore.Shaman.SqlServer
             }
         }
 
-        #endregion
-
-        #region Instance Methods
-
         public void FixMigrationUp(MigrationBuilder migrationBuilder, ModelInfo info)
         {
             if (!MsSqlUtils.IsSupportedProvider(migrationBuilder.ActiveProvider))
                 return;
             var logger = info.UsedShamanOptions.Logger ?? EmptyShamanLogger.Instance;
-            var log = logger.CreateMethod(typeof(SqlServerFixerService), nameof(FixMigrationUp));
+            var log    = logger.CreateMethod(typeof(SqlServerFixerService), nameof(FixMigrationUp));
             log("Begin");
             var createTableOperations = new Dictionary<string, CreateTableOperation>(StringComparer.OrdinalIgnoreCase);
             foreach (var i in migrationBuilder.Operations.OfType<CreateTableOperation>())
@@ -74,8 +76,7 @@ namespace EfCore.Shaman.SqlServer
             foreach (var dbSetInfo in info.DbSets)
             {
                 // looking for create operation
-                CreateTableOperation createTableOperation;
-                if (!createTableOperations.TryGetValue(dbSetInfo.TableName, out createTableOperation))
+                if (!createTableOperations.TryGetValue(dbSetInfo.TableName, out var createTableOperation))
                     continue;
                 log($"Fixing create table {dbSetInfo.TableName}");
                 // var tableCollation = GetCollation(dbSetInfo.Annotations);
@@ -84,16 +85,16 @@ namespace EfCore.Shaman.SqlServer
                 foreach (var columnInfo in dbSetInfo.Properites.Where(q => !q.IsNotMapped && !q.IsNavigationProperty))
                 {
                     if (!columns.TryGetValue(columnInfo.ColumnName, out var addColumnOperation)) continue;
-                    var usedIsUnicode = addColumnOperation.ColumnType?.ToLower().StartsWith("nvarchar") ?? false;
+                    var usedIsUnicode   = addColumnOperation.ColumnType?.ToLower().StartsWith("nvarchar") ?? false;
                     var expectedUnicode = addColumnOperation.IsUnicode ?? usedIsUnicode;
 
                     var columnCollation = GetCollation(columnInfo.Annotations);
                     if (string.IsNullOrEmpty(columnCollation) && usedIsUnicode == expectedUnicode) continue;
-                    var escapedTableName = MsSqlUtils.Escape(dbSetInfo.Schema, dbSetInfo.TableName);
+                    var escapedTableName  = MsSqlUtils.Escape(dbSetInfo.Schema, dbSetInfo.TableName);
                     var escapedColumnName = MsSqlUtils.Escape(columnInfo.ColumnName);
                     if (!string.IsNullOrEmpty(columnCollation))
                         log($"Change collation {escapedTableName}.{escapedColumnName} => {columnCollation}");
-                    if (usedIsUnicode!=expectedUnicode)
+                    if (usedIsUnicode != expectedUnicode)
                         log($"Change unicode {escapedTableName}.{escapedColumnName} => {expectedUnicode}");
                     var sql = CreateChangeCollationSql(escapedTableName, escapedColumnName, columnCollation,
                         expectedUnicode, addColumnOperation.MaxLength, addColumnOperation.IsNullable);
@@ -101,9 +102,8 @@ namespace EfCore.Shaman.SqlServer
                     MoveSqlBeforeIndexCreation(migrationBuilder, createTableOperation, columnInfo.ColumnName);
                 }
             }
+
             log("End");
         }
-
-        #endregion
     }
 }

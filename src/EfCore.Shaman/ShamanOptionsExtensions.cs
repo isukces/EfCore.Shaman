@@ -78,7 +78,7 @@ namespace EfCore.Shaman
         public static ShamanOptions WithDefaultServices(this ShamanOptions options)
         {
             return options
-                .With<ColumnAttributeUpdater>()
+                .With<ColumnInfoColumnAttributeUpdater>()
                 .With<NotMappedAttributeUpdater>()
                 .With<NavigationPropertyAttributeUpdater>()
                 .With<TimestampAttributeUpdater>()

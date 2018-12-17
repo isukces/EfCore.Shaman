@@ -8,19 +8,20 @@ namespace EfCore.Shaman
 {
     public class DecimalPlacesColumnInfoUpdateService : IColumnInfoUpdateService
     {
-        public void ModelInfoUpdateColumnInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo, IShamanLogger logger)
+        public void UpdateColumnInfoInModelInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo, IShamanLogger logger)
         {
         }
 
-        public void ModelFixerUpdateColumnInfo(ColumnInfo columnInfo, EntityTypeBuilder entityBuilder, Type entityType,
+        public void UpdateColumnInfoForMigrationFixer(ISimpleModelInfo modelInfo, IDbSetInfo dbSetInfo, ColumnInfo columnInfo,
+            EntityTypeBuilder entityBuilder,
             IShamanLogger logger)
         {
-            const string name = nameof(DecimalPlacesColumnInfoUpdateService) + "." + nameof(ModelFixerUpdateColumnInfo);
+            const string name = nameof(DecimalPlacesColumnInfoUpdateService) + "." + nameof(UpdateColumnInfoForMigrationFixer);
             if (columnInfo.MaxLength == null || columnInfo.DecimalPlaces == null)
                 return;
             var type   = $"decimal({columnInfo.MaxLength},{columnInfo.DecimalPlaces})";
             var action = $"HasColumnType(\"{type}\")";
-            logger.LogFix(name, entityType, action);
+            logger.LogFix(name, dbSetInfo.EntityType, action);
             entityBuilder.Property(columnInfo.PropertyName).HasColumnType(type);
         }
     }

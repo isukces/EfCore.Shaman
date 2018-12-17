@@ -1,24 +1,18 @@
-﻿#region using
-
-using System;
+﻿using System;
 using System.Reflection;
 using EfCore.Shaman.ModelScanner;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-#endregion
-
 namespace EfCore.Shaman.Services
 {
-    internal class NavigationPropertyAttributeUpdater : IColumnInfoUpdateService
+    public  class NavigationPropertyAttributeUpdater : IColumnInfoUpdateService
     {
-        #region Instance Methods
-
-        public void ModelInfoUpdateColumnInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo, IShamanLogger logger)
+        public void UpdateColumnInfoInModelInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo, IShamanLogger logger)
         {
             var attribute = propertyInfo.GetCustomAttribute<NavigationPropertyAttribute>();
             if (attribute == null) return;
             Action<string> log =
-                txt => logger.Log(typeof(NavigationPropertyAttributeUpdater), nameof(ModelFixerUpdateColumnInfo), txt);
+                txt => logger.Log(typeof(NavigationPropertyAttributeUpdater), nameof(UpdateColumnInfoForMigrationFixer), txt);
             var targetType = attribute.ForceNavigation ? "navigation" : "non-navigation";
             if (columnInfo.IsNavigationProperty == attribute.ForceNavigation)
                 log(
@@ -30,11 +24,10 @@ namespace EfCore.Shaman.Services
             }
         }
 
-        public void ModelFixerUpdateColumnInfo(ColumnInfo columnInfo, EntityTypeBuilder entityBuilder, Type entityType,
+        public void UpdateColumnInfoForMigrationFixer(ISimpleModelInfo modelInfo, IDbSetInfo dbSetInfo, ColumnInfo columnInfo,
+            EntityTypeBuilder entityBuilder,
             IShamanLogger logger)
         {            
         }
-
-        #endregion
     }
 }

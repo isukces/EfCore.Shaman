@@ -2,7 +2,7 @@
 
 namespace EfCore.Shaman
 {
-    [AttributeUsage(AttributeTargets.Property)]
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Class )]
     public class UnicodeTextAttribute : Attribute
     {
         public UnicodeTextAttribute(bool isUnicode = true)

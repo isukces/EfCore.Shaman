@@ -10,21 +10,22 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace EfCore.Shaman.Services
 {
-    internal class DatabaseGeneratedAttributeUpdater : IColumnInfoUpdateService
+    public  class DatabaseGeneratedAttributeUpdater : IColumnInfoUpdateService
     {
-        public void ModelInfoUpdateColumnInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo, IShamanLogger logger)
+        public void UpdateColumnInfoInModelInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo, IShamanLogger logger)
         {
             var at = propertyInfo.GetCustomAttribute<DatabaseGeneratedAttribute>();
             if (at == null)
                 return;
             logger.Log(
                 typeof(DatabaseGeneratedAttributeUpdater),
-                nameof(ModelFixerUpdateColumnInfo),
+                nameof(UpdateColumnInfoForMigrationFixer),
                 $"Set IsDatabaseGenerated=true and DatabaseGeneratedOption.Identity for column {columnInfo.ColumnName}");
             columnInfo.IsDatabaseGenerated = true;
             columnInfo.IsIdentity = at.DatabaseGeneratedOption == DatabaseGeneratedOption.Identity;
         }
-        public void ModelFixerUpdateColumnInfo(ColumnInfo columnInfo, EntityTypeBuilder entityBuilder, Type entityType,
+        public void UpdateColumnInfoForMigrationFixer(ISimpleModelInfo modelInfo, IDbSetInfo dbSetInfo, ColumnInfo columnInfo,
+            EntityTypeBuilder entityBuilder,
             IShamanLogger logger)
         {
         }

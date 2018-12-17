@@ -13,16 +13,18 @@ namespace EfCore.Shaman
         /// <param name="columnInfo"></param>
         /// <param name="propertyInfo"></param>
         /// <param name="logger"></param>
-        void ModelInfoUpdateColumnInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo, IShamanLogger logger);
-        
+        void UpdateColumnInfoInModelInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo, IShamanLogger logger);
+
         /// <summary>
         /// This method is used when migration is being fixed
         /// </summary>
+        /// <param name="modelInfo"></param>
+        /// <param name="dbSetInfo"></param>
         /// <param name="columnInfo"></param>
         /// <param name="entityBuilder"></param>
-        /// <param name="entityType"></param>
         /// <param name="logger"></param>
-        void ModelFixerUpdateColumnInfo(ColumnInfo columnInfo, EntityTypeBuilder entityBuilder, Type entityType,
+        void UpdateColumnInfoForMigrationFixer(ISimpleModelInfo modelInfo, IDbSetInfo dbSetInfo, ColumnInfo columnInfo,
+            EntityTypeBuilder entityBuilder,
             IShamanLogger logger);
     }
 }
