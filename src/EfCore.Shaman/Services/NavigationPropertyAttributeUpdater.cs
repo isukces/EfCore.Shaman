@@ -5,15 +5,27 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace EfCore.Shaman.Services
 {
-    public  class NavigationPropertyAttributeUpdater : IColumnInfoUpdateService
+    /// <summary>
+    /// Updates IsNavigationProperty based on
+    /// <see cref="NavigationPropertyAttribute">NavigationPropertyAttribute</see>
+    /// </summary>
+    public class NavigationPropertyAttributeUpdater : IColumnInfoUpdateService
     {
+        public void UpdateColumnInfoForMigrationFixer(ISimpleModelInfo modelInfo, IDbSetInfo dbSetInfo,
+            ColumnInfo columnInfo,
+            EntityTypeBuilder entityBuilder,
+            IShamanLogger logger)
+        {
+        }
+
         public void UpdateColumnInfoInModelInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo,
             IDbSetInfo dbSetInfo, IShamanLogger logger)
         {
             var attribute = propertyInfo.GetCustomAttribute<NavigationPropertyAttribute>();
             if (attribute == null) return;
             Action<string> log =
-                txt => logger.Log(typeof(NavigationPropertyAttributeUpdater), nameof(UpdateColumnInfoForMigrationFixer), txt);
+                txt => logger.Log(typeof(NavigationPropertyAttributeUpdater), nameof(UpdateColumnInfoForMigrationFixer),
+                    txt);
             var targetType = attribute.ForceNavigation ? "navigation" : "non-navigation";
             if (columnInfo.IsNavigationProperty == attribute.ForceNavigation)
                 log(
@@ -23,12 +35,6 @@ namespace EfCore.Shaman.Services
                 columnInfo.IsNavigationProperty = attribute.ForceNavigation;
                 log($"column {columnInfo.ColumnName} is {targetType} property because of NavigationPropertyAttribute");
             }
-        }
-
-        public void UpdateColumnInfoForMigrationFixer(ISimpleModelInfo modelInfo, IDbSetInfo dbSetInfo, ColumnInfo columnInfo,
-            EntityTypeBuilder entityBuilder,
-            IShamanLogger logger)
-        {            
         }
     }
 }
