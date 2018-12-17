@@ -9,7 +9,8 @@ namespace EfCore.Shaman.Services
 {
     public  class TimestampAttributeUpdater : IColumnInfoUpdateService
     {
-        public void UpdateColumnInfoInModelInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo, IShamanLogger logger)
+        public void UpdateColumnInfoInModelInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo,
+            IDbSetInfo dbSetInfo, IShamanLogger logger)
         {
             if (propertyInfo.GetCustomAttribute<TimestampAttribute>() == null) return;
             columnInfo.IsTimestamp = true;

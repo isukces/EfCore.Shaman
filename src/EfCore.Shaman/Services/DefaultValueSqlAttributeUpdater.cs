@@ -12,7 +12,8 @@ namespace EfCore.Shaman.Services
     internal class DefaultValueSqlAttributeUpdater : IColumnInfoUpdateService
     {
 
-        public void UpdateColumnInfoInModelInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo, IShamanLogger logger)
+        public void UpdateColumnInfoInModelInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo,
+            IDbSetInfo dbSetInfo, IShamanLogger logger)
         {
             var attribute = propertyInfo.GetCustomAttribute<DefaultValueSqlAttribute>();
             if (!string.IsNullOrEmpty(attribute?.DefaultValueSql))

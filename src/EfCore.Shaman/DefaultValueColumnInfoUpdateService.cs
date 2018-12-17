@@ -8,7 +8,8 @@ namespace EfCore.Shaman
 {
     public class DefaultValueColumnInfoUpdateService:IColumnInfoUpdateService
     {
-        public void UpdateColumnInfoInModelInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo, IShamanLogger logger)
+        public void UpdateColumnInfoInModelInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo,
+            IDbSetInfo dbSetInfo, IShamanLogger logger)
         {
         }
       

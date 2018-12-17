@@ -12,7 +12,8 @@ namespace EfCore.Shaman.Services
 {
     public  class NotMappedAttributeUpdater : IColumnInfoUpdateService
     {
-        public void UpdateColumnInfoInModelInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo, IShamanLogger logger)
+        public void UpdateColumnInfoInModelInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo,
+            IDbSetInfo dbSetInfo, IShamanLogger logger)
         {
             if (propertyInfo.GetCustomAttribute<NotMappedAttribute>() != null)
                 columnInfo.IsNotMapped = true;

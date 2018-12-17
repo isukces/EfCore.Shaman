@@ -13,7 +13,8 @@ namespace EfCore.Shaman.Services
         {
         }
 
-        public void UpdateColumnInfoInModelInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo, IShamanLogger logger)
+        public void UpdateColumnInfoInModelInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo,
+            IDbSetInfo dbSetInfo, IShamanLogger logger)
         {
             var indexAttribute = propertyInfo.GetCustomAttribute<DecimalTypeAttribute>();
             if (indexAttribute == null) return;

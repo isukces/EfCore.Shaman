@@ -10,14 +10,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EfCore.Shaman.ModelScanner
 {
-    public class ModelInfo: ISimpleModelInfo
+    public class ModelInfo : ISimpleModelInfo, IUpdatableSimpleModelInfo
     {
         public ModelInfo(Type dbContextType, ShamanOptions options = null)
         {
-            _dbContextType = dbContextType;
-            options = options ?? ShamanOptions.CreateShamanOptions(dbContextType);
+            _dbContextType    = dbContextType;
+            options           = options ?? ShamanOptions.CreateShamanOptions(dbContextType);
             UsedShamanOptions = options;
-            _logger = options.Logger ?? EmptyShamanLogger.Instance;
+            _logger           = options.Logger ?? EmptyShamanLogger.Instance;
             Prepare();
         }
 
@@ -45,6 +45,7 @@ namespace EfCore.Shaman.ModelScanner
                 if (tableNames.TryGetValue(entityType, out name))
                     return name;
             }
+
             var a = entityType.GetTypeInfo().GetCustomAttribute<TableAttribute>();
             return string.IsNullOrEmpty(a?.Name) ? propertyName : a.Name;
         }
@@ -60,6 +61,7 @@ namespace EfCore.Shaman.ModelScanner
                 logger.Log(typeof(ModelInfo), nameof(GetTableNamesFromModel),
                     $"Table name for {entityType.ClrType.Name}: {entityType.TableName}");
             }
+
             return result;
         }
 
@@ -77,14 +79,16 @@ namespace EfCore.Shaman.ModelScanner
             IReadOnlyDictionary<Type, string> tableNames)
         {
             var dbSetInfoUpdateServices = UsedShamanOptions.Services?.OfType<IDbSetInfoUpdateService>().ToArray();
-            var dbSetInfo = new DbSetInfo(entityType, GetTableName(entityType, propertyName, tableNames), DefaultSchema);
+            var dbSetInfo = new DbSetInfo(entityType, GetTableName(entityType, propertyName, tableNames),
+                DefaultSchema);
             {
                 if (dbSetInfoUpdateServices != null)
                     foreach (var i in dbSetInfoUpdateServices)
                         i.UpdateDbSetInfo(dbSetInfo, entityType, _dbContextType, _logger);
             }
             var columnInfoUpdateServices = UsedShamanOptions.Services?.OfType<IColumnInfoUpdateService>().ToArray();
-            var useDirectSaverForType = entityType.GetTypeInfo().GetCustomAttribute<NoDirectSaverAttribute>() == null;
+            var useDirectSaverForType =
+                entityType.GetTypeInfo().GetCustomAttribute<NoDirectSaverAttribute>() == null;
             foreach (var propertyInfo in entityType.GetProperties(BindingFlags.Instance | BindingFlags.Public))
             {
                 if (propertyInfo.NotMappedByEntityFramework())
@@ -99,11 +103,13 @@ namespace EfCore.Shaman.ModelScanner
                     columnInfo.ValueReader = readerWriter;
                     columnInfo.ValueWriter = readerWriter;
                 }
+
                 if (columnInfoUpdateServices != null)
                     foreach (var service in columnInfoUpdateServices)
-                        service.UpdateColumnInfoInModelInfo(columnInfo, propertyInfo, _logger);
+                        service.UpdateColumnInfoInModelInfo(columnInfo, propertyInfo, dbSetInfo, _logger);
                 dbSetInfo.Properites.Add(columnInfo);
             }
+
             return dbSetInfo;
         }
 
@@ -122,16 +128,18 @@ namespace EfCore.Shaman.ModelScanner
                     ? "Use dbContext model"
                     : "Don't use dbContext model");
             var tableNames = GetTableNamesFromModel(model, _logger);
-            DefaultSchema = DefaultSchemaUpdater.GetDefaultSchema(_dbContextType, model, _logger);
-            DefaultIsUnicodeText= DefaultSchemaUpdater.GetDefaultIsUnicodeText(_dbContextType, _logger);
+            DefaultSchema        = DefaultSchemaUpdater.GetDefaultSchema(_dbContextType, model, _logger);
+            DefaultIsUnicodeText = DefaultSchemaUpdater.GetDefaultIsUnicodeText(_dbContextType, _logger);
+            foreach (var i in UsedShamanOptions.Services.OfType<IModelPrepareService>())
+                i.UpdateModel(this, _dbContextType, _logger);
             foreach (var property in _dbContextType.GetProperties())
             {
                 var propertyType = property.PropertyType;
                 if (!propertyType.GetTypeInfo().IsGenericType) continue;
                 if (propertyType.GetGenericTypeDefinition() != typeof(DbSet<>)) continue;
                 var entityType = propertyType.GetGenericArguments()[0];
-                var entity = CreateDbSetWrapper(entityType, property.Name, tableNames);
-                var key  = new FullTableName(entity.TableName, entity.Schema);
+                var entity     = CreateDbSetWrapper(entityType, property.Name, tableNames);
+                var key        = new FullTableName(entity.TableName, entity.Schema);
                 _dbSets[key] = entity;
             }
         }
@@ -151,6 +159,8 @@ namespace EfCore.Shaman.ModelScanner
         ///     IModel from DbContext has been used in modelinfo building
         /// </summary>
         public bool UsedDbContextModel { get; private set; }
+
+        public IDictionary<string, object> Annotations { get; } = new Dictionary<string, object>();
 
         private readonly Type _dbContextType;
 

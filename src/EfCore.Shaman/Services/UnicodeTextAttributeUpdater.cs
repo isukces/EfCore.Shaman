@@ -7,7 +7,8 @@ namespace EfCore.Shaman.Services
 {
     internal class UnicodeTextAttributeUpdater : IColumnInfoUpdateService
     {
-        public void UpdateColumnInfoInModelInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo, IShamanLogger logger)
+        public void UpdateColumnInfoInModelInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo,
+            IDbSetInfo dbSetInfo, IShamanLogger logger)
         {
             var indexAttribute = propertyInfo.GetCustomAttribute<UnicodeTextAttribute>();
             if (indexAttribute == null) return;

@@ -12,8 +12,6 @@ namespace EfCore.Shaman
 {
     public static class ShamanSqlServerExtension
     {
-        #region Static Methods
-
         public static ShamanOptions WithSqlServer(this ShamanOptions options)
         {
             return options
@@ -22,7 +20,5 @@ namespace EfCore.Shaman
                 .With<SqlServerFixerService>()
                 .With<SqlServerFullTextIndexService>();
         }
-
-        #endregion
     }
 }

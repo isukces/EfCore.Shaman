@@ -12,8 +12,10 @@ namespace EfCore.Shaman
         /// </summary>
         /// <param name="columnInfo"></param>
         /// <param name="propertyInfo"></param>
+        /// <param name="dbSetInfo"></param>
         /// <param name="logger"></param>
-        void UpdateColumnInfoInModelInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo, IShamanLogger logger);
+        void UpdateColumnInfoInModelInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo,
+            IDbSetInfo dbSetInfo, IShamanLogger logger);
 
         /// <summary>
         /// This method is used when migration is being fixed

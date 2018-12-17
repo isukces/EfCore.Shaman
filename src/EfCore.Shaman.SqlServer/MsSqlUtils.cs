@@ -1,16 +1,10 @@
-﻿#region using
-
-using System;
+﻿using System;
 using System.Globalization;
-
-#endregion
 
 namespace EfCore.Shaman.SqlServer
 {
-    internal class MsSqlUtils
+    internal static class MsSqlUtils
     {
-        #region Static Methods
-
         public static string Escape(string identifier)
         {
             return "[" + identifier + "]";
@@ -23,8 +17,13 @@ namespace EfCore.Shaman.SqlServer
             return Escape(schema) + "." + Escape(tableName);
         }
 
-        public static string GetStringLength(int? maxLength) 
+        public static string GetStringLength(int? maxLength)
             => maxLength?.ToString(CultureInfo.InvariantCulture) ?? "max";
+
+        public static string GetSqlTableName(this IDbSetInfo tn)
+        {
+            return Escape(tn.Schema, tn.TableName);
+        }
 
         public static bool IsSupportedProvider(string provider)
             => string.Equals(provider, "Microsoft.EntityFrameworkCore.SqlServer", StringComparison.OrdinalIgnoreCase);
@@ -32,12 +31,6 @@ namespace EfCore.Shaman.SqlServer
         public static string QuoteText(string name)
             => name == null ? "NULL" : $"\'{name.Replace("'", "''")}\'";
 
-        #endregion
-
-        #region Other
-
         public const string DefaultSchema = "dbo";
-
-        #endregion
     }
 }

@@ -12,7 +12,8 @@ namespace EfCore.Shaman.Services
 {
     public  class DatabaseGeneratedAttributeUpdater : IColumnInfoUpdateService
     {
-        public void UpdateColumnInfoInModelInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo, IShamanLogger logger)
+        public void UpdateColumnInfoInModelInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo,
+            IDbSetInfo dbSetInfo, IShamanLogger logger)
         {
             var at = propertyInfo.GetCustomAttribute<DatabaseGeneratedAttribute>();
             if (at == null)

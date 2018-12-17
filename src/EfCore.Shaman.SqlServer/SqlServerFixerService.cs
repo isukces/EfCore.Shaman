@@ -38,12 +38,6 @@ namespace EfCore.Shaman.SqlServer
             return qu.ToString();
         }
 
-        private static string GetCollation(IDictionary<string, object> iAnnotations)
-        {
-            iAnnotations.TryGetValue(SqlServerReflectionService.Ck, out var value);
-            return value as string;
-        }
-
         private static void MoveSqlBeforeIndexCreation(MigrationBuilder migrationBuilder,
             CreateTableOperation createTableOperation, string columnName)
         {
@@ -88,7 +82,7 @@ namespace EfCore.Shaman.SqlServer
                     var usedIsUnicode   = addColumnOperation.ColumnType?.ToLower().StartsWith("nvarchar") ?? false;
                     var expectedUnicode = addColumnOperation.IsUnicode ?? usedIsUnicode;
 
-                    var columnCollation = GetCollation(columnInfo.Annotations);
+                    var columnCollation = SqlServerReflectionService.GetCollation(columnInfo, dbSetInfo, info);
                     if (string.IsNullOrEmpty(columnCollation) && usedIsUnicode == expectedUnicode) continue;
                     var escapedTableName  = MsSqlUtils.Escape(dbSetInfo.Schema, dbSetInfo.TableName);
                     var escapedColumnName = MsSqlUtils.Escape(columnInfo.ColumnName);
