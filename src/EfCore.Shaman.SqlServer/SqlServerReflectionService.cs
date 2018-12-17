@@ -47,7 +47,7 @@ namespace EfCore.Shaman.SqlServer
         {
             const string source = nameof(SqlServerReflectionService) + "." + nameof(UpdateColumnInfoOnModelCreating);
             if (!UseDataType) return;
-            if (columnInfo.ClrProperty != typeof(string))
+            if (columnInfo.ClrProperty?.PropertyType != typeof(string))
                 return;
             var modelInfo = dbSetInfo.Model;
             var collation = GetCollation(columnInfo, dbSetInfo, modelInfo);
