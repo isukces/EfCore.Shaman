@@ -29,10 +29,13 @@ namespace EfCore.Shaman.Services
         {
         }
 
-        public void UpdateColumnInfoInModelInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo, IDbSetInfo dbSetInfo,
+        public void UpdateColumnInfoInModelInfo(ColumnInfo columnInfo, IDbSetInfo dbSetInfo,
             IShamanLogger logger)
         {
             if (columnInfo.IsNotMapped || columnInfo.IsNavigationProperty)
+                return;
+            var propertyInfo = columnInfo.ClrProperty;
+            if (propertyInfo == null)
                 return;
             var attribute = propertyInfo.GetCustomAttribute<NavigationPropertyAttribute>();
             if (attribute != null)
@@ -52,7 +55,7 @@ namespace EfCore.Shaman.Services
         {
             if (!type.IsGenericType) return false;
             var gtt = type.GetGenericTypeDefinition();
-            if (!DoNotMapCollections) return false;
+            if (DoNotMapCollections) return false;
             if (!CheckGenerticTypeIsCollection(gtt)) return false;
             var arg = type.GetGenericArguments()[0];
             return IsEntityType(arg);

@@ -14,10 +14,10 @@ namespace EfCore.Shaman.Services
         {
         }
 
-        public void UpdateColumnInfoInModelInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo,
+        public void UpdateColumnInfoInModelInfo(ColumnInfo columnInfo,
             IDbSetInfo dbSetInfo, IShamanLogger logger)
         {
-            var attribute = propertyInfo.GetCustomAttribute<RequiredAttribute>();
+            var attribute = columnInfo.ClrProperty?.GetCustomAttribute<RequiredAttribute>();
             if (attribute == null) return;
 
             var logPrefix = $"Set {dbSetInfo.TableName}.{columnInfo.ColumnName}";

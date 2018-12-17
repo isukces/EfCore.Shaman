@@ -51,6 +51,8 @@ namespace EfCore.Shaman.SqlServer
         {
             const string source = nameof(SqlServerReflectionService) + "." + nameof(UpdateColumnInfoForMigrationFixer);
             if (!UseDataType) return;
+            if (columnInfo.ClrProperty != typeof(string))
+                return;
             var collation = GetCollation(columnInfo, dbSetInfo, modelInfo);
                         
             if (string.IsNullOrEmpty(collation))
@@ -62,9 +64,12 @@ namespace EfCore.Shaman.SqlServer
             entityBuilder.Property(columnInfo.PropertyName).HasColumnType(sqlDataType);
         }
 
-        public void UpdateColumnInfoInModelInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo,
+        public void UpdateColumnInfoInModelInfo(ColumnInfo columnInfo,
             IDbSetInfo dbSetInfo, IShamanLogger logger)
         {
+            var propertyInfo = columnInfo.ClrProperty;            
+            if (propertyInfo?.PropertyType != typeof(string))
+                return;
             var          collation = GetCollation(propertyInfo);
             var target = $"column {dbSetInfo.GetSqlTableName()}.{columnInfo.ColumnName}";
             UpdateAnnotation(columnInfo, collation, logger, target);

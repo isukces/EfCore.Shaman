@@ -11,10 +11,9 @@ namespace EfCore.Shaman
         /// This method is used when ModelInfo is created
         /// </summary>
         /// <param name="columnInfo"></param>
-        /// <param name="propertyInfo"></param>
         /// <param name="dbSetInfo"></param>
         /// <param name="logger"></param>
-        void UpdateColumnInfoInModelInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo,
+        void UpdateColumnInfoInModelInfo(ColumnInfo columnInfo,
             IDbSetInfo dbSetInfo, IShamanLogger logger);
 
         /// <summary>

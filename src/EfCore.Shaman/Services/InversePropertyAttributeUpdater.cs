@@ -13,10 +13,10 @@ namespace EfCore.Shaman.Services
     [Obsolete("Use " + nameof(NavigationPropertyAttribute) + " to explicity set or unset navigation property flag")]
     internal class InversePropertyAttributeUpdater : IColumnInfoUpdateService
     {
-        public void UpdateColumnInfoInModelInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo,
+        public void UpdateColumnInfoInModelInfo(ColumnInfo columnInfo,
             IDbSetInfo dbSetInfo, IShamanLogger logger)
         {
-            if (propertyInfo.GetCustomAttribute<InversePropertyAttribute>() != null)
+            if (columnInfo.ClrProperty?.GetCustomAttribute<InversePropertyAttribute>() != null)
                 columnInfo.IsNavigationProperty = true;
             // todo log
         }

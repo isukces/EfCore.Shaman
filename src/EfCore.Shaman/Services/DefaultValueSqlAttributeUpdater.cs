@@ -12,10 +12,10 @@ namespace EfCore.Shaman.Services
     internal class DefaultValueSqlAttributeUpdater : IColumnInfoUpdateService
     {
 
-        public void UpdateColumnInfoInModelInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo,
+        public void UpdateColumnInfoInModelInfo(ColumnInfo columnInfo,
             IDbSetInfo dbSetInfo, IShamanLogger logger)
         {
-            var attribute = propertyInfo.GetCustomAttribute<DefaultValueSqlAttribute>();
+            var attribute = columnInfo.ClrProperty?.GetCustomAttribute<DefaultValueSqlAttribute>();
             if (!string.IsNullOrEmpty(attribute?.DefaultValueSql))
                 columnInfo.DefaultValue = ValueInfo.FromSqlValue(attribute.DefaultValueSql);
             // todo: log

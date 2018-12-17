@@ -102,7 +102,7 @@ namespace EfCore.Shaman.ModelScanner
                 entityType.GetTypeInfo().GetCustomAttribute<NoDirectSaverAttribute>() == null;
             foreach (var propertyInfo in entityType.GetProperties(BindingFlags.Instance | BindingFlags.Public))
             {
-                var columnInfo = new ColumnInfo(dbSetInfo.Properites.Count, propertyInfo.Name)
+                var columnInfo = new ColumnInfo(dbSetInfo.Properites.Count, propertyInfo.Name, propertyInfo)
                 {
                     NotNull = NotNullFromPropertyType(propertyInfo.PropertyType)
                 };
@@ -115,7 +115,7 @@ namespace EfCore.Shaman.ModelScanner
 
                 if (columnInfoUpdateServices != null)
                     foreach (var service in columnInfoUpdateServices)
-                        service.UpdateColumnInfoInModelInfo(columnInfo, propertyInfo, dbSetInfo, _logger);
+                        service.UpdateColumnInfoInModelInfo(columnInfo, dbSetInfo, _logger);
                 dbSetInfo.Properites.Add(columnInfo);
             }
 

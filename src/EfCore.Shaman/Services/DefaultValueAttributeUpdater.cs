@@ -18,10 +18,10 @@ namespace EfCore.Shaman.Services
         {
         }
 
-        public void UpdateColumnInfoInModelInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo,
+        public void UpdateColumnInfoInModelInfo(ColumnInfo columnInfo,
             IDbSetInfo dbSetInfo, IShamanLogger logger)
         {
-            var attribute = propertyInfo.GetCustomAttribute<DefaultValueAttribute>();
+            var attribute = columnInfo.ClrProperty?.GetCustomAttribute<DefaultValueAttribute>();
             if (attribute != null)
                 columnInfo.DefaultValue = ValueInfo.FromClrValue(attribute.Value);
             // todo: log

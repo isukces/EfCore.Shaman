@@ -25,10 +25,10 @@ namespace EfCore.Shaman.Services
             return indexInfo;
         }
 
-        public void UpdateColumnInfoInModelInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo,
+        public void UpdateColumnInfoInModelInfo(ColumnInfo columnInfo,
             IDbSetInfo dbSetInfo, IShamanLogger logger)
         {
-            var indexAttributes = propertyInfo.GetCustomAttributes<AbstractIndexAttribute>()?.ToArray();
+            var indexAttributes = columnInfo.ClrProperty?.GetCustomAttributes<AbstractIndexAttribute>()?.ToArray();
             if (indexAttributes == null || !indexAttributes.Any()) return;
             foreach (var indexAttribute in indexAttributes)
             {

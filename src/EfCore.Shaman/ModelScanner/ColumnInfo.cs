@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
+using JetBrains.Annotations;
 
 namespace EfCore.Shaman.ModelScanner
 {
     public class ColumnInfo : IShamanAnnotatable
     {
-        public ColumnInfo(int reflectionIndex, string propertyName)
+        public ColumnInfo(int reflectionIndex, string propertyName, PropertyInfo clrProperty)
         {
             ReflectionIndex = reflectionIndex;
             PropertyName    = propertyName;
+            ClrProperty     = clrProperty;
             ColumnName      = propertyName;
             ForceFieldOrder = int.MaxValue;
         }
@@ -25,6 +28,9 @@ namespace EfCore.Shaman.ModelScanner
         ///     Name of property
         /// </summary>
         public string PropertyName { get; set; }
+
+        [CanBeNull]
+        public PropertyInfo ClrProperty { get; }
 
 
         /// <summary>

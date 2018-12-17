@@ -8,22 +8,22 @@ namespace EfCore.Shaman.Services
 {
     public class ColumnInfoColumnAttributeUpdater : IColumnInfoUpdateService
     {
-        public void UpdateColumnInfoInModelInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo,
+        public void UpdateColumnInfoInModelInfo(ColumnInfo columnInfo,
             IDbSetInfo dbSetInfo, IShamanLogger logger)
         {
-            var attribute = propertyInfo.GetCustomAttribute<ColumnAttribute>();
+            var attribute = columnInfo.ClrProperty?.GetCustomAttribute<ColumnAttribute>();
             if (attribute == null) return;
+            const string logSource = nameof(ColumnInfoColumnAttributeUpdater) + "." + nameof(UpdateColumnInfoInModelInfo);
             if (!string.IsNullOrEmpty(attribute.Name))
             {
                 columnInfo.ColumnName = attribute.Name;
-                logger.Log(typeof(ColumnInfoColumnAttributeUpdater), "UpdateColumnInfo",
-                    $"Set ColumnName='{columnInfo.ColumnName}'");
+                logger.Log(logSource, $"Set {dbSetInfo.TableName}.{columnInfo.ColumnName}.ColumnName='{columnInfo.ColumnName}'");
             }
+
             if (attribute.Order >= 0)
             {
                 columnInfo.ForceFieldOrder = attribute.Order;
-                logger.Log(typeof(ColumnInfoColumnAttributeUpdater), "UpdateColumnInfo",
-                    $"Set ForceFieldOrder={columnInfo.ForceFieldOrder}");
+                logger.Log(logSource, $"Set {dbSetInfo.TableName}.{columnInfo.ColumnName}.ForceFieldOrder={columnInfo.ForceFieldOrder}");
             }
         }
  

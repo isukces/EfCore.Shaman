@@ -8,10 +8,10 @@ namespace EfCore.Shaman.Services
 {
     public class MaxLengthAttributeUpdater : IColumnInfoUpdateService
     {
-        public void UpdateColumnInfoInModelInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo,
+        public void UpdateColumnInfoInModelInfo(ColumnInfo columnInfo,
             IDbSetInfo dbSetInfo, IShamanLogger logger)
         {
-            var attribute = propertyInfo.GetCustomAttribute<MaxLengthAttribute>();
+            var attribute = columnInfo.ClrProperty?.GetCustomAttribute<MaxLengthAttribute>();
             if (attribute == null) return;
             columnInfo.MaxLength = attribute.Length;
             // todo log MaxLengthAttributeUpdater.UpdateColumnInfo

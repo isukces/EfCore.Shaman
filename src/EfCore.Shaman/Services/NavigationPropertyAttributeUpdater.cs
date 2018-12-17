@@ -18,10 +18,10 @@ namespace EfCore.Shaman.Services
         {
         }
 
-        public void UpdateColumnInfoInModelInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo,
+        public void UpdateColumnInfoInModelInfo(ColumnInfo columnInfo,
             IDbSetInfo dbSetInfo, IShamanLogger logger)
         {
-            var attribute = propertyInfo.GetCustomAttribute<NavigationPropertyAttribute>();
+            var attribute = columnInfo.ClrProperty?.GetCustomAttribute<NavigationPropertyAttribute>();
             if (attribute == null) return;
             Action<string> log =
                 txt => logger.Log(typeof(NavigationPropertyAttributeUpdater), nameof(UpdateColumnInfoForMigrationFixer),

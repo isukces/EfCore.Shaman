@@ -9,10 +9,10 @@ namespace EfCore.Shaman.Services
     [Obsolete("Use " + nameof(NavigationPropertyAttribute) + " to explicity set or unset navigation property flag")]
     internal class ForeignKeyAttributeUpdater : IColumnInfoUpdateService
     {
-        public void UpdateColumnInfoInModelInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo,
+        public void UpdateColumnInfoInModelInfo(ColumnInfo columnInfo,
             IDbSetInfo dbSetInfo, IShamanLogger logger)
         {
-            if (propertyInfo.GetCustomAttribute<ForeignKeyAttribute>() != null)
+            if (columnInfo.ClrProperty?.GetCustomAttribute<ForeignKeyAttribute>() != null)
                 columnInfo.IsNavigationProperty = true;
             // todo log
             // todo does ForeignKeyAttribute always means IsNavigationProperty = true ?

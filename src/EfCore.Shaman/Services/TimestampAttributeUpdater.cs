@@ -9,10 +9,10 @@ namespace EfCore.Shaman.Services
 {
     public  class TimestampAttributeUpdater : IColumnInfoUpdateService
     {
-        public void UpdateColumnInfoInModelInfo(ColumnInfo columnInfo, PropertyInfo propertyInfo,
+        public void UpdateColumnInfoInModelInfo(ColumnInfo columnInfo,
             IDbSetInfo dbSetInfo, IShamanLogger logger)
         {
-            if (propertyInfo.GetCustomAttribute<TimestampAttribute>() == null) return;
+            if (columnInfo.ClrProperty?.GetCustomAttribute<TimestampAttribute>() == null) return;
             var logPrefix = $"Set {dbSetInfo.TableName}.{columnInfo.ColumnName}";
             const string logSource =
                 nameof(TimestampAttributeUpdater) + "." + nameof(UpdateColumnInfoForMigrationFixer);
