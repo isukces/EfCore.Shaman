@@ -1,15 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 
 namespace EfCore.Shaman.ModelScanner
 {
     public class DbSetInfo : IDbSetInfo
     {
-        public DbSetInfo(Type entityType, string tableName, string schema = "")
+        public DbSetInfo(Type entityType, string tableName, [NotNull] ISimpleModelInfo model, string schema = "")
         {
             EntityType = entityType;
             TableName  = tableName;
+            Model      = model ?? throw new ArgumentNullException(nameof(model));
             Schema     = schema;
         }
 
@@ -18,6 +20,7 @@ namespace EfCore.Shaman.ModelScanner
         public string           TableName  { get; set; }
         public string           Schema     { get; set; }
         public Type             EntityType { get; private set; }
+        public ISimpleModelInfo Model      { get; }
         public List<ColumnInfo> Properites { get; } = new List<ColumnInfo>();
 
         public IDictionary<string, object> Annotations { get; } =

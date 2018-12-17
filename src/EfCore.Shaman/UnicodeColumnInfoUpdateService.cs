@@ -12,15 +12,15 @@ namespace EfCore.Shaman
         {
         }
 
-        public void UpdateColumnInfoForMigrationFixer(ISimpleModelInfo modelInfo, IDbSetInfo dbSetInfo, ColumnInfo columnInfo,
+        public void UpdateColumnInfoOnModelCreating(IDbSetInfo dbSetInfo, ColumnInfo columnInfo,
             EntityTypeBuilder entityBuilder,
             IShamanLogger logger)
         {
-            const string name = nameof(UnicodeColumnInfoUpdateService) + "." + nameof(UpdateColumnInfoForMigrationFixer);
+            const string name = nameof(UnicodeColumnInfoUpdateService) + "." + nameof(UpdateColumnInfoOnModelCreating);
             if (columnInfo.IsUnicode == null)
                 return;
             var action = $"IsUnicode({columnInfo.IsUnicode})";
-            logger.LogFix(name, dbSetInfo.EntityType, action);
+            logger.LogCalling(name, dbSetInfo.EntityType, action);
             entityBuilder.Property(columnInfo.PropertyName).IsUnicode(columnInfo.IsUnicode.Value);
         }
     }

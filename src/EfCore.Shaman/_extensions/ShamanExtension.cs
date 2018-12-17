@@ -30,7 +30,7 @@ namespace EfCore.Shaman
             ShamanOptions shamanOptions = null)
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
-            MigrationFixer.FixOnModelCreating(modelBuilder, context.GetType(), shamanOptions);
+            ModelCreatingFixer.FixOnModelCreating(modelBuilder, context.GetType(), shamanOptions);
         }
 
         /// <summary>
@@ -43,7 +43,7 @@ namespace EfCore.Shaman
             where T : DbContext
         {
             if (modelBuilder == null) throw new ArgumentNullException(nameof(modelBuilder));
-            MigrationFixer.FixOnModelCreating(modelBuilder, typeof(T), shamanOptions);
+            ModelCreatingFixer.FixOnModelCreating(modelBuilder, typeof(T), shamanOptions);
         }
        
     }

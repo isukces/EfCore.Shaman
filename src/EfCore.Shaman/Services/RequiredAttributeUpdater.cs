@@ -7,7 +7,7 @@ namespace EfCore.Shaman.Services
 {
     public class RequiredAttributeUpdater : IColumnInfoUpdateService
     {
-        public void UpdateColumnInfoForMigrationFixer(ISimpleModelInfo modelInfo, IDbSetInfo dbSetInfo,
+        public void UpdateColumnInfoOnModelCreating(IDbSetInfo dbSetInfo,
             ColumnInfo columnInfo,
             EntityTypeBuilder entityBuilder,
             IShamanLogger logger)

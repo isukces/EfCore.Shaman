@@ -12,12 +12,12 @@ namespace EfCore.Shaman.Services
         {
             var indexAttribute = columnInfo.ClrProperty?.GetCustomAttribute<UnicodeTextAttribute>();
             if (indexAttribute == null) return;
-            logger.Log(typeof(UnicodeTextAttribute), nameof(UpdateColumnInfoForMigrationFixer),
+            logger.Log(typeof(UnicodeTextAttribute), nameof(UpdateColumnInfoOnModelCreating),
                 $"Set IsUnicode={indexAttribute.IsUnicode}");
             columnInfo.IsUnicode = indexAttribute.IsUnicode;
         }
 
-        public void UpdateColumnInfoForMigrationFixer(ISimpleModelInfo modelInfo, IDbSetInfo dbSetInfo, ColumnInfo columnInfo,
+        public void UpdateColumnInfoOnModelCreating(IDbSetInfo dbSetInfo, ColumnInfo columnInfo,
             EntityTypeBuilder entityBuilder,
             IShamanLogger logger)
         {

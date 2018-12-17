@@ -11,7 +11,7 @@ namespace EfCore.Shaman.Services
     /// </summary>
     public class NavigationPropertyAttributeUpdater : IColumnInfoUpdateService
     {
-        public void UpdateColumnInfoForMigrationFixer(ISimpleModelInfo modelInfo, IDbSetInfo dbSetInfo,
+        public void UpdateColumnInfoOnModelCreating(IDbSetInfo dbSetInfo,
             ColumnInfo columnInfo,
             EntityTypeBuilder entityBuilder,
             IShamanLogger logger)
@@ -24,7 +24,7 @@ namespace EfCore.Shaman.Services
             var attribute = columnInfo.ClrProperty?.GetCustomAttribute<NavigationPropertyAttribute>();
             if (attribute == null) return;
             Action<string> log =
-                txt => logger.Log(typeof(NavigationPropertyAttributeUpdater), nameof(UpdateColumnInfoForMigrationFixer),
+                txt => logger.Log(typeof(NavigationPropertyAttributeUpdater), nameof(UpdateColumnInfoOnModelCreating),
                     txt);
             var targetType = attribute.ForceNavigation ? "navigation" : "non-navigation";
             if (columnInfo.IsNavigationProperty == attribute.ForceNavigation)

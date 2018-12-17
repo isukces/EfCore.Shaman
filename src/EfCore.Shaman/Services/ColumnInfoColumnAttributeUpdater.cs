@@ -27,7 +27,7 @@ namespace EfCore.Shaman.Services
             }
         }
  
-        public void UpdateColumnInfoForMigrationFixer(ISimpleModelInfo modelInfo, IDbSetInfo dbSetInfo, ColumnInfo columnInfo,
+        public void UpdateColumnInfoOnModelCreating(IDbSetInfo dbSetInfo, ColumnInfo columnInfo,
             EntityTypeBuilder entityBuilder,
             IShamanLogger logger)
         {

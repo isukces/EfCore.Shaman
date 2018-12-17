@@ -12,7 +12,7 @@ namespace EfCore.Shaman.Services
 {
     internal class DefaultValueAttributeUpdater : IColumnInfoUpdateService
     {
-        public void UpdateColumnInfoForMigrationFixer(ISimpleModelInfo modelInfo, IDbSetInfo dbSetInfo, ColumnInfo columnInfo,
+        public void UpdateColumnInfoOnModelCreating(IDbSetInfo dbSetInfo, ColumnInfo columnInfo,
             EntityTypeBuilder entityBuilder,
             IShamanLogger logger)
         {

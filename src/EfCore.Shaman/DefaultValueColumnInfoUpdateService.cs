@@ -13,11 +13,11 @@ namespace EfCore.Shaman
         {
         }
       
-        public void UpdateColumnInfoForMigrationFixer(ISimpleModelInfo modelInfo, IDbSetInfo dbSetInfo, ColumnInfo columnInfo,
+        public void UpdateColumnInfoOnModelCreating(IDbSetInfo dbSetInfo, ColumnInfo columnInfo,
             EntityTypeBuilder entityBuilder,
             IShamanLogger logger)
         {
-            const string source = nameof(DefaultValueColumnInfoUpdateService) + "." + nameof(UpdateColumnInfoForMigrationFixer);
+            const string source = nameof(DefaultValueColumnInfoUpdateService) + "." + nameof(UpdateColumnInfoOnModelCreating);
             var dv = columnInfo.DefaultValue;
             if (columnInfo.DefaultValue == null) return;
             string action;
@@ -25,12 +25,12 @@ namespace EfCore.Shaman
             {
                 case ValueInfoKind.Clr:
                     action = $"{columnInfo.PropertyName}.HasDefaultValue(\"{columnInfo.DefaultValue.ClrValue}\")";
-                    logger.LogFix(source, dbSetInfo.EntityType, action);
+                    logger.LogCalling(source, dbSetInfo.EntityType, action);
                     entityBuilder.Property(columnInfo.PropertyName).HasDefaultValue(columnInfo.DefaultValue.ClrValue);
                     break;
                 case ValueInfoKind.Sql:
                     action = $"{columnInfo.PropertyName}.HasDefaultValueSql(\"{columnInfo.DefaultValue.SqlValue}\")";
-                    logger.LogFix(source, dbSetInfo.EntityType, action);
+                    logger.LogCalling(source, dbSetInfo.EntityType, action);
                     entityBuilder.Property(columnInfo.PropertyName).HasDefaultValueSql(columnInfo.DefaultValue.SqlValue);
                     break;
                 default:

@@ -15,7 +15,7 @@ namespace EfCore.Shaman.Services
             if (columnInfo.ClrProperty?.GetCustomAttribute<TimestampAttribute>() == null) return;
             var logPrefix = $"Set {dbSetInfo.TableName}.{columnInfo.ColumnName}";
             const string logSource =
-                nameof(TimestampAttributeUpdater) + "." + nameof(UpdateColumnInfoForMigrationFixer);
+                nameof(TimestampAttributeUpdater) + "." + nameof(UpdateColumnInfoOnModelCreating);
 
             columnInfo.IsTimestamp = true;
             logger.Log(logSource, $"{logPrefix}.IsTimestamp=true");
@@ -23,7 +23,7 @@ namespace EfCore.Shaman.Services
             logger.Log(logSource, $"{logPrefix}.IsDatabaseGenerated=true");
         }
 
-        public void UpdateColumnInfoForMigrationFixer(ISimpleModelInfo modelInfo, IDbSetInfo dbSetInfo, ColumnInfo columnInfo,
+        public void UpdateColumnInfoOnModelCreating(IDbSetInfo dbSetInfo, ColumnInfo columnInfo,
             EntityTypeBuilder entityBuilder,
             IShamanLogger logger)
         {

@@ -17,9 +17,8 @@ namespace EfCore.Shaman.Services
             // todo log MaxLengthAttributeUpdater.UpdateColumnInfo
         }
 
-        public void UpdateColumnInfoForMigrationFixer(ISimpleModelInfo modelInfo, IDbSetInfo dbSetInfo, ColumnInfo columnInfo,
-            EntityTypeBuilder entityBuilder,
-            IShamanLogger logger)
+        public void UpdateColumnInfoOnModelCreating(IDbSetInfo dbSetInfo, ColumnInfo columnInfo,
+            EntityTypeBuilder entityBuilder, IShamanLogger logger)
         {
         }
     }

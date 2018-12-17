@@ -90,7 +90,7 @@ namespace EfCore.Shaman.ModelScanner
             IReadOnlyDictionary<Type, string> tableNames)
         {
             var dbSetInfoUpdateServices = UsedShamanOptions.Services?.OfType<IDbSetInfoUpdateService>().ToArray();
-            var dbSetInfo = new DbSetInfo(entityType, GetTableName(entityType, propertyName, tableNames),
+            var dbSetInfo = new DbSetInfo(entityType, GetTableName(entityType, propertyName, tableNames),this,
                 DefaultSchema);
             {
                 if (dbSetInfoUpdateServices != null)

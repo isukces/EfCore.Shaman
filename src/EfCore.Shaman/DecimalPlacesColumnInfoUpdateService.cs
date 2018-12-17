@@ -13,16 +13,16 @@ namespace EfCore.Shaman
         {
         }
 
-        public void UpdateColumnInfoForMigrationFixer(ISimpleModelInfo modelInfo, IDbSetInfo dbSetInfo, ColumnInfo columnInfo,
+        public void UpdateColumnInfoOnModelCreating(IDbSetInfo dbSetInfo, ColumnInfo columnInfo,
             EntityTypeBuilder entityBuilder,
             IShamanLogger logger)
         {
-            const string name = nameof(DecimalPlacesColumnInfoUpdateService) + "." + nameof(UpdateColumnInfoForMigrationFixer);
+            const string name = nameof(DecimalPlacesColumnInfoUpdateService) + "." + nameof(UpdateColumnInfoOnModelCreating);
             if (columnInfo.MaxLength == null || columnInfo.DecimalPlaces == null)
                 return;
             var type   = $"decimal({columnInfo.MaxLength},{columnInfo.DecimalPlaces})";
             var action = $"{columnInfo.PropertyName}.HasColumnType(\"{type}\")";
-            logger.LogFix(name, dbSetInfo.EntityType, action);
+            logger.LogCalling(name, dbSetInfo.EntityType, action);
             entityBuilder.Property(columnInfo.PropertyName).HasColumnType(type);
         }
     }

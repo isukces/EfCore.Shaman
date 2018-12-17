@@ -14,7 +14,7 @@ namespace EfCore.Shaman.Tests
     {
 #if EF200
         public TestInMemoryTransactionManager(
-            [CanBeNull] IDiagnosticsLogger<DbLoggerCategory.Database.Transaction> logger)
+            [NotNull] IDiagnosticsLogger<DbLoggerCategory.Database.Transaction> logger)
             : base(logger)
         {
         }

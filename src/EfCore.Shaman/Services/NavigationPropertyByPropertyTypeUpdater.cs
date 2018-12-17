@@ -21,7 +21,7 @@ namespace EfCore.Shaman.Services
 
         public HashSet<Type> CollectionsGenericTypes { get;  }
 
-        public void UpdateColumnInfoForMigrationFixer(ISimpleModelInfo modelInfo, IDbSetInfo dbSetInfo,
+        public void UpdateColumnInfoOnModelCreating(IDbSetInfo dbSetInfo,
             ColumnInfo columnInfo,
             EntityTypeBuilder entityBuilder, IShamanLogger logger)
         {

@@ -61,7 +61,7 @@ namespace EfCore.Shaman
                 src.Log(new ShamanLogMessage(source, message));
         }
 
-        public static void LogFix(this IShamanLogger logger, string source, Type entityType, string action)
+        public static void LogCalling(this IShamanLogger logger, string source, Type entityType, string action)
         {
             var logMessage = $"calling {action} for {entityType.Name}";
             logger.Log(source, logMessage);

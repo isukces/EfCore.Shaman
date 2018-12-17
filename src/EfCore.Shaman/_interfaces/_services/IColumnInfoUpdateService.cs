@@ -17,15 +17,13 @@ namespace EfCore.Shaman
             IDbSetInfo dbSetInfo, IShamanLogger logger);
 
         /// <summary>
-        /// This method is used when migration is being fixed
+        /// This method is used when DbContext.OnModelCreating is executed
         /// </summary>
-        /// <param name="modelInfo"></param>
         /// <param name="dbSetInfo"></param>
         /// <param name="columnInfo"></param>
         /// <param name="entityBuilder"></param>
         /// <param name="logger"></param>
-        void UpdateColumnInfoForMigrationFixer(ISimpleModelInfo modelInfo, IDbSetInfo dbSetInfo, ColumnInfo columnInfo,
-            EntityTypeBuilder entityBuilder,
-            IShamanLogger logger);
+        void UpdateColumnInfoOnModelCreating(IDbSetInfo dbSetInfo, ColumnInfo columnInfo,
+            EntityTypeBuilder entityBuilder, IShamanLogger logger);
     }
 }

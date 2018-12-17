@@ -36,12 +36,12 @@ namespace EfCore.Shaman.Services
                     .WithInfoFromAbstractIndexAttribute(indexAttribute)
                     .WithInfoFromUniqueIndexAttribute(indexAttribute as UniqueIndexAttribute)
                     .WithInfoFromFullTextIndexAttribute(indexAttribute as FullTextIndexAttribute);
-                logger.Log(typeof(IndexAttributeUpdater), nameof(UpdateColumnInfoForMigrationFixer),
+                logger.Log(typeof(IndexAttributeUpdater), nameof(UpdateColumnInfoOnModelCreating),
                     $"Set indexInfo: Order={indexInfo.Order}, IsDescending={indexInfo.IsDescending}, IndexType={indexInfo.IndexType}");
             }
         }
 
-        public void UpdateColumnInfoForMigrationFixer(ISimpleModelInfo modelInfo, IDbSetInfo dbSetInfo, ColumnInfo columnInfo,
+        public void UpdateColumnInfoOnModelCreating(IDbSetInfo dbSetInfo, ColumnInfo columnInfo,
             EntityTypeBuilder entityBuilder,
             IShamanLogger logger)
         {
