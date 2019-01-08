@@ -27,6 +27,11 @@ namespace EfCore.Shaman.SqlServer
             annotatable.Annotations[Ck] = collation;
         }
 
+        /// <summary>
+        /// Gets collation from annotation but not checks if column is string so check this elsewhere
+        /// </summary>
+        /// <param name="sources"></param>
+        /// <returns></returns>
         public static string GetCollation(params IShamanAnnotatable[] sources)
         {
             foreach (var annotatable in sources)

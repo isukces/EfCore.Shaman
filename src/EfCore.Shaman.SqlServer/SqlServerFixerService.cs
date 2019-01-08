@@ -79,21 +79,25 @@ namespace EfCore.Shaman.SqlServer
                 foreach (var columnInfo in dbSetInfo.Properites.Where(q => !q.IsNotMapped && !q.IsNavigationProperty))
                 {
                     if (!columns.TryGetValue(columnInfo.ColumnName, out var addColumnOperation)) continue;
-                    var usedIsUnicode   = addColumnOperation.ColumnType?.ToLower().StartsWith("nvarchar") ?? false;
-                    var expectedUnicode = addColumnOperation.IsUnicode ?? usedIsUnicode;
+                    if (addColumnOperation.ClrType == typeof(string))
+                    {
+                        // fix collation and unicode for text field
+                        var usedIsUnicode = MsSqlUtils.IsUnicodeTextField(addColumnOperation.ColumnType);
+                        var expectedUnicode = addColumnOperation.IsUnicode ?? usedIsUnicode;
 
-                    var columnCollation = SqlServerReflectionService.GetCollation(columnInfo, dbSetInfo, info);
-                    if (string.IsNullOrEmpty(columnCollation) && usedIsUnicode == expectedUnicode) continue;
-                    var escapedTableName  = MsSqlUtils.Escape(dbSetInfo.Schema, dbSetInfo.TableName);
-                    var escapedColumnName = MsSqlUtils.Escape(columnInfo.ColumnName);
-                    if (!string.IsNullOrEmpty(columnCollation))
-                        log($"Change collation {escapedTableName}.{escapedColumnName} => {columnCollation}");
-                    if (usedIsUnicode != expectedUnicode)
-                        log($"Change unicode {escapedTableName}.{escapedColumnName} => {expectedUnicode}");
-                    var sql = CreateChangeCollationSql(escapedTableName, escapedColumnName, columnCollation,
-                        expectedUnicode, addColumnOperation.MaxLength, addColumnOperation.IsNullable);
-                    migrationBuilder.Sql(sql);
-                    MoveSqlBeforeIndexCreation(migrationBuilder, createTableOperation, columnInfo.ColumnName);
+                        var columnCollation = SqlServerReflectionService.GetCollation(columnInfo, dbSetInfo, info);
+                        if (string.IsNullOrEmpty(columnCollation) && usedIsUnicode == expectedUnicode) continue;
+                        var escapedTableName  = MsSqlUtils.Escape(dbSetInfo.Schema, dbSetInfo.TableName);
+                        var escapedColumnName = MsSqlUtils.Escape(columnInfo.ColumnName);
+                        if (!string.IsNullOrEmpty(columnCollation))
+                            log($"Change collation {escapedTableName}.{escapedColumnName} => {columnCollation}");
+                        if (usedIsUnicode != expectedUnicode)
+                            log($"Change unicode {escapedTableName}.{escapedColumnName} => {expectedUnicode}");
+                        var sql = CreateChangeCollationSql(escapedTableName, escapedColumnName, columnCollation,
+                            expectedUnicode, addColumnOperation.MaxLength, addColumnOperation.IsNullable);
+                        migrationBuilder.Sql(sql);
+                        MoveSqlBeforeIndexCreation(migrationBuilder, createTableOperation, columnInfo.ColumnName);
+                    }
                 }
             }
 

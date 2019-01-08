@@ -9,8 +9,6 @@ namespace EfCore.Shaman.Tests.EfCore.Shaman.SqlServer
 {
     public class SqlServerFixerServiceTest
     {
-        #region Instance Methods
-
         [Fact]
         public void T01_ShouldCreateChangeCollationSql()
         {
@@ -22,7 +20,7 @@ namespace EfCore.Shaman.Tests.EfCore.Shaman.SqlServer
             var expected = "ALTER TABLE [dbo].[Table] ALTER COLUMN [Column] nvarchar(123) COLLATE Polish_100_CI_AS NOT NULL";
             Assert.Equal(expected, sql);
         }
-
-        #endregion
+        
+        
     }
 }

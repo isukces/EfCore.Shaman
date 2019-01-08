@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using JetBrains.Annotations;
 
 namespace EfCore.Shaman.SqlServer
 {
@@ -17,19 +18,43 @@ namespace EfCore.Shaman.SqlServer
             return Escape(schema) + "." + Escape(tableName);
         }
 
-        public static string GetStringLength(int? maxLength)
-            => maxLength?.ToString(CultureInfo.InvariantCulture) ?? "max";
-
         public static string GetSqlTableName(this IDbSetInfo tn)
         {
             return Escape(tn.Schema, tn.TableName);
         }
 
+        public static string GetStringLength(int? maxLength)
+        {
+            return maxLength?.ToString(CultureInfo.InvariantCulture) ?? "max";
+        }
+
         public static bool IsSupportedProvider(string provider)
-            => string.Equals(provider, "Microsoft.EntityFrameworkCore.SqlServer", StringComparison.OrdinalIgnoreCase);
+        {
+            return string.Equals(provider, "Microsoft.EntityFrameworkCore.SqlServer",
+                StringComparison.OrdinalIgnoreCase);
+        }
+
+        public static bool IsTextField([CanBeNull] string msSqlColType)
+        {
+            if (string.IsNullOrEmpty(msSqlColType))
+                return false;
+            return IsUnicodeTextField(msSqlColType)
+                   || msSqlColType.StartsWith("varchar", StringComparison.OrdinalIgnoreCase)
+                   || msSqlColType.StartsWith("char", StringComparison.OrdinalIgnoreCase);
+        }
+
+        public static bool IsUnicodeTextField([CanBeNull] string msSqlColType)
+        {
+            if (string.IsNullOrEmpty(msSqlColType))
+                return false;
+            return msSqlColType.StartsWith("nvarchar", StringComparison.OrdinalIgnoreCase)
+                   || msSqlColType.StartsWith("nchar", StringComparison.OrdinalIgnoreCase);
+        }
 
         public static string QuoteText(string name)
-            => name == null ? "NULL" : $"\'{name.Replace("'", "''")}\'";
+        {
+            return name == null ? "NULL" : $"\'{name.Replace("'", "''")}\'";
+        }
 
         public const string DefaultSchema = "dbo";
     }
