@@ -1,73 +1,57 @@
-﻿#region using
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
-#endregion
-
 namespace EfCore.Shaman.ModelScanner
 {
     public class EfModelWrapper
     {
-        #region Static Methods
-
         public static EfModelWrapper FromModel(IModel model)
         {
             var rel = model?.Relational();
+            var de  = rel?.DefaultSchema?.Trim();
+            var et = model?.GetEntityTypes() ?? new List<IEntityType>();
             return new EfModelWrapper
             {
-                DefaultSchema = rel?.DefaultSchema?.Trim(),
-                EntityTypes =
-                    model?.GetEntityTypes()
-                        .Select(EfModelEntityWrapper.FromIEntityType).ToList() ??
-                    new List<EfModelEntityWrapper>()
+                DefaultSchema = de,
+                EntityTypes = et.Select(a => EfModelEntityWrapper.FromIEntityType(a, de)).ToList()
             };
         }
-
-        #endregion
-
-        #region Properties
 
         public IReadOnlyList<EfModelEntityWrapper> EntityTypes { get; private set; }
 
         public string DefaultSchema { get; private set; }
 
-        #endregion
-
-        #region Nested
-
         public class EfModelEntityWrapper
         {
-            #region Static Methods
-
-            public static EfModelEntityWrapper FromIEntityType(IEntityType entityType)
+            public static EfModelEntityWrapper FromIEntityType(IEntityType entityType, string defaultSchema)
             {
+                var rel = entityType.Relational();
+                var relSchema = rel.Schema;
                 return new EfModelEntityWrapper
                 {
-                    ClrType = entityType.ClrType,
-                    TableName = entityType.Relational().TableName
+                    ClrType        = entityType.ClrType,
+                    ShortTableName = rel.TableName,
+                    Schema         = string.IsNullOrEmpty(relSchema) ? defaultSchema : relSchema
                 };
             }
 
-            #endregion
+            public override string ToString()
+            {
+                var fullTableName = GetFullTableName().ToString();
+                return $"Type: {ClrType?.Name}, Table: {fullTableName}";
+            }
 
-            #region Instance Methods
+            public Type   ClrType        { get; private set; }
+            public string ShortTableName { get; private set; }
+            public string Schema         { get; private set; }
 
-            public override string ToString() => $"{ClrType?.Name} => {TableName}";
-
-            #endregion
-
-            #region Properties
-
-            public Type ClrType { get; private set; }
-            public string TableName { get; private set; }
-
-            #endregion
+            public FullTableName GetFullTableName()
+            {
+                return new FullTableName(ShortTableName, Schema);
+            }
         }
-
-        #endregion
     }
 }

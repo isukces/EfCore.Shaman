@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Migrations.Operations;
 
 namespace EfCore.Shaman.SqlServer
 {
-    public sealed class SqlServerFixerService : IFixMigrationUpService
+    public sealed class SqlServerFixerService : IFixMigrationUpService, IModelPrepareService
     {
         public static string CreateChangeCollationSql(string escapedTableName, string escapedColumnName,
             string columnCollation, bool? isUnicode, int? maxLength, bool isNullable)
@@ -64,15 +64,20 @@ namespace EfCore.Shaman.SqlServer
             var logger = info.UsedShamanOptions.Logger ?? EmptyShamanLogger.Instance;
             var log    = logger.CreateMethod(typeof(SqlServerFixerService), nameof(FixMigrationUp));
             log("Begin");
-            var createTableOperations = new Dictionary<string, CreateTableOperation>(StringComparer.OrdinalIgnoreCase);
+            var createTableOperations = new Dictionary<FullTableName, CreateTableOperation>();
             foreach (var i in migrationBuilder.Operations.OfType<CreateTableOperation>())
-                createTableOperations[i.Name] = i;
+            {
+                var tn =new FullTableName(i.Name, i.Schema).WithDefaultSchema(info.DefaultSchema);
+                createTableOperations[tn] = i;
+            }
+
             foreach (var dbSetInfo in info.DbSets)
             {
                 // looking for create operation
-                if (!createTableOperations.TryGetValue(dbSetInfo.TableName, out var createTableOperation))
+                var tn =new FullTableName(dbSetInfo.TableName, dbSetInfo.Schema).WithDefaultSchema(info.DefaultSchema);
+                if (!createTableOperations.TryGetValue(tn, out var createTableOperation))
                     continue;
-                log($"Fixing create table {dbSetInfo.TableName}");
+                log($"Fixing create table {tn}");
                 // var tableCollation = GetCollation(dbSetInfo.Annotations);
                 var columns = createTableOperation.Columns.ToDictionary(a => a.Name, a => a,
                     StringComparer.OrdinalIgnoreCase);
@@ -102,6 +107,15 @@ namespace EfCore.Shaman.SqlServer
             }
 
             log("End");
+        }
+
+        public void UpdateModel(IUpdatableSimpleModelInfo simpleModelInfo, Type dbContextType, IShamanLogger logger)
+        {
+            if (!string.IsNullOrEmpty(simpleModelInfo.DefaultSchema))
+                return;
+            var log = logger.CreateMethod(typeof(SqlServerFixerService), nameof(UpdateModel));
+            simpleModelInfo.DefaultSchema = "dbo";
+            log("Change default schema to [" + simpleModelInfo.DefaultSchema + "]");
         }
     }
 }

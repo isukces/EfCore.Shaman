@@ -130,7 +130,9 @@ namespace EfCore.Shaman
         /// <param name="databaseFacade"></param>
         /// <returns></returns>
         private static IRelationalConnection GetRelationalConnection(this DatabaseFacade databaseFacade)
-            => databaseFacade.GetService<IRelationalConnection>();
+        {
+            return databaseFacade.GetService<IRelationalConnection>();
+        }
 
         #endregion
     }

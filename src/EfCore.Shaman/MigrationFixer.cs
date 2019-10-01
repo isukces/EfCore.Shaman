@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using EfCore.Shaman.ModelScanner;
+using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
@@ -15,11 +16,11 @@ namespace EfCore.Shaman
             _info          = modelInfo ?? new ModelInfo(dbContextType, _shamanOptions);
         }
 
-        public static void FixMigrationUp<T>(MigrationBuilder migrationBuilder, ShamanOptions shamanOptions = null)
+        public static void FixMigrationUp<T>(MigrationBuilder migrationBuilder, ShamanOptions shamanOptions = null, [CanBeNull]GetModelTableNameDelegate getModelTableName=null)
             where T : DbContext
         {
             var tmp = new MigrationFixer(typeof(T), shamanOptions);
-            tmp.FixMigrationUp(migrationBuilder);
+            tmp.FixMigrationUp(migrationBuilder, getModelTableName);
         }
 
 
@@ -36,7 +37,7 @@ namespace EfCore.Shaman
             return 0; // should never occur
         }
 
-        public void FixMigrationUp(MigrationBuilder migrationBuilder)
+        public void FixMigrationUp(MigrationBuilder migrationBuilder,  [CanBeNull]GetModelTableNameDelegate getModelTableName)
         {
             var services = _shamanOptions?.Services.OfType<IFixMigrationUpService>().ToArray();
             if (services != null)
@@ -47,17 +48,20 @@ namespace EfCore.Shaman
                 }
 
             foreach (var table in migrationBuilder.Operations.OfType<CreateTableOperation>())
-                FixOnModelCreatingForTable(table);
+                FixOnModelCreatingForTable(table, getModelTableName);
         }
 
 
-        private void FixOnModelCreatingForTable(CreateTableOperation table)
+        private void FixOnModelCreatingForTable(CreateTableOperation table, [CanBeNull]GetModelTableNameDelegate getModelTableName)
         {
             if (table == null)
                 throw new ArgumentNullException(nameof(table));
             if (_info == null)
                 throw new NullReferenceException(nameof(_info));
-            var entity = _info.GetByTableName(new FullTableName(table.Name, table.Schema));
+            var tn = new FullTableName(table.Name, table.Schema).WithDefaultSchema(_info.DefaultSchema);
+            if (getModelTableName != null)
+                tn = getModelTableName(tn);
+            var entity = _info.GetByTableName(tn);
             if (entity == null)
             {
                 _shamanOptions.Logger.Log(typeof(MigrationFixer), nameof(FixOnModelCreatingForTable),
@@ -90,4 +94,6 @@ namespace EfCore.Shaman
         private readonly ModelInfo _info;
         private readonly ShamanOptions _shamanOptions;
     }
+
+    public delegate FullTableName GetModelTableNameDelegate(FullTableName createTableName);
 }

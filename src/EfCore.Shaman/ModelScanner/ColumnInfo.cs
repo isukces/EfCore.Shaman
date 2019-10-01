@@ -16,8 +16,10 @@ namespace EfCore.Shaman.ModelScanner
             ForceFieldOrder = int.MaxValue;
         }
 
-        public override string ToString() =>
-            $"Property {PropertyName} => {ColumnName}";
+        public override string ToString()
+        {
+            return $"Property {PropertyName} => {ColumnName}";
+        }
 
         /// <summary>
         ///     Index of property scanned with GetProperties() method

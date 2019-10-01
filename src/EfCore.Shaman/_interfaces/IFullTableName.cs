@@ -1,4 +1,6 @@
-﻿namespace EfCore.Shaman
+﻿using EfCore.Shaman.ModelScanner;
+
+namespace EfCore.Shaman
 {
     public interface IFullTableName
     {

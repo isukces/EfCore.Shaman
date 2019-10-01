@@ -15,11 +15,14 @@ namespace EfCore.Shaman.ModelScanner
             Schema     = schema;
         }
 
-        public override string ToString() => $"DbSet: {EntityType?.Name} => {Schema}.{TableName}";
+        public override string ToString()
+        {
+            return $"DbSet: {EntityType?.Name} => {Schema}.{TableName}";
+        }
 
         public string           TableName  { get; set; }
         public string           Schema     { get; set; }
-        public Type             EntityType { get; private set; }
+        public Type             EntityType { get; }
         public ISimpleModelInfo Model      { get; }
         public List<ColumnInfo> Properites { get; } = new List<ColumnInfo>();
 

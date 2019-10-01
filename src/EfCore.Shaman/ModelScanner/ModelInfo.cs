@@ -48,37 +48,41 @@ namespace EfCore.Shaman.ModelScanner
             return false;
         }
 
-        private static string GetTableName(Type entityType, string propertyName,
-            IReadOnlyDictionary<Type, string> tableNames)
+        private static FullTableName GetTableName(Type entityType, string propertyName,
+            IReadOnlyDictionary<Type, FullTableName> tableNames, string defaultSchema)
         {
             if (tableNames != null)
             {
-                string name;
-                if (tableNames.TryGetValue(entityType, out name))
+                if (tableNames.TryGetValue(entityType, out var name))
                     return name;
             }
 
             var a = entityType.GetTypeInfo().GetCustomAttribute<TableAttribute>();
-            return string.IsNullOrEmpty(a?.Name) ? propertyName : a.Name;
+            var tableName= string.IsNullOrEmpty(a?.Name) ? propertyName : a.Name;
+            if (string.IsNullOrEmpty(tableName))
+                return FullTableName.Empty;
+            return new FullTableName(tableName, a?.Schema).WithDefaultSchema(defaultSchema);
         }
 
-        private static IReadOnlyDictionary<Type, string> GetTableNamesFromModel(EfModelWrapper model,
+        private static Dictionary<Type, FullTableName> GetTableNamesFromModel(EfModelWrapper model,
             IShamanLogger logger)
         {
             if (model == null) return null;
-            var result = new Dictionary<Type, string>();
+            var result = new Dictionary<Type, FullTableName>();
             foreach (var entityType in model.EntityTypes)
             {
-                result[entityType.ClrType] = entityType.TableName;
+                result[entityType.ClrType] = entityType.GetFullTableName();
                 logger.Log(typeof(ModelInfo), nameof(GetTableNamesFromModel),
-                    $"Table name for {entityType.ClrType.Name}: {entityType.TableName}");
+                    $"Table name for {entityType.ClrType.Name}: {entityType.GetFullTableName()}");
             }
 
             return result;
         }
 
         public DbSetInfo DbSet<T>()
-            => _dbSets.Values.SingleOrDefault(a => a.EntityType == typeof(T));
+        {
+            return _dbSets.Values.SingleOrDefault(a => a.EntityType == typeof(T));
+        }
 
         public DbSetInfo GetByTableName(FullTableName tableName)
         {
@@ -86,12 +90,11 @@ namespace EfCore.Shaman.ModelScanner
             return entity;
         }
 
-        private DbSetInfo CreateDbSetWrapper(Type entityType, string propertyName,
-            IReadOnlyDictionary<Type, string> tableNames)
+        private DbSetInfo CreateDbSetWrapper(Type entityType, FullTableName fullTableNameProposition)
         {
             var dbSetInfoUpdateServices = UsedShamanOptions.Services?.OfType<IDbSetInfoUpdateService>().ToArray();
-            var dbSetInfo = new DbSetInfo(entityType, GetTableName(entityType, propertyName, tableNames),this,
-                DefaultSchema);
+            
+            var dbSetInfo = new DbSetInfo(entityType, fullTableNameProposition.TableName, this, fullTableNameProposition.Schema);
             {
                 if (dbSetInfoUpdateServices != null)
                     foreach (var i in dbSetInfoUpdateServices)
@@ -136,26 +139,33 @@ namespace EfCore.Shaman.ModelScanner
                 UsedDbContextModel
                     ? "Use dbContext model"
                     : "Don't use dbContext model");
-            var tableNames = GetTableNamesFromModel(model, _logger);
-            DefaultSchema        = DefaultSchemaUpdater.GetDefaultSchema(_dbContextType, model, _logger);
+            DefaultSchema = DefaultSchemaUpdater.GetDefaultSchema(_dbContextType, model, _logger);
+            var rawTableNames = GetTableNamesFromModel(model, _logger);
             DefaultIsUnicodeText = DefaultSchemaUpdater.GetDefaultIsUnicodeText(_dbContextType, _logger);
             foreach (var i in UsedShamanOptions.Services.OfType<IModelPrepareService>())
                 i.UpdateModel(this, _dbContextType, _logger);
+/*
             foreach (var property in _dbContextType.GetProperties())
             {
                 var propertyType = property.PropertyType;
                 if (!propertyType.GetTypeInfo().IsGenericType) continue;
                 if (propertyType.GetGenericTypeDefinition() != typeof(DbSet<>)) continue;
                 var entityType = propertyType.GetGenericArguments()[0];
-                var entity     = CreateDbSetWrapper(entityType, property.Name, tableNames);
-                var key        = new FullTableName(entity.TableName, entity.Schema);
+                
+                var fullTableName = GetTableName(entityType, property.Name, rawTableNames, DefaultSchema);
+                var entity     = CreateDbSetWrapper(entityType, fullTableName);
+                var key = new FullTableName(entity.TableName, entity.Schema);
+                key = key.WithDefaultSchema(DefaultSchema);
                 _dbSets[key] = entity;
+                _dbSetsWithoutModifications[fullTableName] = entity;
             }
-
+*/
             foreach (var aa in GetEntityTypes(_dbContextType))
             {
-                var entity = CreateDbSetWrapper(aa.EntityType, aa.Property.Name, tableNames);
+                var fullTableName = GetTableName(aa.EntityType, aa.Property.Name, rawTableNames, DefaultSchema);
+                var entity = CreateDbSetWrapper(aa.EntityType, fullTableName);
                 var key    = new FullTableName(entity.TableName, entity.Schema);
+                key = key.WithDefaultSchema(DefaultSchema);
                 _dbSets[key] = entity;
             }
         }

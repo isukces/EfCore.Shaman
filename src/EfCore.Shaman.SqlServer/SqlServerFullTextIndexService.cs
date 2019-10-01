@@ -38,6 +38,9 @@ namespace EfCore.Shaman.SqlServer
         }
 
         public static string CreateSqlCreateFullTextCatalogIfNotExists(string name)
-            => $"if not exists (SELECT * FROM sys.fulltext_catalogs where name={MsSqlUtils.QuoteText(name)}) CREATE FULLTEXT CATALOG {MsSqlUtils.Escape(name)};";
+        {
+            return
+                $"if not exists (SELECT * FROM sys.fulltext_catalogs where name={MsSqlUtils.QuoteText(name)}) CREATE FULLTEXT CATALOG {MsSqlUtils.Escape(name)};";
+        }
     }
 }

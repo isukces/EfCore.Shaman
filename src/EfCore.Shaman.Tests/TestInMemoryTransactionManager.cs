@@ -39,11 +39,20 @@ namespace EfCore.Shaman.Tests
             return Task.FromResult(_currentTransaction);
         }
 
-        public override void CommitTransaction() => CurrentTransaction.Commit();
+        public override void CommitTransaction()
+        {
+            CurrentTransaction.Commit();
+        }
 
-        public override void RollbackTransaction() => CurrentTransaction.Rollback();
+        public override void RollbackTransaction()
+        {
+            CurrentTransaction.Rollback();
+        }
 
-        public override IDbContextTransaction CurrentTransaction => _currentTransaction;
+        public override IDbContextTransaction CurrentTransaction
+        {
+            get { return _currentTransaction; }
+        }
 
         private IDbContextTransaction _currentTransaction;
 
