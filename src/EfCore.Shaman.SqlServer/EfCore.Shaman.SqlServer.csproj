@@ -2,9 +2,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <AssemblyName>EfCore.Shaman.SqlServer</AssemblyName>
-    <AssemblyVersion>1.0.19008.83</AssemblyVersion>
-    <Version>1.0.19008.83</Version>
-    <FileVersion>1.0.19008.83</FileVersion>
+    <AssemblyVersion>1.0.19275.84</AssemblyVersion>
+    <Version>1.0.19275.84</Version>
+    <FileVersion>1.0.19275.84</FileVersion>
     <TargetFrameworks>net461;netstandard2.0</TargetFrameworks>
     <RuntimeIdentifiers>win</RuntimeIdentifiers>
     <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'net461' ">1.6.1</NetStandardImplicitPackageVersion>

@@ -1,20 +1,19 @@
 // using System.IO;
 
-var deps = @"
-Microsoft.EntityFrameworkCore
-Microsoft.EntityFrameworkCore.InMemory
-Microsoft.EntityFrameworkCore.Relational
-";
 
-var builder = new ProjectBuilder(){
-	VisualStudioExe = GlobalVar["VisualStudio 2017"],
-	NugetExe = GlobalVar["Nuget"],
-	NugetRepositoryDir =  GlobalVar["Private Nuget Repository"],
-	SolutionName = "EfCore.Shaman.Core",
-	SolutionDir = ConfigDir,
-	ProjectName = "EfCore.Shaman"
-	// OnlySelectedPackages = deps.Split('\r', '\n', ',')
+var builder = new ProjectBuilder()
+{
+    VisualStudioExe = GlobalVar["VisualStudio 2017"],
+    Nuget =
+    {
+        Exe           = GlobalVar["Nuget"],
+        RepositoryDir = GlobalVar["Private Nuget Repository"]
+    },
+    SolutionName = "EfCore.Shaman.Core",
+    SolutionDir  = ConfigDir,
+    ProjectName  = "EfCore.Shaman"
 };
+var nuget = builder.Nuget;
 
 // task: Clean
 DeleteDir(builder.ProjectDir+"\\bin", builder.ProjectDir+"\\obj");
@@ -24,22 +23,22 @@ DeleteDir(builder.ProjectDir+"\\bin", builder.ProjectDir+"\\obj");
 var version = builder.UpdateVersionCore();
 
 // task: Nuget restore
-Execute(builder.NugetExe , "restore "+builder.SolutionName +".sln");
+Execute(nuget.Exe, "restore " + builder.SolutionName + ".sln");
 
 
 // task: Build
 builder.Build("deploy");
 
-var nugetPackageFileName = string.Format(@"{0}\{1}.{2}.symbols.nupkg", 
-	builder.ProjectDir+@"\bin\Release", 
-	builder.GetNugetName(), 
-	version);
+//var releaseDir = Path.Combine(builder.ProjectDir, "bin", "Release");
+//var nugetShortNameSymbols = builder.Nuget.GetNugetPackageShortFile(version, true);
+// var nugetShortName = builder.Nuget.GetNugetPackageShortFile(version, false);
+//var nugetS = Path.Combine(releaseDir, nugetShortNameSymbols); 
 
 // task: Copy nuget
-var nugetOut = builder.NugetRepositoryDir + "\\" + builder.GetNugetName() + "." + version + ".nupkg";
+var nugetIn = Path.Combine(builder.ProjectDir, "bin", "Release", nuget.GetNugetPackageShortFile(version, true));
+var nugetOut = Path.Combine(nuget.RepositoryDir, nuget.GetNugetPackageShortFile(version, false));
 
-Console.WriteLine("Copy {0} to {1}", nugetPackageFileName, nugetOut);
-File.Copy(nugetPackageFileName, nugetOut, true);
+Console.WriteLine("Copy {0} to {1}", nugetIn, nugetOut);
+File.Copy(nugetIn, nugetOut, true);
 
 Console.WriteLine("--FINISHED--");
-
