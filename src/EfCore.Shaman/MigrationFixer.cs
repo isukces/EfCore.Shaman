@@ -64,7 +64,7 @@ namespace EfCore.Shaman
             var entity = _info.GetByTableName(tn);
             if (entity == null)
             {
-                _shamanOptions.Logger.Log(typeof(MigrationFixer), nameof(FixOnModelCreatingForTable),
+                Log(nameof(FixOnModelCreatingForTable),
                     $"Table {table.Name} not found. Skipping.");
                 return;
             }
@@ -74,16 +74,28 @@ namespace EfCore.Shaman
                 .Where(info => !info.IsNotMapped && !info.IsNavigationProperty)
                 .ToDictionary(a => a.ColumnName, StringComparer.OrdinalIgnoreCase);
             var natural = Enumerable.Range(0, table.Columns.Count).ToDictionary(a => table.Columns[a].Name, a => a);
+
+            string GetSortColumns()
+            {
+                return "(" + string.Join(",", table.Columns.Select(a => a.Name)) + ")";
+            }
+
+            var sortBefore = GetSortColumns();
             table.Columns.Sort((a, b) =>
             {
-                ColumnInfo aWrapper, bWrapper;
-                colsDic.TryGetValue(a.Name, out aWrapper);
-                colsDic.TryGetValue(b.Name, out bWrapper);
+                colsDic.TryGetValue(a.Name, out var aWrapper);
+                colsDic.TryGetValue(b.Name, out var bWrapper);
                 var compareResult = ComparePropertyWrapper(aWrapper, bWrapper);
                 if (compareResult != 0)
                     return compareResult;
                 return natural[a.Name].CompareTo(natural[b.Name]); // bez zmian
             });
+            var sortAfter = GetSortColumns();
+            if (sortBefore != sortAfter)
+            {
+                Log(nameof(FixOnModelCreatingForTable), 
+                    $"Table {table.Name} change column order {sortBefore} => {sortAfter}.");
+            }
         }
 
         private void Log(string methodName, string message)

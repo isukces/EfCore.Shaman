@@ -36,8 +36,9 @@ namespace EfCore.Shaman.Services
                     .WithInfoFromAbstractIndexAttribute(indexAttribute)
                     .WithInfoFromUniqueIndexAttribute(indexAttribute as UniqueIndexAttribute)
                     .WithInfoFromFullTextIndexAttribute(indexAttribute as FullTextIndexAttribute);
+                var target = $"column {dbSetInfo.Schema}.{dbSetInfo.TableName}.{columnInfo.ColumnName}";
                 logger.Log(typeof(IndexAttributeUpdater), nameof(UpdateColumnInfoOnModelCreating),
-                    $"Set indexInfo: Order={indexInfo.Order}, IsDescending={indexInfo.IsDescending}, IndexType={indexInfo.IndexType}");
+                    $"Set indexInfo: Order={indexInfo.Order}, IsDescending={indexInfo.IsDescending}, IndexType={indexInfo.IndexType} for {target}");
             }
         }
 
