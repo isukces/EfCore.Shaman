@@ -111,7 +111,7 @@ namespace EfCore.Shaman.ModelScanner
                 };
                 if (useDirectSaverForType)
                 {
-                    var readerWriter = new SimplePropertyReaderWriter(entityType, propertyInfo, _logger);
+                    var readerWriter = SimplePropertyReaderWriter.Make(entityType, propertyInfo, _logger);
                     columnInfo.ValueReader = readerWriter;
                     columnInfo.ValueWriter = readerWriter;
                 }

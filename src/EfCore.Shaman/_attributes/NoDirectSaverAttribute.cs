@@ -7,7 +7,7 @@ namespace EfCore.Shaman
     ///     Shaman is sometimes unable to prepare property reader/writer to support DirectSaver
     ///     i.e. for classes derived from IdentityUser
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property)]
     public class NoDirectSaverAttribute : Attribute
     {
     }

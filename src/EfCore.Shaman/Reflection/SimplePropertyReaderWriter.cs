@@ -1,33 +1,36 @@
 ﻿using System;
 using System.Linq.Expressions;
 using System.Reflection;
+using JetBrains.Annotations;
 
 namespace EfCore.Shaman.Reflection
 {
     public class SimplePropertyReaderWriter : IPropertyValueReader, IPropertyValueWriter
     {
-        public SimplePropertyReaderWriter(Type type, PropertyInfo propertyInfo, IShamanLogger logger)
+        private SimplePropertyReaderWriter(Type type, PropertyInfo propertyInfo, IShamanLogger logger)
         {
-            _logger = logger ?? EmptyShamanLogger.Instance;
+            _logger       = logger ?? EmptyShamanLogger.Instance;
             _propertyInfo = propertyInfo;
             try
             {
                 {
                     var instance = Expression.Parameter(typeof(object), "instance");
-                    Expression expr = Expression.Property(Expression.Convert(instance, type), propertyInfo.Name);
+                    Expression expr =
+                        Expression.Property(Expression.Convert(instance, type), propertyInfo.Name);
                     Expression convertedToObject = Expression.Convert(expr, typeof(object));
                     _reader = Expression.Lambda<Func<object, object>>(convertedToObject, instance).Compile();
                 }
             }
-            catch (Exception e) 
+            catch (Exception e)
             {
                 _logger.LogException(Guid.Parse("{D8AFA7E9-DC66-407C-BB61-B19B6BFF6351}"), e);
             }
+
             try
             {
                 {
                     var instance = Expression.Parameter(typeof(object).MakeByRefType(), "instance");
-                    var value = Expression.Parameter(typeof(object), "value");
+                    var value    = Expression.Parameter(typeof(object), "value");
 
                     var expr =
                         Expression.Lambda<ByRefStructAction>(
@@ -44,11 +47,20 @@ namespace EfCore.Shaman.Reflection
                     _writer = expr.Compile();
                 }
             }
-            catch (Exception e) 
+            catch (Exception e)
             {
-                _logger.LogException(Guid.Parse("{81F76FA3-8CAF-4E56-AE2E-58BC006F5F18}"), e);
-
+                var ee = new UnableToGetReaderWriterException(
+                    $"Unable to get reader/writer for property {type}.{propertyInfo.Name}. Consider using NoDirectSaverAttribute.", e);
+                _logger.LogException(Guid.Parse("{81F76FA3-8CAF-4E56-AE2E-58BC006F5F18}"), ee);
             }
+        }
+
+        [CanBeNull]
+        public static SimplePropertyReaderWriter Make(Type type, PropertyInfo propertyInfo, IShamanLogger logger)
+        {
+            if (propertyInfo.GetCustomAttribute<NoDirectSaverAttribute>() != null) 
+                return null;
+            return new SimplePropertyReaderWriter(type, propertyInfo, logger);
         }
 
         public object ReadPropertyValue(object obj)
@@ -77,5 +89,13 @@ namespace EfCore.Shaman.Reflection
         /// <param name="instance"></param>
         /// <param name="value"></param>
         private delegate void ByRefStructAction(ref object instance, object value);
+    }
+
+    public class UnableToGetReaderWriterException : Exception
+    {
+        public UnableToGetReaderWriterException(string message, Exception innerException) : base(message,
+            innerException)
+        {
+        }
     }
 }
