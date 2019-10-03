@@ -114,7 +114,7 @@ namespace EfCore.Shaman.SqlServer
             if (!string.IsNullOrEmpty(simpleModelInfo.DefaultSchema))
                 return;
             var log = logger.CreateMethod(typeof(SqlServerFixerService), nameof(UpdateModel));
-            simpleModelInfo.DefaultSchema = "dbo";
+            simpleModelInfo.DefaultSchema = MsSqlUtils.DefaultSchema;
             log("Change default schema to [" + simpleModelInfo.DefaultSchema + "]");
         }
     }

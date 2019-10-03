@@ -85,13 +85,17 @@ namespace EfCore.Shaman.SqlServer
 
         public void UpdateDbSetInfo(DbSetInfo dbSetInfo, Type entityType, Type contextType, IShamanLogger logger)
         {
+            var target = $"table {dbSetInfo.GetSqlTableName()}";
             if (string.IsNullOrEmpty(dbSetInfo.Schema))
-                dbSetInfo.Schema = "dbo";
+            {
+                dbSetInfo.Schema = UseDefaultTableSchema;
+                logger.Log(nameof(SqlServerReflectionService),
+                    $"Set table schema '{dbSetInfo.Schema}' for {target}, entity={entityType}");
+            }
 
             var collation = GetCollation(entityType.GetTypeInfo());
             if (string.IsNullOrEmpty(collation))
                 return;
-            var target = $"table {dbSetInfo.GetSqlTableName()}";
             UpdateAnnotation(dbSetInfo, collation, logger, target);
         }
 
@@ -109,5 +113,7 @@ namespace EfCore.Shaman.SqlServer
 
         public const string Prefix = "SqlServer.";
         public const string Ck = Prefix + "Collation";
+
+        public string UseDefaultTableSchema { get; set; } = MsSqlUtils.DefaultSchema;
     }
 }
