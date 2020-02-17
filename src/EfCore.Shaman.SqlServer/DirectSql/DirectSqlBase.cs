@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using EfCore.Shaman.ModelScanner;
 using Microsoft.EntityFrameworkCore;
 
@@ -23,12 +24,12 @@ namespace EfCore.Shaman.SqlServer.DirectSql
             return "[" + x + "]";
         }
 
-        protected static void ExecSqlAndUpdateBack(string sqlText, DbContext context, object entity,
+        protected static async Task ExecSqlAndUpdateBackAsync(string sqlText, DbContext context, object entity,
             IReadOnlyList<ColumnInfo> returned, object[] parameterValues)
         {
             if (returned != null && returned.Any())
             {
-                using(var reader = context.Database.ExecuteReader(sqlText, parameterValues))
+                using(var reader = await context.Database.ExecuteReaderAsync(sqlText, parameterValues))
                 {
                     while (reader.DbDataReader.Read())
                     {

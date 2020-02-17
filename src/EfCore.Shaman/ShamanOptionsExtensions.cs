@@ -1,9 +1,13 @@
 ﻿#region using
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using EfCore.Shaman.Services;
 using JetBrains.Annotations;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -24,7 +28,7 @@ namespace EfCore.Shaman
         /// <param name="sql"></param>
         /// <param name="parameters"></param>
         /// <returns></returns>
-        public static RelationalDataReader ExecuteReader(
+        public static Task<RelationalDataReader> ExecuteReaderAsync(
             this DatabaseFacade databaseFacade,
             string sql,
             params object[] parameters)
@@ -39,12 +43,58 @@ namespace EfCore.Shaman
                     .GetService<IRawSqlCommandBuilder>()
                     .Build(sql, parameters);
 
-                return rawSqlCommand
-                    .RelationalCommand
-                    .ExecuteReader(GetRelationalConnection(databaseFacade),
-                        parameterValues: rawSqlCommand.ParameterValues);
+              
+                //    [NotNull] 
+                var connection = GetRelationalConnection(databaseFacade);
+                //    [CanBeNull] 
+                Dictionary<string, object> parameterValues = null;
+                /*if (parameters.Any())
+                {
+                    parameterValues = new Dictionary<string, object>();
+                    foreach(var i in parameters)
+                        
+                }*/
+                
+                //    [CanBeNull] 
+                IReadOnlyList<ReaderColumn > readerColumns = null;
+                //    [CanBeNull] 
+                DbContext context = null;
+                //    [CanBeNull] 
+                IDiagnosticsLogger<DbLoggerCategory.Database.Command> logger = null;
+                    
+                    
+                    
+                var parameterObject =new RelationalCommandParameterObject(
+                    connection,
+                    parameterValues,
+                    readerColumns,
+                    context,
+                    logger
+                    
+                    );
+                //RelationalCommandParameterObject eee = GetRelationalConnection(databaseFacade);
+                return rawSqlCommand.RelationalCommand.ExecuteReaderAsync(parameterObject);
             }
         }
+        /*
+         *
+         *  public RelationalCommandParameterObject(
+        [NotNull] IRelationalConnection connection,
+        [CanBeNull] IReadOnlyDictionary<string, object> parameterValues,
+        [CanBeNull] IReadOnlyList<ReaderColumn> readerColumns,
+        [CanBeNull] DbContext context,
+        [CanBeNull] IDiagnosticsLogger<DbLoggerCategory.Database.Command> logger)
+        {
+            Check.NotNull(connection, nameof(connection));
+
+            Connection = connection;
+            ParameterValues = parameterValues;
+            ReaderColumns = readerColumns;
+            Context = context;
+            Logger = logger;
+        }
+         * 
+         */
 
         public static ShamanOptions With<T>(this ShamanOptions options) where T : IShamanService, new()
         {

@@ -63,6 +63,7 @@ namespace EfCore.Shaman.Tests
                 TransactionManager = transactionManager;
             }
 
+           
             public void Commit()
             {
                 TransactionManager._currentTransaction = null;
@@ -77,12 +78,31 @@ namespace EfCore.Shaman.Tests
             {
                 TransactionManager._currentTransaction = null;
             }
+           
+
+            
+            public Task CommitAsync(CancellationToken cancellationToken = new CancellationToken())
+            {
+                TransactionManager._currentTransaction = null;
+                return Task.CompletedTask;
+            }
+
+            public Task RollbackAsync(CancellationToken cancellationToken = new CancellationToken())
+            {
+                TransactionManager._currentTransaction = null;
+                return Task.CompletedTask;
+            }
 #if EF200
             public Guid TransactionId
                 => TransactionManager._currentTransaction?.TransactionId ?? Guid.Empty;
 #endif
 
             private TestInMemoryTransactionManager TransactionManager { get; }
+            public ValueTask DisposeAsync()
+            {
+                TransactionManager._currentTransaction = null;
+                return new ValueTask(Task.CompletedTask);
+            }
         }
     }
 }

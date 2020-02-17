@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using EfCore.Shaman.ModelScanner;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,8 +10,8 @@ namespace EfCore.Shaman
     {
         void Delete(DbContext context, IReadOnlyDictionary<string, object> values);
         IReadOnlyList<ColumnInfo> GetPrimaryKeyColumns();
-        void Insert(DbContext context, T entity, bool skipSelect = false);
-        void Update(DbContext context, T entity, bool skipSelect = false);
+        Task InsertAsync(DbContext context, T entity, bool skipSelect = false);
+        Task UpdateAsync(DbContext context, T entity, bool skipSelect = false);
     }
 
     public static class DirectSaverExtensions
@@ -39,22 +40,22 @@ namespace EfCore.Shaman
         }
 
 
-        public static void DirectInsert<T>(this ShamanDbContext context, T obj, bool skipSelect = false) where T : class
+        public static async Task DirectInsertAsync<T>(this ShamanDbContext context, T obj, bool skipSelect = false) where T : class
         {
             if (context.IsUsingInMemoryDatabase)
             {
                 context.Add(obj);
-                context.SaveChanges();
+                await context.SaveChangesAsync();
             }
             else
             {
                 var ds = context.GetDirectSaver<T>();
-                ds.Insert(context, obj, skipSelect);
+                await ds.InsertAsync(context, obj, skipSelect);
             }
         }
 
 
-        public static void DirectSave<T>(this IDirectSaver<T> saver, DbContext context, T entity, DirectSaverEntityStatus status, bool skipSelect = false) where T : class
+        public static async Task DirectSaveAsync<T>(this IDirectSaver<T> saver, DbContext context, T entity, DirectSaverEntityStatus status, bool skipSelect = false) where T : class
         {
             if (context is IInMemoryDatabaseAwareDbProvider p && p.IsUsingInMemoryDatabase)
             {
@@ -84,10 +85,10 @@ namespace EfCore.Shaman
                     case DirectSaverEntityStatus.Clean:
                         return;
                     case DirectSaverEntityStatus.MustBeInserted:
-                        saver.Insert(context, entity, skipSelect);
+                        await saver.InsertAsync(context, entity, skipSelect);
                         break;
                     case DirectSaverEntityStatus.MustBeUpdated:
-                        saver.Update(context, entity, skipSelect);
+                        await saver.UpdateAsync(context, entity, skipSelect);
                         break;
                     case DirectSaverEntityStatus.MustBeRemoved:
                         saver.DirectDelete(context, entity);
@@ -98,31 +99,31 @@ namespace EfCore.Shaman
             }
         }
 
-        public static void DirectSave<T>(this IDirectSaver<T> saver, DbContext context, EntityWithDirectSaverStatus<T> entityWithStatus, bool skipSelect = false) where T : class
+        public static Task DirectSaveAsync<T>(this IDirectSaver<T> saver, DbContext context, EntityWithDirectSaverStatus<T> entityWithStatus, bool skipSelect = false) where T : class
         {
-            saver.DirectSave(context, entityWithStatus.Item, entityWithStatus.Status, skipSelect);
+            return saver.DirectSaveAsync(context, entityWithStatus.Item, entityWithStatus.Status, skipSelect);
         }
 
 
-        public static void DirectSave<T>(this ShamanDbContext context, EntityWithDirectSaverStatus<T> item, bool skipSelect = false) where T : class
+        public static Task DirectSave<T>(this ShamanDbContext context, EntityWithDirectSaverStatus<T> item, bool skipSelect = false) where T : class
         {
             if (item.Status == DirectSaverEntityStatus.Clean)
-                return;
+                return Task.CompletedTask;
             var ds = context.GetDirectSaver<T>();
-            ds.DirectSave(context, item, skipSelect);
+            return ds.DirectSaveAsync(context, item, skipSelect);
         }
 
 
-        public static void DirectSave<T>(this ShamanDbContext context, T obj, DirectSaverEntityStatus status, bool skipSelect = false) where T : class
+        public static Task DirectSaveAsync<T>(this ShamanDbContext context, T obj, DirectSaverEntityStatus status, bool skipSelect = false) where T : class
         {
             var ds = context.GetDirectSaver<T>();
-            ds.DirectSave(context, obj, status, skipSelect);
+            return ds.DirectSaveAsync(context, obj, status, skipSelect);
         }
 
-        public static void DirectUpdate<T>(this ShamanDbContext context, T obj, bool skipSelect = false)
+        public static Task DirectUpdateAsync<T>(this ShamanDbContext context, T obj, bool skipSelect = false)
         {
             var ds = context.GetDirectSaver<T>();
-            ds.Update(context, obj, skipSelect);
+            return ds.UpdateAsync(context, obj, skipSelect);
         }
     }
 }

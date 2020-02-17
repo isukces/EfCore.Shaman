@@ -41,7 +41,7 @@ namespace EfCore.Shaman.Tests.Model
             base.OnModelCreating(modelBuilder);
 
             // manual changes 
-            var er = modelBuilder.Model.GetEntityTypes()
+            IMutableEntityType er = modelBuilder.Model.GetEntityTypes()
                 .Single(a => a.ClrType == typeof(MyEntityWithDifferentTableName));
             er.Relational().TableName = "ManualChange";
 

@@ -85,11 +85,12 @@ namespace EfCore.Shaman.ModelScanner
                 logger.Log(typeof(ModelsCachedContainer), nameof(SetRawModel), message);
             }
 
-            string MutableEntityTypeToString(IMutableEntityType mutableEntityType)
+            /*string MutableEntityTypeToString(IMutableEntityType mutableEntityType)
             {
                 try
                 {
                     var r = mutableEntityType.Relational();
+                    mutableEntityType.BaseType.GetTableName();
                     return $"{r.Schema}.{r.TableName}";
                 }
                 catch (Exception e)
@@ -97,7 +98,7 @@ namespace EfCore.Shaman.ModelScanner
                     logger.LogException(Guid.Parse("{22CC8890-B871-45BF-890E-9341B41183F6}"), e);
                     return "??";
                 }
-            }
+            }*/
             var value = EfModelWrapper.FromModel(model);
             var result = Cache.TryAdd(type, value);
             Log(result ? "Success" : "Skipped");

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using EfCore.Shaman.ModelScanner;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
@@ -13,7 +14,7 @@ namespace EfCore.Shaman.SqlServer.DirectSql
         }
 
 
-        public static void DoUpdate(IFullTableName fullTableName, DbContext context, ColumnInfo[] sqlColumns,
+        public static Task DoUpdateAsync(IFullTableName fullTableName, DbContext context, ColumnInfo[] sqlColumns,
             ColumnInfo identityColumn, object entity, bool skipSelect = false)
         {
             var a = new UpdateBuilder
@@ -23,7 +24,7 @@ namespace EfCore.Shaman.SqlServer.DirectSql
                 Entity = entity,
                 IdentityColumn = identityColumn
             };
-            a.Update(context, skipSelect);
+            return a.UpdateAsync(context, skipSelect);
         }
 
         [NotNull]
@@ -70,11 +71,11 @@ namespace EfCore.Shaman.SqlServer.DirectSql
         }
 
 
-        private void Update(DbContext context, bool skipSelect)
+        private async Task UpdateAsync(DbContext context, bool skipSelect)
         {
             var returned = PrepareUpdateSql(skipSelect);
             var sql = SqlText.ToString();
-            ExecSqlAndUpdateBack(sql, context, Entity, returned, ParameterValues.ToArray());
+            await ExecSqlAndUpdateBackAsync(sql, context, Entity, returned, ParameterValues.ToArray());
            
         }
     }

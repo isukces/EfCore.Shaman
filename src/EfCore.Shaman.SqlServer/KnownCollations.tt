@@ -34,7 +34,7 @@ foreach(var line in data) {
     }
 }
 <#+
-string FixName(string x) {	
+    private static string FixName(string x) {	
     var result = new StringBuilder(x.Length);
     var upper = true;
     foreach(var i in x){

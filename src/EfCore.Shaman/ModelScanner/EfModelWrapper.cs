@@ -10,8 +10,9 @@ namespace EfCore.Shaman.ModelScanner
     {
         public static EfModelWrapper FromModel(IModel model)
         {
-            var rel = model?.Relational();
-            var de  = rel?.DefaultSchema?.Trim();
+            //var rel = model?.GetdeRelational();
+            //var de  = rel?.DefaultSchema?.Trim();
+            var de = model?.GetDefaultSchema();
             var et = model?.GetEntityTypes() ?? new List<IEntityType>();
             return new EfModelWrapper
             {

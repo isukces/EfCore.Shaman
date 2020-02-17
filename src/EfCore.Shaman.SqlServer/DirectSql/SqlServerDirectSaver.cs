@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using EfCore.Shaman.ModelScanner;
 using Microsoft.EntityFrameworkCore;
 
@@ -55,14 +56,14 @@ namespace EfCore.Shaman.SqlServer.DirectSql
         }
 
 
-        public void Insert(DbContext context, T entity, bool skipSelect = false)
+        public Task InsertAsync(DbContext context, T entity, bool skipSelect = false)
         {
-            InsertBuilder.DoInsert(_info, context, _sqlColumns, _identityColumn, entity, skipSelect);
+            return InsertBuilder.DoInsertAsync(_info, context, _sqlColumns, _identityColumn, entity, skipSelect);
         }
 
-        public void Update(DbContext context, T entity, bool skipSelect = false)
+        public Task UpdateAsync(DbContext context, T entity, bool skipSelect = false)
         {
-            UpdateBuilder.DoUpdate(_info, context, _sqlColumns, _identityColumn, entity, skipSelect);
+            return UpdateBuilder.DoUpdateAsync(_info, context, _sqlColumns, _identityColumn, entity, skipSelect);
         }
 
         #endregion

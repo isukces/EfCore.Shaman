@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using EfCore.Shaman.ModelScanner;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
@@ -12,7 +13,7 @@ namespace EfCore.Shaman.SqlServer.DirectSql
         {
         }
 
-        public static void DoInsert(IFullTableName tableName, DbContext context, ColumnInfo[] sqlColumns,
+        public static Task DoInsertAsync(IFullTableName tableName, DbContext context, ColumnInfo[] sqlColumns,
             ColumnInfo identityColumn, object entity, bool skipSelect = false)
         {
             var builder = new InsertBuilder
@@ -22,7 +23,7 @@ namespace EfCore.Shaman.SqlServer.DirectSql
                 SqlColumns = sqlColumns,
                 IdentityColumn = identityColumn
             };
-            builder.Insert(context, skipSelect);
+            return builder.InsertAsync(context, skipSelect);
         }
 
         private string AddPropertyValue(int idx)
@@ -35,14 +36,14 @@ namespace EfCore.Shaman.SqlServer.DirectSql
             return _parameters[idx];
         }
 
-        private void Insert(DbContext context, bool skipSelect)
+        private async Task InsertAsync(DbContext context, bool skipSelect)
         {
             _parameters = new string[SqlColumns.Count];
             // var ts = DateTime.UtcNow;
             SqlText.AppendLine("SET NOCOUNT ON;");
             PrepareInsertSql();
             var returned = PrepareSelectSql(skipSelect);
-            ExecSqlAndUpdateBack(SqlText.ToString(), context, Entity, returned, ParameterValues.ToArray());
+            await ExecSqlAndUpdateBackAsync(SqlText.ToString(), context, Entity, returned, ParameterValues.ToArray());
             //Debug.WriteLine("  sql elapsed " + (DateTime.UtcNow - ts).TotalMilliseconds);
             /*
 
